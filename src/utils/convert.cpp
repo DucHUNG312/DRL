@@ -40,5 +40,17 @@ cv::Mat tensor_to_cv(const torch::Tensor& in_tensor, size_t h, size_t w, size_t 
     return mat;
 }
 
+torch::Tensor eigen_to_tensor(Mat& in_mat)
+{
+    auto tensor = torch::from_blob(in_mat.data(), {in_mat.rows(), in_mat.cols()}).to(torch::kDouble).to(torch::kCPU);
+    return tensor.clone();
+}
+
+Mat eigen_to_tensor(const torch::Tensor& in_tensor)
+{
+    auto tensor = in_tensor.to(torch::kDouble).to(torch::kCPU);
+    Eigen::Map<Mat> mat(tensor.data_ptr<double>(), tensor.size(0), tensor.size(1));
+    return mat;
+}
 }
 }

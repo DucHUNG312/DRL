@@ -40,6 +40,60 @@
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
+namespace lab
+{
+// double vectors
+using Vec2  = Eigen::Matrix<double, 2, 1>;                          
+using Vec3  = Eigen::Matrix<double, 3, 1>;                          
+using Vec4  = Eigen::Matrix<double, 4, 1>;                          
+using Vec5  = Eigen::Matrix<double, 5, 1>;                          
+using Vec6  = Eigen::Matrix<double, 6, 1>;                          
+using Vec7  = Eigen::Matrix<double, 7, 1>;                          
+using Vec8  = Eigen::Matrix<double, 8, 1>;                          
+using Vec9  = Eigen::Matrix<double, 9, 1>;                          
+using Vec10 = Eigen::Matrix<double, 10, 1>;                         
+using Vec   = Eigen::Matrix<double, Eigen::Dynamic, 1>;             
+
+// float square matrixs
+using Mat2  = Eigen::Matrix<double, 2, 2>;                          
+using Mat3  = Eigen::Matrix<double, 3, 3>;                          
+using Mat4  = Eigen::Matrix<double, 4, 4>;                          
+using Mat5  = Eigen::Matrix<double, 5, 5>;                          
+using Mat6  = Eigen::Matrix<double, 6, 6>;                          
+using Mat7  = Eigen::Matrix<double, 7, 7>;                          
+using Mat8  = Eigen::Matrix<double, 8, 8>;                          
+using Mat9  = Eigen::Matrix<double, 9, 9>;                          
+using Mat10 = Eigen::Matrix<double, 10, 10>;                        
+using Mat   = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+
+// float vectors
+using Vec2f  = Eigen::Matrix<float, 2, 1>;                          
+using Vec3f  = Eigen::Matrix<float, 3, 1>;                          
+using Vec4f  = Eigen::Matrix<float, 4, 1>;                          
+using Vec5f  = Eigen::Matrix<float, 5, 1>;                          
+using Vec6f  = Eigen::Matrix<float, 6, 1>;                          
+using Vec7f  = Eigen::Matrix<float, 7, 1>;                          
+using Vec8f  = Eigen::Matrix<float, 8, 1>;                          
+using Vec9f  = Eigen::Matrix<float, 9, 1>;                          
+using Vec10f = Eigen::Matrix<float, 10, 1>;                         
+using Vecf   = Eigen::Matrix<float, Eigen::Dynamic, 1>;             
+
+// float square matrixs
+using Mat2f  = Eigen::Matrix<float, 2, 2>;                          
+using Mat3f  = Eigen::Matrix<float, 3, 3>;                          
+using Mat4f  = Eigen::Matrix<float, 4, 4>;                          
+using Mat5f  = Eigen::Matrix<float, 5, 5>;                          
+using Mat6f  = Eigen::Matrix<float, 6, 6>;                          
+using Mat7f  = Eigen::Matrix<float, 7, 7>;                          
+using Mat8f  = Eigen::Matrix<float, 8, 8>;                          
+using Mat9f  = Eigen::Matrix<float, 9, 9>;                          
+using Mat10f = Eigen::Matrix<float, 10, 10>;                        
+using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
+}
+
 #include "version.h"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -289,8 +343,28 @@ namespace lab
 #define LAB_CPU_GPU __host__ __device__
 #define LAB_GPU __device__
 #define LAB_CONST __device__ const
+
+namespace lab
+{
+namespace cuda
+{
+    LAB_FORCE_INLINE bool is_cuda_available()
+    {
+        return torch::cuda::is_available();
+    }
+
+    LAB_FORCE_INLINE torch::Device get_device()
+    {
+        return is_cuda_available() ? torch::kCUDA : torch::kCPU;
+    }
+}
+}
+
+#define LAB_TORCH_DEVICE ::lab::cuda::get_device()
 #else
 #define LAB_CONST const
 #define LAB_CPU_GPU
 #define LAB_GPU
+#define LAB_TORCH_DEVICE torch::kCPU
 #endif
+
