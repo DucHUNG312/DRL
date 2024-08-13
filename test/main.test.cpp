@@ -1,5 +1,4 @@
-#include <gtest/gtest.h>
-#include <lab/lab.h>
+#include "main.h"
 
 using namespace lab;
 

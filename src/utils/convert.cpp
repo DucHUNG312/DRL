@@ -4,6 +4,14 @@ namespace lab
 {
 namespace utils
 {
+bool str_to_bool(const std::string& str)
+{
+    if(str == "0") return false;
+    else if(str == "1") return true;
+    LAB_UNREACHABLE;
+    return false;
+}
+
 torch::Tensor cv_to_tensor(const cv::Mat& in_mat, size_t h, size_t w, size_t c) 
 {
     cv::Mat mat = in_mat.clone();

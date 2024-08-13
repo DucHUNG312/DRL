@@ -16,13 +16,14 @@ file(GLOB_RECURSE HEADER_FILES
 
 include_directories(
     ${LAB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_executable(${PROJECT_NAME} main.test.cpp ${SRC_FILES} ${HEADER_FILES})
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${LAB_LINKED_LIBRARIES} 
-    lab 
     GTest::gtest_main
+    lab 
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17

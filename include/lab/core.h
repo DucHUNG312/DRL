@@ -36,6 +36,7 @@
 #include <condition_variable>
 #include <shared_mutex>
 #include <optional>
+#include <regex>
 
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
@@ -296,6 +297,25 @@ using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 #ifndef LAB_MEM_LIMIT_MB
 #define LAB_MEM_LIMIT_MB 32
 #endif
+
+#define LAB_ARG(T, name)                                                  \
+ public:                                                                  \
+  inline void name(const T& new_##name) { /* NOLINT */                    \
+    this->name##_ = new_##name;                                           \
+  }                                                                       \
+  inline void name(T&& new_##name) { /* NOLINT */                         \
+    this->name##_ = std::move(new_##name);                                \
+  }                                                                       \
+  inline const T& name() const noexcept { /* NOLINT */                    \
+    return this->name##_;                                                 \
+  }                                                                       \
+  inline T& name() noexcept { /* NOLINT */                                \
+    return this->name##_;                                                 \
+  }                                                                       \
+                                                                          \
+ protected:                                                                 \
+  T name##_ /* NOLINT */
+
 
 #define LAB_NONCOPYABLE(class_name)							  \
     class_name(const class_name&)            = delete;		  \
