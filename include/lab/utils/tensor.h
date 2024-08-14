@@ -73,5 +73,10 @@ bool tensor_close(const torch::Tensor& tensor1, const torch::Tensor& tensor2);
  */
 std::string get_object_name(const c10::IValue& ivalue);
 
+torch::Tensor clamp_probs(const torch::Tensor& probs);
+
+torch::Tensor probs_to_logits(const torch::Tensor& probs, bool is_binary = false);
+
+torch::Tensor logits_to_probs(const torch::Tensor& logits, bool is_binary = false);
 }
 }

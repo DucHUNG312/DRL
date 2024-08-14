@@ -97,5 +97,24 @@ std::string get_object_name(const c10::IValue& ivalue)
     return "";
 }
 
+torch::Tensor clamp_probs(const torch::Tensor& probs)
+{
+    auto eps = (probs.dtype() == torch::kDouble) ? std::numeric_limits<double>::epsilon() : std::numeric_limits<float>::epsilon();
+    return torch::clamp(probs, eps, 1. - eps);
+} 
+
+torch::Tensor probs_to_logits(const torch::Tensor& probs, bool is_binary /*= false*/)
+{
+    torch::Tensor ps_clamped = clamp_probs(probs);
+    if(is_binary) return torch::log(ps_clamped) - torch::log1p(-ps_clamped);
+    return torch::log(ps_clamped);
+}
+
+torch::Tensor logits_to_probs(const torch::Tensor& logits, bool is_binary /*= false*/)
+{
+    if(is_binary) return torch::sigmoid(logits);
+    return torch::nn::functional::softmax(logits, {-1});
+}
+
 }
 }

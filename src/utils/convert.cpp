@@ -60,5 +60,12 @@ Mat eigen_to_tensor(const torch::Tensor& in_tensor)
     Eigen::Map<Mat> mat(tensor.data_ptr<double>(), tensor.size(0), tensor.size(1));
     return mat;
 }
+
+std::vector<int64_t> get_arayref_data(torch::IntArrayRef arr)
+{
+    std::vector<int64_t> result(arr.size());
+    std::copy(arr.begin(), arr.end(), result.begin());
+    return result;
+}
 }
 }
