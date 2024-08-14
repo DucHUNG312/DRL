@@ -1,0 +1,18 @@
+#pragma once
+
+#include "lab/core.h"
+
+namespace lab
+{
+namespace utils
+{
+
+class Distribution
+{
+public:
+    
+private:
+};
+
+}
+}

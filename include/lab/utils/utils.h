@@ -7,6 +7,7 @@
 #include "lab/utils/tensor.h"
 #include "lab/utils/env.h"
 #include "lab/utils/shape.h"
+#include "lab/utils/optimizer.h"
 
 namespace lab
 {
