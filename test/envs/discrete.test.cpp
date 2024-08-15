@@ -157,7 +157,8 @@ TEST(Spaces, Discrete7)
     lab::spaces::Discrete space1(5, 0);
     space1.set_seed(42);
     lab::spaces::Discrete space2 = space1;
-    lab::spaces::Discrete space3 = space1;
+    lab::spaces::Discrete space3;
+    space3 = space1;
 
     ASSERT_EQ( space2.name(), lab::spaces::SpaceType::DISCRETE );
     ASSERT_EQ( space2.n(), 5 );

@@ -6,9 +6,6 @@ namespace lab
 {
 namespace envs
 {
-namespace control
-{
 
-}
 }
 }

@@ -22,7 +22,9 @@ public:
     );
 
     Box(const Box& box);
+    Box& operator=(const Box& other);
     Box(Box&& box) noexcept;
+    Box& operator=(Box&& other) noexcept;
     virtual ~Box() override = default;
 
     virtual torch::Tensor sample() override;

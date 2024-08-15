@@ -50,14 +50,21 @@ double Rand::sample_real_uniform(double a, double b)
     return (uniform_value * (b - a)) + a;
 }
 
-torch::Tensor Rand::sample_real_uniform(double a, double b, const torch::IntArrayRef& shape)
+torch::Tensor Rand::sample_real_uniform(double a, double b, torch::IntArrayRef shape)
 {
     LAB_CHECK_GE(b, a);
     auto uniform_tensor = torch::rand(shape, generator, torch::TensorOptions().dtype(torch::kDouble));
     return (uniform_tensor * (b - a)) + a;
 }
 
-torch::Tensor Rand::sample_real_uniform(torch::Tensor& a, torch::Tensor& b)
+torch::Tensor Rand::sample_real_uniform(double a, double b, const torch::Tensor& in)
+{
+    LAB_CHECK_GE(b, a);
+    torch::Tensor tensor = torch::rand(in.sizes(), generator, torch::TensorOptions().dtype(torch::kDouble));
+    return (tensor * (b - a)) + a;
+}
+
+torch::Tensor Rand::sample_real_uniform(const torch::Tensor& a, const torch::Tensor& b)
 {
     LAB_CHECK_EQ(b.sizes(), a.sizes());
     auto uniform_tensor = torch::rand(a.sizes(), generator, torch::TensorOptions().dtype(torch::kDouble));
@@ -70,7 +77,7 @@ int64_t Rand::sample_int_uniform(int64_t a, int64_t b)
     return uniform_tensor.item<int64_t>();
 }
 
-torch::Tensor Rand::sample_int_uniform(int64_t a, int64_t b, const torch::IntArrayRef& shape)
+torch::Tensor Rand::sample_int_uniform(int64_t a, int64_t b, torch::IntArrayRef shape)
 {
     auto uniform_tensor = torch::randint(a, b, shape, generator, torch::TensorOptions().dtype(torch::kInt64));
     return uniform_tensor;
@@ -83,7 +90,7 @@ double Rand::sample_gaussian(double mu, double sigma)
     return normal_tensor.item<double>();
 }
 
-torch::Tensor Rand::sample_gaussian(double mu, double sigma, const torch::IntArrayRef& shape)
+torch::Tensor Rand::sample_gaussian(double mu, double sigma, torch::IntArrayRef shape)
 {
     LAB_CHECK_GT(sigma, 0);
     auto normal_tensor = torch::normal(mu, sigma, shape, generator, torch::TensorOptions().dtype(torch::kDouble));

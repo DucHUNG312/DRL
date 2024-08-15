@@ -240,7 +240,7 @@ using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 #define LAB_ENABLE_CHECK
 #ifdef LAB_ENABLE_CHECK
 #define CHECK_FAIL_RAISE(x) LAB_LOG_FATAL("Check failed: {} at {}, line {}", x, __FILE__, __LINE__), true
-#define CHECK(x) (!(!(x) && (CHECK_FAIL_RAISE(#x))))
+#define CHECK_(x) (!(!(x) && (CHECK_FAIL_RAISE(#x))))
 #define CHECK_MSG(x, msg) (!(!(x) && (LAB_LOG_ERROR(#msg), true)))
 #define CHECK_IMPL(a, b, op) (!(!(a op b) && (CHECK_FAIL_RAISE(#a #op #b))))
 #define EMPTY_CHECK \
@@ -253,7 +253,7 @@ using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 #define CHECK_LT(a, b) CHECK_IMPL(a, b, <)
 #define CHECK_LE(a, b) CHECK_IMPL(a, b, <=)
 
-#define LAB_CHECK(x) (CHECK(x))
+#define LAB_CHECK(x) (CHECK_(x))
 #define LAB_CHECK_MSG(x, msg) (CHECK_MSG(x, msg))
 #define LAB_CHECK_EQ(a, b) (CHECK_EQ(a, b))
 #define LAB_CHECK_NE(a, b) (CHECK_NE(a, b))

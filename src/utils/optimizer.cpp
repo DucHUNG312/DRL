@@ -1,4 +1,5 @@
 #include "lab/utils/optimizer.h"
+#include "lab/utils/math.h"
 
 namespace lab
 {
@@ -162,13 +163,13 @@ torch::Tensor RAdam::step(torch::optim::Optimizer::LossClosure closure /*= nullp
             else
             {
                 buffered[0].fill_(state.step());
-                auto bias_correction1 = 1 - std::pow(beta1, state.step());
-                auto bias_correction2 = 1 - std::pow(beta2, state.step());
-                auto N_sma_max = 2 / (1 - beta2) - 1;
+                double bias_correction1 = 1 - std::pow(beta1, state.step());
+                double bias_correction2 = 1 - std::pow(beta2, state.step());
+                double N_sma_max = 2 / (1 - beta2) - 1;
                 N_sma = N_sma_max - 2 * state.step() * bias_correction2 / (1 - bias_correction2);
                 buffered[1].fill_(N_sma);
                 if(N_sma >= 5)
-                    step_size = std::sqrt((1 - bias_correction2) * (N_sma - 4) / (N_sma_max - 4) * (N_sma - 2) / N_sma * N_sma_max / (N_sma_max - 2)) / bias_correction1;
+                    step_size = utils::math::safe_sqrt((1 - bias_correction2) * (N_sma - 4) / (N_sma_max - 4) * (N_sma - 2) / N_sma * N_sma_max / (N_sma_max - 2)) / bias_correction1;
                 else
                     step_size = 1 / bias_correction1;
                 buffered[2].fill_(step_size);

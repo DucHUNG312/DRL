@@ -12,7 +12,7 @@ bool str_to_bool(const std::string& str)
     return false;
 }
 
-torch::Tensor cv_to_tensor(const cv::Mat& in_mat, size_t h, size_t w, size_t c) 
+torch::Tensor cv_to_tensor(const cv::Mat& in_mat, int64_t h, int64_t w, int64_t c) 
 {
     cv::Mat mat = in_mat.clone();
     cv::resize(mat, mat, cv::Size(w, h));

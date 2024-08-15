@@ -71,7 +71,7 @@ TEST(Spaces, Box2)
     torch::Tensor not_valid_1 = torch::tensor(not_valid_1_val, torch::kDouble);
     torch::Tensor not_valid_2 = torch::tensor(not_valid_2_val, torch::kDouble);
     lab::spaces::Box space1(low, high);
-    lab::spaces::Box space2(space1);
+    lab::spaces::Box space2 = space1;
     lab::spaces::Box space3(low3, high3);
 
     ASSERT_EQ( space1.name(), lab::spaces::SpaceType::BOX );
@@ -123,7 +123,7 @@ TEST(Spaces, Box3)
     torch::Tensor not_valid_1 = torch::tensor({{{4, 9}, {13, 23}}, {{11, 2}, {-35, 38}}}, torch::kDouble);
     torch::Tensor not_valid_2 = torch::tensor({{{6, 9}, {-12, 24}}, {{-104, 7}, {20, 8}}}, torch::kDouble);
     lab::spaces::Box space1(low, high);
-    lab::spaces::Box space2(space1);
+    lab::spaces::Box space2 = space1;
     lab::spaces::Box space3(low3, high3);
 
     ASSERT_EQ( space1.name(), lab::spaces::SpaceType::BOX );
@@ -179,7 +179,8 @@ TEST(Spaces, Box4)
     torch::Tensor not_valid_1 = torch::tensor({{{4, 9}, {13, 23}}, {{11, 2}, {-35, 38}}}, torch::kDouble);
     torch::Tensor not_valid_2 = torch::tensor({{{6, 9}, {-12, 24}}, {{-104, 7}, {20, 8}}}, torch::kDouble);
     lab::spaces::Box space1(low, high);
-    lab::spaces::Box space2(space1);
+    lab::spaces::Box space2;
+    space2 = space1;
     lab::spaces::Box space3(low3, high3);
 
     space1.set_seed(42);

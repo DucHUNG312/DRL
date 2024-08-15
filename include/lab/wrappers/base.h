@@ -15,7 +15,7 @@ public:
     using EnvType = envs::Env<ObsSpace, ActSpace>;
     using ObsType = typename ObsSpace::Type;
     using ActType = typename ActSpace::Type;
-    using StepResultType = envs::StepResult<ObsType>;
+    using StepResultType = utils::StepResult<ObsType>;
 
     LAB_ARG(c10::intrusive_ptr<EnvType>, env);
 public:
@@ -29,7 +29,7 @@ public:
         return env_->reset(seed);
     }
 
-    virtual StepResultType step(ActType& action) override
+    virtual StepResultType step(const ActType& action) override
     {
         return env_->step(action);
     }
@@ -44,7 +44,7 @@ public:
         env_->close();
     }
 
-    virtual EnvType& unwrapped() override
+    virtual c10::intrusive_ptr<EnvType> unwrapped() override
     {
         return env_->unwrapped();
     }
@@ -56,7 +56,7 @@ class ObservationWrapper : public Wrapper<ObsSpace, ActSpace>
 public:
     using ObsType = typename ObsSpace::Type;
     using ActType = typename ActSpace::Type;
-    using StepResultType = envs::StepResult<ObsType>;
+    using StepResultType = utils::StepResult<ObsType>;
 
     LAB_ARG(ObsType, observation);
 public:
@@ -66,10 +66,10 @@ public:
         return observation_;
     }
 
-    virtual StepResultType step(ActType& act) override
+    virtual StepResultType step(const ActType& act) override
     {
         StepResultType result = this->env()->step(act);
-        observation_ = result.next_state();
+        observation_ = result.next_state;
         return result;
     }
 
@@ -82,14 +82,14 @@ class RewardWrapper : public Wrapper<ObsSpace, ActSpace>
 public:
     using ObsType = typename ObsSpace::Type;
     using ActType = typename ActSpace::Type;
-    using StepResultType = envs::StepResult<ObsType>;
+    using StepResultType = utils::StepResult<ObsType>;
 
     LAB_ARG(double, reward);
 public:
-    virtual StepResultType step(ActType& act) override
+    virtual StepResultType step(const ActType& act) override
     {
         StepResultType result = this->env()->step(act);
-        reward_ = result.reward();
+        reward_ = result.reward;
         return result;
     }
 
@@ -102,11 +102,11 @@ class ActionWrapper : public Wrapper<ObsSpace, ActSpace>
 public:
     using ObsType = typename ObsSpace::Type;
     using ActType = typename ActSpace::Type;
-    using StepResultType = envs::StepResult<ObsType>;
+    using StepResultType = utils::StepResult<ObsType>;
 
     LAB_ARG(ActType, action);
 public:
-    virtual StepResultType step(ActType& act) override
+    virtual StepResultType step(const ActType& act) override
     {
         action_ = act;
         return this->env()->step(action_);
@@ -114,7 +114,11 @@ public:
 
     virtual ActType action(ActType& act) = 0;
 
-    virtual ActType reverse_action(ActType& act) = 0;
+    virtual ActType reverse_action(ActType& act)
+    {
+        LAB_UNIMPLEMENTED;
+        return action(act);
+    }
 };
 
 }

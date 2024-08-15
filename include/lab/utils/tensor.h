@@ -14,6 +14,12 @@ namespace utils
 bool has_no_zeros(const torch::Tensor& tensor);
 
 /**
+ * @brief Check if the tensor contains all zero elements
+ * @param tensor tensor to check
+ */
+bool has_all_zeros(const torch::Tensor& tensor);
+
+/**
  * @brief Get bounding shape for a list of shape
  * @param array_refs list of shapes
  */

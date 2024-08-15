@@ -28,6 +28,11 @@ bool has_no_zeros(const torch::Tensor& tensor)
     return torch::all(tensor).item<bool>();
 }
 
+bool has_all_zeros(const torch::Tensor& tensor)
+{
+    return tensor.nonzero().numel() == 0;
+}
+
 torch::IntArrayRef get_bounding_shape(const std::vector<torch::IntArrayRef>& array_refs) 
 {
     return internal::get_bounding_shape<torch::IntArrayRef>(array_refs);

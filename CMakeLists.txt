@@ -111,6 +111,7 @@ find_package(OpenCV REQUIRED)
 find_package(GLUT)
 find_package(OpenGL)
 find_package(Eigen3 REQUIRED)
+find_package(LZ4 REQUIRED)
 
 set(LAB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 set(LAB_INCLUDE_DIRS
@@ -123,6 +124,7 @@ set(LAB_LINKED_LIBRARIES
     ${GLUT_LIBRARIES} 
     ${OPENGL_LIBRARIES}
     Eigen3::Eigen
+    ${LZ4_LIBRARIES}
 )
 
 if(LAB_DEVICE STREQUAL "GPU")

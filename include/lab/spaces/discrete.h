@@ -18,7 +18,9 @@ public:
     Discrete();
     Discrete(int64_t n, int64_t start = 0);
     Discrete(const Discrete& dis);
+    Discrete& operator=(const Discrete& other);
     Discrete(Discrete&& dis) noexcept;
+    Discrete& operator=(Discrete&& other) noexcept;
     virtual ~Discrete() override = default;
 
     virtual int64_t sample() override;
@@ -39,26 +41,6 @@ LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& out, const Discrete& dis
 LAB_FORCE_INLINE Discrete make_discrete_space(int64_t n, int64_t start = 0) 
 {
     return Discrete(n , start);
-}
-
-LAB_FORCE_INLINE bool operator==(Discrete& d1, Discrete& d2) 
-{
-  return (d1.n() == d2.n()) && (d1.start() == d2.start());
-}
-
-LAB_FORCE_INLINE bool operator!=(Discrete& d1, Discrete& d2) 
-{
-  return !(d1 == d2);
-}
-
-LAB_FORCE_INLINE bool operator==(Discrete& d1, const Discrete& d2) 
-{
-  return (d1.n() == d2.n()) && (d1.start() == d2.start());
-}
-
-LAB_FORCE_INLINE bool operator!=(Discrete& d1, const Discrete& d2) 
-{
-  return !(d1 == d2);
 }
 
 LAB_FORCE_INLINE bool operator==(const Discrete& d1, const Discrete& d2) 

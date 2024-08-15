@@ -55,3 +55,12 @@ set(EIGEN_BUILD_BTL OFF CACHE BOOL "Set to ON to build benchmark suite" FORCE)
 set(EIGEN_BUILD_DOC OFF CACHE BOOL "Set to ON to build Eigen documentation" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "Set to ON to enable creation of Eigen tests" FORCE)
 FetchContent_MakeAvailable(extern_eigen)
+
+#lz4
+FetchContent_Declare(
+    extern_lz4
+    GIT_REPOSITORY https://github.com/lz4/lz4.git
+    GIT_TAG v1.10.0
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lz4
+)
+FetchContent_MakeAvailable(extern_lz4)

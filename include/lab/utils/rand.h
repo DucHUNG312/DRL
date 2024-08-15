@@ -46,17 +46,19 @@ public:
 
     double sample_real_uniform(double a, double b);
 
-    torch::Tensor sample_real_uniform(double a, double b, const torch::IntArrayRef& shape);
+    torch::Tensor sample_real_uniform(double a, double b, torch::IntArrayRef shape);
 
-    torch::Tensor sample_real_uniform(torch::Tensor& a, torch::Tensor& b);
+    torch::Tensor sample_real_uniform(double a, double b, const torch::Tensor& in);
+
+    torch::Tensor sample_real_uniform(const torch::Tensor& a, const torch::Tensor& b);
 
     int64_t sample_int_uniform(int64_t a, int64_t b);
 
-    torch::Tensor sample_int_uniform(int64_t a, int64_t b, const torch::IntArrayRef& shape);
+    torch::Tensor sample_int_uniform(int64_t a, int64_t b, torch::IntArrayRef shape);
 
     double sample_gaussian(double mu, double sigma);
 
-    torch::Tensor sample_gaussian(double mu, double sigma, const torch::IntArrayRef& shape);
+    torch::Tensor sample_gaussian(double mu, double sigma, torch::IntArrayRef shape);
 
     torch::Tensor gen_int_permutation(int64_t n);
 };     

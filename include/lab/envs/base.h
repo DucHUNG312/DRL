@@ -8,38 +8,29 @@ namespace lab
 {
 namespace envs
 {
-
-template<typename T>
-class StepResult
-{
-    LAB_ARG(T, next_state);
-    LAB_ARG(double, reward) = 0;
-    LAB_ARG(bool, done) = false; 
-public:
-    StepResult() = default;
-    StepResult(T next_state, double reward, bool done)
-        : next_state_(next_state), reward_(reward), done_(done) {}
-    ~StepResult() = default;
-};
-
 template<typename ObsSpace, typename ActSpace>
-class Env
+class Env : public c10::intrusive_ptr_target
 {
 public:
     using ObsType = typename ObsSpace::Type;
     using ActType = typename ActSpace::Type;
 
     LAB_ARG(ObsSpace, observation_space);
-    LAB_ARG(ObsSpace, state);
+    LAB_ARG(ObsType, state);
     LAB_ARG(ActSpace, action_space);
-    LAB_ARG(utils::EnvSpec, spec);
+    LAB_ARG(utils::EnvOptions, env_options);
     LAB_ARG(utils::Rand, rand);
 public:
-    Env() = default;
+    Env(uint64_t seed = 0)
+    {
+        set_seed(seed);
+    }
 
-    Env(const utils::EnvSpec& spec)
-        : spec_(spec)
-    {}
+    Env(const utils::EnvOptions& env_options = {})
+        : env_options_(env_options)
+    {
+        set_seed(env_options.seed);
+    }
 
     Env(const Env& other)
     {
@@ -71,17 +62,23 @@ public:
 
     virtual ObsType reset(uint64_t seed = 0) = 0;
 
-    virtual StepResult<ObsType> step(ActType& action) = 0;
+    virtual utils::StepResult<ObsType> step(const ActType& action) = 0;
 
     virtual void render() = 0;
 
     virtual void close() = 0;
 
-    virtual Env& unwrapped() = 0;
+    virtual c10::intrusive_ptr<Env> unwrapped() = 0;
 
-    void set_seed(uint64_t seed)
+    void set_seed(uint64_t seed = 0)
     {
         rand_.set_seed(seed);
+    }
+
+    void enable_rendering(const std::string& mode = "human")
+    {
+        if(mode != "None" || mode != "human") env_options_.render_mode = "human";
+        else env_options_.render_mode = mode;
     }
 private:
     void copy_from(const Env& other)
@@ -89,7 +86,7 @@ private:
         observation_space_ = other.observation_space_;
         state_ = other.state_;
         action_space_ = other.action_space_;
-        spec_ = other.spec_;
+        env_options_ = other.env_options_;
         rand_ = other.rand_;
     }
 
@@ -98,7 +95,7 @@ private:
         observation_space_ = std::move(other.observation_space_);
         state_ = std::move(other.state_);
         action_space_ = std::move(other.action_space_);
-        spec_ = std::move(other.spec_);
+        env_options_ = std::move(other.env_options_);
         rand_ = std::move(other.rand_);
     }
 };
@@ -107,6 +104,9 @@ using FiniteEnv = Env<spaces::Discrete, spaces::Discrete>;
 using ContinuousEnv = Env<spaces::Box, spaces::Box>;
 using ContinuousStateEnv = Env<spaces::Box, spaces::Discrete>;
 using ContinuousActionEnv = Env<spaces::Discrete, spaces::Box>;
+
+using FiniteResult = utils::StepResult<int64_t>;
+using ContinuousResult = utils::StepResult<torch::Tensor>;
 
 }
 }

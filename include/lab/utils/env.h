@@ -14,91 +14,142 @@ enum class EnvType
     CONTINUOUS,
     CONTINUOUS_STATE,
     CONTINUOUS_ACT,
+    NONE,
 };
 
-struct EnvSpec
+template<typename T>
+class StepResult
+{
+    T next_state;
+    double reward = 0;
+    bool terminated = false; 
+    bool truncated = false;
+public:
+    StepResult() = default;
+    StepResult(const T& next_state, double reward, bool terminated, bool truncated)
+        : next_state(next_state), reward(reward), terminated(terminated), truncated(truncated) {}
+    StepResult(const StepResult& other)
+    {
+        next_state = other.next_state; 
+        reward = other.reward; 
+        terminated = other.terminated; 
+        truncated = other.truncated; 
+    }
+    StepResult(StepResult&& other) noexcept
+    {
+        next_state = std::move(other.next_state); 
+        reward = std::move(other.reward); 
+        terminated = std::move(other.terminated); 
+        truncated = std::move(other.truncated); 
+
+    }
+    StepResult& operator=(const StepResult& other) 
+    {
+        if (this != &other) 
+        {
+            next_state = other.next_state;
+            reward = other.reward;
+            terminated = other.terminated;
+            truncated = other.truncated;
+        }
+        return *this;
+    }
+    StepResult& operator=(StepResult&& other) noexcept 
+    {
+        if (this != &other) 
+        {
+            next_state = std::move(other.next_state);
+            reward = std::move(other.reward);
+            terminated = std::move(other.terminated);
+            truncated = std::move(other.truncated);
+        }
+        return *this;
+    }
+    virtual ~StepResult() = default;
+
+
+    bool operator==(const StepResult& other) const 
+    {
+        return next_state == other.next_state &&
+               reward == other.reward &&
+               terminated == other.terminated &&
+               truncated == other.truncated;
+    }
+
+    bool operator==(StepResult& other) 
+    {
+        return next_state == other.next_state &&
+               reward == other.reward &&
+               terminated == other.terminated &&
+               truncated == other.truncated;
+    }
+
+    bool operator!=(const StepResult& other) const 
+    {
+        return !(*this == other);
+    }
+
+    bool operator!=(StepResult& other) 
+    {
+        return !(*this == other);
+    }
+};
+struct EnvOptions
 {
     std::string id;
     double reward_threshold = 0;
     bool nondeterministic = true;
+    uint64_t seed = 0;
     int64_t max_episode_steps = -1;
-    bool autoreset = false;
-    EnvType type;
+    bool auto_reset = false;
+    EnvType type = EnvType::NONE;
     std::pair<double, double> reward_range = { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() };
-    bool render_mode = false;
-
-    EnvSpec() = default;
-    EnvSpec(
+    std::string render_mode = "None";
+    uint64_t screen_width = 0;
+    uint64_t screen_height = 0;
+    bool is_open = false;
+public:
+    EnvOptions() = default;
+    EnvOptions(
         const std::string& id, 
         double reward_threshold, 
         bool nondeterministic, 
+        uint64_t seed,
         int64_t max_episode_steps, 
-        bool autoreset,
+        bool auto_reset,
         EnvType type,
         const std::pair<double, double>& reward_range,
-        bool render_mode);
-
-    EnvSpec(const EnvSpec& other);
-
-    EnvSpec(EnvSpec&& other) noexcept;
-
-    EnvSpec& operator=(const EnvSpec& other) 
-    {
-        if (this != &other) 
-            copy_from(other);
-        return *this;
-    }
-
-    EnvSpec& operator=(EnvSpec&& other) noexcept 
-    {
-        if (this != &other) 
-            move_from(std::move(other));
-        return *this;
-    }
+        const std::string& render_mode,
+        uint64_t screen_width,
+        uint64_t screen_height,
+        bool is_open);
+    EnvOptions(const EnvOptions& other);
+    EnvOptions(EnvOptions&& other) noexcept;
+    EnvOptions& operator=(const EnvOptions& other);
+    EnvOptions& operator=(EnvOptions&& other) noexcept;
+    virtual ~EnvOptions() = default;
 private:
-    void copy_from(const EnvSpec& other)
-    {
-        id = other.id;
-        reward_threshold = other.reward_threshold;
-        nondeterministic = other.nondeterministic;
-        max_episode_steps = other.max_episode_steps;
-        autoreset = other.autoreset;
-        type = other.type;
-        reward_range = other.reward_range;
-        render_mode = other.render_mode;
-    }
-
-    void move_from(EnvSpec&& other) noexcept
-    {
-        id = std::move(other.id);
-        reward_threshold = std::move(other.reward_threshold);
-        nondeterministic = std::move(other.nondeterministic);
-        max_episode_steps = std::move(other.max_episode_steps);
-        autoreset = std::move(other.autoreset);
-        type = std::move(other.type);
-        reward_range = std::move(other.reward_range);
-        render_mode = std::move(other.render_mode);
-    }
+    void copy_from(const EnvOptions& other);
+    void move_from(EnvOptions&& other) noexcept;
 };
 
 static std::unordered_set<std::string> env_ids = 
 {
-   "CartPole-v0",
+   "CartPole",
 };
 
-static std::unordered_map<std::string, EnvSpec> env_specs = 
+static std::unordered_map<std::string, EnvOptions> default_env_options = 
 {
-/*       ID                       id       |  reward threshold  |  nondeterministic  |  max episode  |  autoreset  |             type              |  reward_range  |  render   */
-{   "CartPole-v0",   EnvSpec("CartPole-v0",         180,                 true,              100,          false,       EnvType::CONTINUOUS_STATE,       {0,200},         false     )}
+{   
+    "CartPole",   EnvOptions("CartPole", 180, true, 0, 100, false, EnvType::CONTINUOUS_STATE, {0,200}, "None", 600, 400, false)
+}
 };
 
 bool check_env_id_exits(const std::string& id);
 
-bool check_env_spec(const EnvSpec& spec);
+bool check_env_option(const EnvOptions& option);
 
-void register_env(const EnvSpec& spec);
-
-EnvSpec get_env_spec(const std::string& id);
+EnvOptions get_default_env_option(const std::string& id);
 
 }
 }
