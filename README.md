@@ -22,3 +22,10 @@ Check your GPU's compute capability version [here](https://developer.nvidia.com/
 ```
 cmake .. -DCMAKE_CUDA_ARCHITECTURE=${GPU_COMPUTE_CAPABILITY}
 ```
+
+## TODO
+
+- Support rendering
+- Support more environments
+- Create a framework for training
+- Add algorithms
