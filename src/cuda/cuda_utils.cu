@@ -1,4 +1,4 @@
-#include "lab/utils/cuda/job.h"
+#include "lab/cuda/cuda_utils.h"
 
 namespace lab
 {
