@@ -12,6 +12,7 @@ bool str_to_bool(const std::string& str)
     return false;
 }
 
+#if 0
 torch::Tensor cv_to_tensor(const cv::Mat& in_mat, int64_t h, int64_t w, int64_t c) 
 {
     cv::Mat mat = in_mat.clone();
@@ -60,6 +61,7 @@ Mat eigen_to_tensor(const torch::Tensor& in_tensor)
     Eigen::Map<Mat> mat(tensor.data_ptr<double>(), tensor.size(0), tensor.size(1));
     return mat;
 }
+#endif
 
 std::vector<int64_t> get_arayref_data(torch::IntArrayRef arr)
 {

@@ -70,7 +70,7 @@ LAB_CPU_GPU inline double deg(double rad)
 
 LAB_CPU_GPU inline double safe_sqrt(double x) 
 {
-    LAB_CHECK_GE(x, -1e-3);
+    assert(x >= -1e-3);
     return std::sqrt(std::max(0., x));
 }
 

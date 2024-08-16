@@ -39,6 +39,8 @@
 #include <regex>
 
 #include <torch/torch.h>
+
+#if 0
 #include <opencv2/opencv.hpp>
 
 #include <Eigen/Core>
@@ -94,8 +96,9 @@ using Mat9f  = Eigen::Matrix<float, 9, 9>;
 using Mat10f = Eigen::Matrix<float, 10, 10>;                        
 using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 }
+#endif
 
-#include "version.h"
+#include "lab/version.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #define LAB_PLATFORM_WINDOWS
@@ -351,7 +354,7 @@ namespace lab
 #define LAB_ARRAYSIZE(array) (sizeof(::lab::internal::array_size_helper(array)))
 
 // GPU Macro Definitions
-#if defined(LAB_GPU_BUILD)
+#ifdef LAB_GPU_BUILD
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <cuda_runtime.h>
@@ -360,31 +363,13 @@ namespace lab
 #ifndef LAB_NOINLINE
 #define LAB_NOINLINE __attribute__((noinline))
 #endif
+#define LAB_GLOBAL __global__
 #define LAB_CPU_GPU __host__ __device__
 #define LAB_GPU __device__
 #define LAB_CONST __device__ const
-
-namespace lab
-{
-namespace cuda
-{
-    LAB_FORCE_INLINE bool is_cuda_available()
-    {
-        return torch::cuda::is_available();
-    }
-
-    LAB_FORCE_INLINE torch::Device get_device()
-    {
-        return is_cuda_available() ? torch::kCUDA : torch::kCPU;
-    }
-}
-}
-
-#define LAB_TORCH_DEVICE ::lab::cuda::get_device()
 #else
-#define LAB_CONST const
+#define LAB_GLOBAL 
 #define LAB_CPU_GPU
 #define LAB_GPU
-#define LAB_TORCH_DEVICE torch::kCPU
+#define LAB_CONST const
 #endif
-

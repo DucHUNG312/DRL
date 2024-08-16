@@ -1,7 +1,15 @@
 #include "lab/logger.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 namespace lab
 {

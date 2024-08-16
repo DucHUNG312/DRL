@@ -34,15 +34,15 @@ set(gtest_build_tests OFF CACHE BOOL "Set to ON to build tests" FORCE)
 
 FetchContent_MakeAvailable(extern_googletest)
 
-# opencv
-FetchContent_Declare(
-    extern_opencv
-    GIT_REPOSITORY https://github.com/opencv/opencv
-    GIT_TAG 4.6.0
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/opencv
-)
+# # opencv
+# FetchContent_Declare(
+#     extern_opencv
+#     GIT_REPOSITORY https://github.com/opencv/opencv
+#     GIT_TAG 4.6.0
+#     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/opencv
+# )
 
-FetchContent_MakeAvailable(extern_opencv)
+# FetchContent_MakeAvailable(extern_opencv)
 
 # eigen
 FetchContent_Declare(

@@ -8,4 +8,8 @@
 #include "lab/render/render.h"
 #include "lab/agents/agents.h"
 
+#ifdef LAB_GPU_BUILD
+#include "lab/utils/cuda/cuda.h"
+#endif
+
 

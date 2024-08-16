@@ -38,26 +38,28 @@ if(LAB_DEVICE STREQUAL "GPU")
     if (NOT CUDA_FOUND)
         message(WARNING "GPU build is set but CUDA toolkit not found. Use CPU instead.")
         set(LAB_DEVICE "CPU")
-    elseif(NOT DEFINED CMAKE_CUDA_ARCHITECTURE)
-        message(WARNING "CMAKE_CUDA_ARCHITECTURE is not set. Use CPU instead.")
-        set(LAB_DEVICE "CPU")
     else()
+        if(NOT DEFINED CMAKE_CUDA_ARCHITECTURE)
+            set(CMAKE_CUDA_ARCHITECTURE "52")
+            message(WARNING "CMAKE_CUDA_ARCHITECTURE is not set. Use default architecture.")
+        endif()
         message(STATUS "CMAKE_CUDA_ARCHITECTURE: ${CMAKE_CUDA_ARCHITECTURE}")
         # Add CUDA flags
-        set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr --expt-extended-lambda -allow-unsupported-compiler -fopenmp -gencode arch=compute_${CMAKE_CUDA_ARCHITECTURE},code=sm_${CMAKE_CUDA_ARCHITECTURE}")
+        set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -fpermissive --expt-relaxed-constexpr --expt-extended-lambda -allow-unsupported-compiler -gencode arch=compute_${CMAKE_CUDA_ARCHITECTURE},code=sm_${CMAKE_CUDA_ARCHITECTURE}")
+        add_definitions(-DLAB_GPU_BUILD)
     endif()
 endif()
 
 find_package(OpenMP REQUIRED)
 # Set OpenMP flags for a few compilers
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang") # using Clang
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstrict-aliasing -march=native -mtune=native")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -fstrict-aliasing -march=native -mtune=native")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Rpass-analysis=loop-vectorize")
    set(CMAKE_NOVEC_FLAGS "${CMAKE_NOVEC_FLAGS} -fnovectorize")
    set(CMAKE_VEC_FLAGS "${CMAKE_VEC_FLAGS} -fvectorize")
    set(CMAKE_OPENMP_FLAGS "${CMAKE_OPENMP_FLAGS} -fopenmp")
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU") # using GCC
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstrict-aliasing -march=native -mtune=native")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -fstrict-aliasing -march=native -mtune=native")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopt-info-vec-optimized -fopt-info-omp-optimized")
    set(CMAKE_NOVEC_FLAGS "${CMAKE_NOVEC_FLAGS} -fno-tree-vectorize")
    set(CMAKE_VEC_FLAGS "${CMAKE_VEC_FLAGS} -ftree-vectorize")
@@ -107,7 +109,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 add_subdirectory("extern")
 
 find_package(spdlog REQUIRED)
-find_package(OpenCV REQUIRED)
+#find_package(OpenCV REQUIRED)
 find_package(GLUT)
 find_package(OpenGL)
 find_package(Eigen3 REQUIRED)
@@ -120,18 +122,15 @@ set(LAB_INCLUDE_DIRS
 set(LAB_LINKED_LIBRARIES
     spdlog::spdlog_header_only
     ${TORCH_LIBRARIES}
-    ${OpenCV_LIBS}
+    #${OpenCV_LIBS}
     ${GLUT_LIBRARIES} 
     ${OPENGL_LIBRARIES}
     Eigen3::Eigen
     ${LZ4_LIBRARIES}
 )
-
 if(LAB_DEVICE STREQUAL "GPU")
-    if(CUDA_FOUND)
-        list(APPEND LAB_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
-        list(APPEND LAB_LINKED_LIBRARIES ${CUDA_LIBRARIES})
-    endif()
+    list(APPEND LAB_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
+    list(APPEND LAB_LINKED_LIBRARIES ${CUDA_LIBRARIES})
 endif()
 
 add_subdirectory("src")
