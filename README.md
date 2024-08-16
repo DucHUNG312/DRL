@@ -1,3 +1,9 @@
+## This project has been tested on
+
+- Ubuntu 22.04
+- CUDA 12.5
+- GCC 12.3.0
+
 ## Build
 
 The project will build with GPU support by default. You can set `LAB_GPU` to `OFF` to run it on the CPU only.

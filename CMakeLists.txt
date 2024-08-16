@@ -30,10 +30,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     add_definitions(-DLAB_RELEASE)
 endif()
 
-find_package(CUDA REQUIRED)
-set(CUDA_SEPARABLE_COMPILATION ON)
-set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-
+find_package(CUDA)
 if(LAB_DEVICE STREQUAL "GPU")
     if (NOT CUDA_FOUND)
         message(WARNING "GPU build is set but CUDA toolkit not found. Use CPU instead.")
