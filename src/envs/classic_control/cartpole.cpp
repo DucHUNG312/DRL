@@ -22,7 +22,7 @@ void CartPole::init()
     torch::Tensor high = torch::tensor({x_threshold * 2, utils::math::Max, theta_threshold_radians * 2, utils::math::Max}, torch::kDouble);
     action_space(spaces::Discrete(2));
     observation_space(spaces::Box(-high, high));
-    state(torch::tensor({0, 0, 0, 0}, torch::kDouble));
+    result().state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
     env_options().is_open = true;
 }
 
@@ -38,23 +38,20 @@ CartPole::CartPole(const utils::EnvOptions& env_options)
     init();
 }
 
-torch::Tensor CartPole::reset(uint64_t seed /*= 0*/)
+void CartPole::reset(uint64_t seed /*= 0*/)
 {
-    state(rand().sample_real_uniform(reset_low, reset_high, state()));
+    result().state = rand().sample_real_uniform(reset_low, reset_high, result().state);
     steps_beyond_terminated = -1;
-    if(env_options().render_mode == "human") 
-        render();
-    return state();
 }
 
-ContinuousResult CartPole::step(const int64_t& action)
+void CartPole::step(const int64_t& action)
 {
     LAB_CHECK(action_space().contains(action));
 
-    double x = state()[0].item<double>(); 
-    double x_dot = state()[1].item<double>();
-    double theta = state()[2].item<double>();
-    double theta_dot = state()[3].item<double>();
+    double x = result().state[0].item<double>(); 
+    double x_dot = result().state[1].item<double>();
+    double theta = result().state[2].item<double>();
+    double theta_dot = result().state[3].item<double>();
     double force = (action == 1) ? force_mag : -force_mag;
     double costheta = std::cos(theta);
     double sintheta = std::sin(theta);
@@ -64,23 +61,23 @@ ContinuousResult CartPole::step(const int64_t& action)
 
     if(kinematics_integrator == "euler")
     {
-        state()[0] = x = x + tau * x_dot;
-        state()[1] = x_dot = x_dot + tau * xacc;
-        state()[2] = theta = theta + tau * theta_dot;
-        state()[3] = theta_dot = theta_dot + tau * thetaacc;
+        result().state[0] = x = x + tau * x_dot;
+        result().state[1] = x_dot = x_dot + tau * xacc;
+        result().state[2] = theta = theta + tau * theta_dot;
+        result().state[3] = theta_dot = theta_dot + tau * thetaacc;
     }
     else
     {
-        state()[1] = x_dot = x_dot + tau * xacc;
-        state()[0] = x = x + tau * x_dot;
-        state()[3] = theta_dot = theta_dot + tau * thetaacc;
-        state()[2] = theta = theta + tau * theta_dot;
+        result().state[1] = x_dot = x_dot + tau * xacc;
+        result().state[0] = x = x + tau * x_dot;
+        result().state[3] = theta_dot = theta_dot + tau * thetaacc;
+        result().state[2] = theta = theta + tau * theta_dot;
     }
 
-    bool done = (x < -x_threshold) || (x > x_threshold) || (theta < -theta_threshold_radians) || (theta > theta_threshold_radians);
+    bool terminated = (x < -x_threshold) || (x > x_threshold) || (theta < -theta_threshold_radians) || (theta > theta_threshold_radians);
 
     double reward;
-    if(!done)
+    if(!terminated)
     {
         reward = 1;
     }
@@ -97,22 +94,24 @@ ContinuousResult CartPole::step(const int64_t& action)
         reward = 0;
     }
 
-    if(env_options().render_mode == "human") 
-        render();
-
-    return ContinuousResult(state(), reward, done, false);
+    result().reward = reward;
+    result().terminated = terminated;
+    result().truncated = false;
 }
 
 void CartPole::render()
 {
-    LAB_UNIMPLEMENTED;
+    /* Set up */
+
+    /* Render */
+    render::Renderer::render();
 }
 
 void CartPole::close()
 {
-    if(env_options().render_mode == "human") 
-        LAB_UNIMPLEMENTED;
     env_options().is_open = false;
+    if (env_options_.renderer_enabled)
+        render::Renderer::shutdown();
 }
 
 c10::intrusive_ptr<ContinuousStateEnv> CartPole::unwrapped()

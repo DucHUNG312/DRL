@@ -1,17 +1,11 @@
-#include "lab/logger.h"
+#include "lab/utils/logger.h"
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 namespace lab
+{
+namespace utils
 {
 std::shared_ptr<spdlog::logger> Logger::core_logger;
 std::vector<spdlog::sink_ptr> sinks;
@@ -46,5 +40,6 @@ void Logger::add_sink(spdlog::sink_ptr& sink)
 {
 	core_logger->sinks().push_back(sink);
 	core_logger->set_pattern("%v%$");
+}
 }
 }

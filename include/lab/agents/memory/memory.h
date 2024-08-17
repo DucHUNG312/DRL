@@ -6,11 +6,7 @@ namespace lab
 {
 namespace agents
 {
-namespace memory
-{
 
 
-    
-}
 }
 }

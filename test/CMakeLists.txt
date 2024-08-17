@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.25)
 
 project(test VERSION 1.0.0 LANGUAGES CXX)
 

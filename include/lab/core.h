@@ -40,78 +40,8 @@
 
 #include <torch/torch.h>
 
-#if 0
-#include <opencv2/opencv.hpp>
-
-#include <Eigen/Core>
-#include <Eigen/Dense>
-
-namespace lab
-{
-// double vectors
-using Vec2  = Eigen::Matrix<double, 2, 1>;                          
-using Vec3  = Eigen::Matrix<double, 3, 1>;                          
-using Vec4  = Eigen::Matrix<double, 4, 1>;                          
-using Vec5  = Eigen::Matrix<double, 5, 1>;                          
-using Vec6  = Eigen::Matrix<double, 6, 1>;                          
-using Vec7  = Eigen::Matrix<double, 7, 1>;                          
-using Vec8  = Eigen::Matrix<double, 8, 1>;                          
-using Vec9  = Eigen::Matrix<double, 9, 1>;                          
-using Vec10 = Eigen::Matrix<double, 10, 1>;                         
-using Vec   = Eigen::Matrix<double, Eigen::Dynamic, 1>;             
-
-// float square matrixs
-using Mat2  = Eigen::Matrix<double, 2, 2>;                          
-using Mat3  = Eigen::Matrix<double, 3, 3>;                          
-using Mat4  = Eigen::Matrix<double, 4, 4>;                          
-using Mat5  = Eigen::Matrix<double, 5, 5>;                          
-using Mat6  = Eigen::Matrix<double, 6, 6>;                          
-using Mat7  = Eigen::Matrix<double, 7, 7>;                          
-using Mat8  = Eigen::Matrix<double, 8, 8>;                          
-using Mat9  = Eigen::Matrix<double, 9, 9>;                          
-using Mat10 = Eigen::Matrix<double, 10, 10>;                        
-using Mat   = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
-
-// float vectors
-using Vec2f  = Eigen::Matrix<float, 2, 1>;                          
-using Vec3f  = Eigen::Matrix<float, 3, 1>;                          
-using Vec4f  = Eigen::Matrix<float, 4, 1>;                          
-using Vec5f  = Eigen::Matrix<float, 5, 1>;                          
-using Vec6f  = Eigen::Matrix<float, 6, 1>;                          
-using Vec7f  = Eigen::Matrix<float, 7, 1>;                          
-using Vec8f  = Eigen::Matrix<float, 8, 1>;                          
-using Vec9f  = Eigen::Matrix<float, 9, 1>;                          
-using Vec10f = Eigen::Matrix<float, 10, 1>;                         
-using Vecf   = Eigen::Matrix<float, Eigen::Dynamic, 1>;             
-
-// float square matrixs
-using Mat2f  = Eigen::Matrix<float, 2, 2>;                          
-using Mat3f  = Eigen::Matrix<float, 3, 3>;                          
-using Mat4f  = Eigen::Matrix<float, 4, 4>;                          
-using Mat5f  = Eigen::Matrix<float, 5, 5>;                          
-using Mat6f  = Eigen::Matrix<float, 6, 6>;                          
-using Mat7f  = Eigen::Matrix<float, 7, 7>;                          
-using Mat8f  = Eigen::Matrix<float, 8, 8>;                          
-using Mat9f  = Eigen::Matrix<float, 9, 9>;                          
-using Mat10f = Eigen::Matrix<float, 10, 10>;                        
-using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
-}
-#endif
-
 #include "lab/version.h"
-
-#if defined(_WIN32) || defined(_WIN64)
-    #define LAB_PLATFORM_WINDOWS
-#elif defined(__APPLE__) || defined(__MACH__)
-    #define LAB_PLATFORM_MACOS
-#elif defined(__linux__)
-    #define LAB_PLATFORM_LINUX
-#else
-    #define LAB_PLATFORM_UNKNOWN
-#endif
-#ifdef LAB_PLATFORM_UNKNOWN
-    #error "Unknown platform. Compilation halted."
-#endif
+#include "lab/utils/platform_detect.h"
 
 #ifdef LAB_DEBUG
 #ifdef LAB_PLATFORM_WINDOWS
@@ -130,33 +60,26 @@ using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 #define LAB_ENABLE_LOG
 #endif // LAB_DEBUG
 #ifdef LAB_ENABLE_LOG
-#include "lab/logger.h"
-#define LAB_INIT_LOG() ::lab::Logger::init()
-#define LAB_SHUTDOWN_LOG() ::lab::Logger::shutdown()
+#include "lab/utils/logger.h"
+#define LAB_INIT_LOG() ::lab::utils::Logger::init()
+#define LAB_SHUTDOWN_LOG() ::lab::utils::Logger::shutdown()
 
-#define LAB_LOG_TRACE_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::trace, __VA_ARGS__)
-#define LAB_LOG_DEBUG_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::debug, __VA_ARGS__)
-#define LAB_LOG_INFO_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::info, __VA_ARGS__)
-#define LAB_LOG_WARN_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::warn, __VA_ARGS__)
-#define LAB_LOG_ERROR_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::err, __VA_ARGS__)
-#define LAB_LOG_FATAL_(...) SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::critical, __VA_ARGS__), LAB_BREAK()
+#define LAB_LOG_TRACE_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::trace, __VA_ARGS__)
+#define LAB_LOG_DEBUG_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::debug, __VA_ARGS__)
+#define LAB_LOG_INFO_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::info, __VA_ARGS__)
+#define LAB_LOG_WARN_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::warn, __VA_ARGS__)
+#define LAB_LOG_ERROR_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::err, __VA_ARGS__)
+#define LAB_LOG_FATAL_(...) SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::critical, __VA_ARGS__), LAB_BREAK()
 
-#define LAB_LOG_TRACE(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::trace, __VA_ARGS__), LAB_LOG_TRACE_('\n'))
-#define LAB_LOG_DEBUG(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::debug, __VA_ARGS__), LAB_LOG_DEBUG_('\n'))
-#define LAB_LOG_INFO(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::info, __VA_ARGS__), LAB_LOG_INFO_('\n'))
-#define LAB_LOG_WARN(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::warn, __VA_ARGS__), LAB_LOG_WARN_('\n'))
-#define LAB_LOG_ERROR(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::err, __VA_ARGS__), LAB_LOG_ERROR_('\n'))
-#define LAB_LOG_FATAL(...) (SPDLOG_LOGGER_CALL(::lab::Logger::get_core_logger(), spdlog::level::level_enum::critical, __VA_ARGS__), LAB_LOG_FATAL_('\n'))
+#define LAB_LOG_TRACE(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::trace, __VA_ARGS__), LAB_LOG_TRACE_('\n'))
+#define LAB_LOG_DEBUG(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::debug, __VA_ARGS__), LAB_LOG_DEBUG_('\n'))
+#define LAB_LOG_INFO(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::info, __VA_ARGS__), LAB_LOG_INFO_('\n'))
+#define LAB_LOG_WARN(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::warn, __VA_ARGS__), LAB_LOG_WARN_('\n'))
+#define LAB_LOG_ERROR(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::err, __VA_ARGS__), LAB_LOG_ERROR_('\n'))
+#define LAB_LOG_FATAL(...) (SPDLOG_LOGGER_CALL(::lab::utils::Logger::get_core_logger(), spdlog::level::level_enum::critical, __VA_ARGS__), LAB_LOG_FATAL_('\n'))
 #else
 #define LAB_INIT_LOG() ((void)0)
 #define LAB_SHUTDOWN_LOG() ((void)0)
-
-#define LAB_LOG_TRACE(...) ((void)0)
-#define LAB_LOG_DEBUG(...) ((void)0)
-#define LAB_LOG_INFO(...) ((void)0)
-#define LAB_LOG_WARN(...) ((void)0)
-#define LAB_LOG_ERROR(...) ((void)0)
-#define LAB_LOG_FATAL(...) ((void)0)
 
 #define LAB_LOG_TRACE(...) ((void)0)
 #define LAB_LOG_DEBUG(...) ((void)0)
@@ -323,20 +246,11 @@ using Matf   = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 #define LAB_NONCOPYABLE(class_name)							  \
     class_name(const class_name&)            = delete;		  \
     class_name& operator=(const class_name&) = delete;
-#define LAB_NONCOPYABLEANDMOVE(class_name)					  \
+#define LAB_NONCOPYMOVEABLE(class_name)					  \
     class_name(const class_name&)            = delete;		  \
     class_name& operator=(const class_name&) = delete;		  \
     class_name(class_name&&)                 = delete;		  \
     class_name& operator=(class_name&&)      = delete;
-
-#define LAB_CANCOPYABLE(class_name)							  \
-    class_name(const class_name&)            = default;		  \
-    class_name& operator=(const class_name&) = default;
-#define LAB_CANCOPYABLEANDMOVE(class_name)					  \
-    class_name(const class_name&)            = default;		  \
-    class_name& operator=(const class_name&) = default;		  \
-    class_name(class_name&&)                 = default;		  \
-    class_name& operator=(class_name&&)      = default;
 
 // Suppresses 'unused variable' warnings.
 namespace lab

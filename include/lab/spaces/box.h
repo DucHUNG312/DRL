@@ -21,11 +21,11 @@ public:
         const torch::Tensor& high
     );
 
-    Box(const Box& box);
-    Box& operator=(const Box& other);
-    Box(Box&& box) noexcept;
-    Box& operator=(Box&& other) noexcept;
-    virtual ~Box() override = default;
+    Box(const Box& box) = default;
+    Box& operator=(const Box& other) = default;
+    Box(Box&& box) noexcept = default;
+    Box& operator=(Box&& other) noexcept = default;
+    virtual ~Box() = default;
 
     virtual torch::Tensor sample() override;
 

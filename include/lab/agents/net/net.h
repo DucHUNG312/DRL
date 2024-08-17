@@ -6,11 +6,6 @@ namespace lab
 {
 namespace agents
 {
-namespace net
-{
 
-
-    
-}
 }
 }

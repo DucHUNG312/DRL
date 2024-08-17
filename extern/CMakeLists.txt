@@ -34,28 +34,6 @@ set(gtest_build_tests OFF CACHE BOOL "Set to ON to build tests" FORCE)
 
 FetchContent_MakeAvailable(extern_googletest)
 
-# # opencv
-# FetchContent_Declare(
-#     extern_opencv
-#     GIT_REPOSITORY https://github.com/opencv/opencv
-#     GIT_TAG 4.6.0
-#     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/opencv
-# )
-
-# FetchContent_MakeAvailable(extern_opencv)
-
-# eigen
-FetchContent_Declare(
-    extern_eigen
-    GIT_REPOSITORY https://github.com/DucHUNG312/eigen
-    GIT_TAG 3.4.0
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen
-)
-set(EIGEN_BUILD_BTL OFF CACHE BOOL "Set to ON to build benchmark suite" FORCE)
-set(EIGEN_BUILD_DOC OFF CACHE BOOL "Set to ON to build Eigen documentation" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "Set to ON to enable creation of Eigen tests" FORCE)
-FetchContent_MakeAvailable(extern_eigen)
-
 #lz4
 FetchContent_Declare(
     extern_lz4
@@ -64,3 +42,21 @@ FetchContent_Declare(
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lz4
 )
 FetchContent_MakeAvailable(extern_lz4)
+
+#json
+FetchContent_Declare(
+    extern_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.3
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json
+)
+FetchContent_MakeAvailable(extern_json)
+
+#DataFrame
+FetchContent_Declare(
+    extern_dataframe
+    GIT_REPOSITORY https://github.com/hosseinmoein/DataFrame.git
+    GIT_TAG 2.1.0
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dataframe
+)
+FetchContent_MakeAvailable(extern_dataframe)

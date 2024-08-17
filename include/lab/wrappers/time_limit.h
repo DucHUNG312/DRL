@@ -31,21 +31,19 @@ public:
         elapsed_steps_ = 0;
     }
 
-    virtual ObsType reset(uint64_t seed = 0) override
+    virtual void reset(uint64_t seed = 0) override
     {
         elapsed_steps_ = 0;
-        return this->env()->reset(seed);
+        this->env()->reset(seed);
     }
 
-    virtual StepResultType step(const ActType& action) override
+    virtual void step(const ActType& action) override
     {
-        StepResultType result = this->env()->step(action);
+        this->env()->step(action);
         elapsed_steps_ += 1;
 
         if(elapsed_steps_ >= max_episode_steps_)
-            result.truncated = true;
-
-        return result;
+            this->env()->result().truncated = true;
     }
 };
 

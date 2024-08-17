@@ -14,15 +14,10 @@ public:
     CartPole();
     CartPole(const utils::EnvOptions& env_options);
     virtual ~CartPole() = default;
-
-    virtual torch::Tensor reset(uint64_t seed = 0) override;
-
-    virtual ContinuousResult step(const int64_t& action) override;
-
-    virtual void render() override;
-
+    virtual void reset(uint64_t seed = 0) override;
+    virtual void step(const int64_t& action) override;
     virtual void close() override;
-
+    virtual void render() override;
     virtual c10::intrusive_ptr<ContinuousStateEnv> unwrapped() override;
 public:
     double gravity = 9.8;

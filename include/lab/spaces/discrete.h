@@ -17,11 +17,11 @@ public:
 
     Discrete();
     Discrete(int64_t n, int64_t start = 0);
-    Discrete(const Discrete& dis);
-    Discrete& operator=(const Discrete& other);
-    Discrete(Discrete&& dis) noexcept;
-    Discrete& operator=(Discrete&& other) noexcept;
-    virtual ~Discrete() override = default;
+    Discrete(const Discrete& dis) = default;
+    Discrete& operator=(const Discrete& other) = default;
+    Discrete(Discrete&& dis) noexcept = default;
+    Discrete& operator=(Discrete&& other) noexcept = default;
+    virtual ~Discrete() = default;
 
     virtual int64_t sample() override;
 

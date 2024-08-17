@@ -17,27 +17,31 @@ LAB_FORCE_INLINE torch::Device get_torch_device()
     return is_torch_cuda_available() ? torch::kCUDA : torch::kCPU;
 }
 
-LAB_FORCE_INLINE cudaError_t check_cuda(cudaError_t result) noexcept
+LAB_FORCE_INLINE void check_cuda(cudaError_t result, char const* const func, const char* const file, int const line)
 {
-    if (result != cudaSuccess) 
-        LAB_LOG_FATAL("CUDA Runtime API Error: {} at {}({})", cudaGetErrorString(result), __FILE__, __LINE__);
-    return result;
+    if (result != cudaSuccess)
+    {
+        LAB_LOG_FATAL("CUDA Runtime API Error({}) {}, at {}: {}({})", result, cudaGetErrorString(result), func, file, line);
+        cudaDeviceReset();
+        exit(99);
+    }
 }
 
-LAB_FORCE_INLINE CUresult check_cuda_driver(CUresult result) noexcept
+LAB_FORCE_INLINE void check_cuda_driver(CUresult result, char const* const func, const char* const file, int const line)
 {
     if (result != CUDA_SUCCESS) 
     {
         const char *errorName, *errorStr;
         cuGetErrorName(result, &errorName);
         cuGetErrorString(result, &errorStr);
-        LAB_LOG_FATAL("CUDA Driver API Error: {}-{} at {}({})", errorName, errorStr, __FILE__, __LINE__);
+        LAB_LOG_FATAL("CUDA Driver API Error({}) {}-{} at {}: {}({})", result, errorName, errorStr, func, file, line);
+        cudaDeviceReset();
+        exit(99);
     }
-    return result;
 }
 
-#define LAB_CHECK_CUDA(x) ::lab::cuda::check_cuda(x)
-#define LAB_CHECK_CUDA_DRIVER(x) ::lab::cuda::check_cuda_driver(x)
+#define LAB_CHECK_CUDA(val) ::lab::cuda::check_cuda( (val), #val, __FILE__, __LINE__ )
+#define LAB_CHECK_CUDA_DRIVER(val) ::lab::cuda::check_cuda_driver( (val), #val, __FILE__, __LINE__ )
 
 LAB_FORCE_INLINE void* alloc_gpu(size_t num_bytes)
 {

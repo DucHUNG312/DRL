@@ -1,4 +1,4 @@
-#include "lab/register.h"
+#include "lab/lab.h"
 
 TORCH_LIBRARY(lab, m) 
 {

@@ -1,18 +1,13 @@
 #pragma once
 
-#include "lab/core.h"
-#include "lab/utils/utils.h"
-
+#include "lab/agents/base.h"
 
 namespace lab
 {
 namespace agents
 {
-namespace net
-{
 
 
-    
-}
+
 }
 }

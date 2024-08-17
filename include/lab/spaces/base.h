@@ -25,42 +25,11 @@ public:
     using Type = T;
 
     SpaceBase() = default;
+    SpaceBase(const SpaceBase& other) = default;
+    SpaceBase(SpaceBase&& other) noexcept = default;
+    SpaceBase& operator=(const SpaceBase& other) = default;
+    SpaceBase& operator=(SpaceBase&& other) noexcept = default;
     virtual ~SpaceBase() = default;
-
-    SpaceBase(const SpaceBase& other)
-        : name_(other.name_),
-          rand_(other.rand_),
-          shape_(other.shape_)
-    {
-    }
-
-    SpaceBase(SpaceBase&& other) noexcept
-        : name_(std::move(other.name_)),
-          rand_(std::move(other.rand_)),
-          shape_(std::move(other.shape_))
-    {
-    }
-
-    SpaceBase& operator=(const SpaceBase& other) 
-    {
-        if (this != &other) 
-        {
-            name_ = other.name_;
-            rand_ = other.rand_;
-            shape_ = other.shape_;
-        }
-        return *this;
-    }
-
-    SpaceBase& operator=(SpaceBase&& other) noexcept 
-    {
-        if (this != &other) {
-            name_ = std::move(other.name_);
-            rand_ = std::move(other.rand_);
-            shape_ = std::move(other.shape_);
-        }
-        return *this;
-    }
 
     void set_seed(int64_t seed = 0)
     {

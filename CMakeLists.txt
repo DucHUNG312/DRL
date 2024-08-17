@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
 project(RL VERSION 1.0.0 LANGUAGES CXX)
 
@@ -41,6 +41,8 @@ if(LAB_DEVICE STREQUAL "GPU")
             message(WARNING "CMAKE_CUDA_ARCHITECTURE is not set. Use default architecture.")
         endif()
         message(STATUS "CMAKE_CUDA_ARCHITECTURE: ${CMAKE_CUDA_ARCHITECTURE}")
+        set(CMAKE_CUDA_STANDARD 20)
+        set(CMAKE_CUDA_STANDARD_REQUIRED ON)
         # Add CUDA flags
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -fpermissive --expt-relaxed-constexpr --expt-extended-lambda -allow-unsupported-compiler -gencode arch=compute_${CMAKE_CUDA_ARCHITECTURE},code=sm_${CMAKE_CUDA_ARCHITECTURE}")
         add_definitions(-DLAB_GPU_BUILD)
@@ -90,7 +92,7 @@ elseif (CMAKE_C_COMPILER_ID MATCHES "Cray")
 endif()
 
 # Pytorch
-set(PYTORCH_VERSION "2.3.0")
+set(PYTORCH_VERSION "2.4.0")
 set(PYTORCH_MIN_VERSION "1.12.0")
 find_package(Torch QUIET PATHS "${CMAKE_SOURCE_DIR}/libtorch")
 if((NOT Torch_FOUND) OR (("${Torch_VERSION}" VERSION_LESS "${PYTORCH_MIN_VERSION}") OR
@@ -106,29 +108,29 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 add_subdirectory("extern")
 
 find_package(spdlog REQUIRED)
-#find_package(OpenCV REQUIRED)
-find_package(GLUT)
 find_package(OpenGL)
-find_package(Eigen3 REQUIRED)
 find_package(LZ4 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 set(LAB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 set(LAB_INCLUDE_DIRS
     ${LAB_INCLUDE_DIR}
+    "${CMAKE_SOURCE_DIR}/extern/dataframe/include"
 )
 set(LAB_LINKED_LIBRARIES
     spdlog::spdlog_header_only
     ${TORCH_LIBRARIES}
-    #${OpenCV_LIBS}
-    ${GLUT_LIBRARIES} 
     ${OPENGL_LIBRARIES}
-    Eigen3::Eigen
     ${LZ4_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    DataFrame::DataFrame
 )
 if(LAB_DEVICE STREQUAL "GPU")
     list(APPEND LAB_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
     list(APPEND LAB_LINKED_LIBRARIES ${CUDA_LIBRARIES})
 endif()
+
+add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment/")
 
 add_subdirectory("src")
 add_subdirectory("test")

@@ -18,59 +18,25 @@ enum class EnvType
 };
 
 template<typename T>
-class StepResult
+struct StepResult
 {
-    T next_state;
+    T state;
     double reward = 0;
     bool terminated = false; 
     bool truncated = false;
-public:
+
     StepResult() = default;
-    StepResult(const T& next_state, double reward, bool terminated, bool truncated)
-        : next_state(next_state), reward(reward), terminated(terminated), truncated(truncated) {}
-    StepResult(const StepResult& other)
-    {
-        next_state = other.next_state; 
-        reward = other.reward; 
-        terminated = other.terminated; 
-        truncated = other.truncated; 
-    }
-    StepResult(StepResult&& other) noexcept
-    {
-        next_state = std::move(other.next_state); 
-        reward = std::move(other.reward); 
-        terminated = std::move(other.terminated); 
-        truncated = std::move(other.truncated); 
-
-    }
-    StepResult& operator=(const StepResult& other) 
-    {
-        if (this != &other) 
-        {
-            next_state = other.next_state;
-            reward = other.reward;
-            terminated = other.terminated;
-            truncated = other.truncated;
-        }
-        return *this;
-    }
-    StepResult& operator=(StepResult&& other) noexcept 
-    {
-        if (this != &other) 
-        {
-            next_state = std::move(other.next_state);
-            reward = std::move(other.reward);
-            terminated = std::move(other.terminated);
-            truncated = std::move(other.truncated);
-        }
-        return *this;
-    }
+    StepResult(const T& state, double reward, bool terminated, bool truncated)
+        : state(state), reward(reward), terminated(terminated), truncated(truncated) {}
+    StepResult(const StepResult& other) = default;
+    StepResult(StepResult&& other) noexcept = default;
+    StepResult& operator=(const StepResult& other) = default;
+    StepResult& operator=(StepResult&& other) noexcept = default;
     virtual ~StepResult() = default;
-
 
     bool operator==(const StepResult& other) const 
     {
-        return next_state == other.next_state &&
+        return state == other.state &&
                reward == other.reward &&
                terminated == other.terminated &&
                truncated == other.truncated;
@@ -78,7 +44,7 @@ public:
 
     bool operator==(StepResult& other) 
     {
-        return next_state == other.next_state &&
+        return state == other.state &&
                reward == other.reward &&
                terminated == other.terminated &&
                truncated == other.truncated;
@@ -94,6 +60,18 @@ public:
         return !(*this == other);
     }
 };
+
+template<typename T>
+LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& os, const StepResult<T>& result)
+{
+    os << "result:\n";
+    os << "\tstate: " << result.state << "\n";
+    os << "\treward: " << result.reward << "\n";
+    os << "\tterminated: " << (result.terminated ? "true" : "false") << "\n";
+    os << "\ttruncated: " << (result.truncated ? "true" : "false");
+    return os;
+}
+
 struct EnvOptions
 {
     std::string id;
@@ -104,29 +82,29 @@ struct EnvOptions
     bool auto_reset = false;
     EnvType type = EnvType::NONE;
     std::pair<double, double> reward_range = { std::numeric_limits<double>::min(), std::numeric_limits<double>::max() };
-    std::string render_mode = "None";
+    bool renderer_enabled = false;
     uint64_t screen_width = 0;
     uint64_t screen_height = 0;
     bool is_open = false;
 public:
     EnvOptions() = default;
     EnvOptions(
-        const std::string& id, 
-        double reward_threshold, 
-        bool nondeterministic, 
-        uint64_t seed,
-        int64_t max_episode_steps, 
-        bool auto_reset,
-        EnvType type,
-        const std::pair<double, double>& reward_range,
-        const std::string& render_mode,
-        uint64_t screen_width,
-        uint64_t screen_height,
-        bool is_open);
-    EnvOptions(const EnvOptions& other);
-    EnvOptions(EnvOptions&& other) noexcept;
-    EnvOptions& operator=(const EnvOptions& other);
-    EnvOptions& operator=(EnvOptions&& other) noexcept;
+        const std::string& _id, 
+        double _reward_threshold, 
+        bool _nondeterministic,
+        uint64_t _seed,
+        int64_t _max_episode_steps, 
+        bool _auto_reset,
+        EnvType _type,
+        const std::pair<double, double>& _reward_range,
+        bool _renderer_enabled,
+        uint64_t _screen_width,
+        uint64_t _screen_height,
+        bool _is_open);
+    EnvOptions(const EnvOptions& other) = default;
+    EnvOptions(EnvOptions&& other) noexcept = default;
+    EnvOptions& operator=(const EnvOptions& other) = default;
+    EnvOptions& operator=(EnvOptions&& other) noexcept = default;
     virtual ~EnvOptions() = default;
 private:
     void copy_from(const EnvOptions& other);
@@ -141,7 +119,7 @@ static std::unordered_set<std::string> env_ids =
 static std::unordered_map<std::string, EnvOptions> default_env_options = 
 {
 {   
-    "CartPole",   EnvOptions("CartPole", 180, true, 0, 100, false, EnvType::CONTINUOUS_STATE, {0,200}, "None", 600, 400, false)
+    "CartPole",   EnvOptions("CartPole", 180, true, 0, 100, false, EnvType::CONTINUOUS_STATE, {0,200}, false, 1280, 720, false)
 }
 };
 

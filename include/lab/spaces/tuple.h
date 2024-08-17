@@ -17,10 +17,10 @@ public:
     using element_type = lab::spaces::experiment::Tuple;
 
     Tuple(const std::vector<c10::IValue>& spaces);
-    Tuple(const Tuple& tup);
-    Tuple(Tuple&& tup)noexcept;
+    Tuple(const Tuple& tup) = default;
+    Tuple(Tuple&& tup)noexcept = default;
 
-    virtual ~Tuple() override = default;
+    virtual ~Tuple() = default;
 
     virtual c10::intrusive_ptr<c10::ivalue::Tuple> sample() override;
 

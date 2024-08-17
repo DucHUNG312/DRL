@@ -1,20 +1,12 @@
 #pragma once
 
-#include "core.h"
-
 #define SPDLOG_EOL ""
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
 
 namespace lab
+{
+namespace utils
 {
 class Logger
 {
@@ -26,4 +18,5 @@ public:
 private:
 	static std::shared_ptr<spdlog::logger> core_logger;
 };
+}
 }

@@ -24,14 +24,14 @@ public:
         env_ = c10::make_intrusive<EnvType>(env);
     }
 
-    virtual ObsType reset(uint64_t seed = 0) override
+    virtual void reset(uint64_t seed = 0) override
     {
-        return env_->reset(seed);
+        env_->reset(seed);
     }
 
-    virtual StepResultType step(const ActType& action) override
+    virtual void step(const ActType& action) override
     {
-        return env_->step(action);
+        env_->step(action);
     }
 
     virtual void render() override
@@ -60,17 +60,16 @@ public:
 
     LAB_ARG(ObsType, observation);
 public:
-    virtual ObsType reset(uint64_t seed = 0) override
+    virtual void reset(uint64_t seed = 0) override
     {
-        observation_ = this->env()->reset(seed);
-        return observation_;
+        this->env()->reset(seed);
+        observation_ = this->env()->result().state;
     }
 
-    virtual StepResultType step(const ActType& act) override
+    virtual void step(const ActType& act) override
     {
-        StepResultType result = this->env()->step(act);
-        observation_ = result.next_state;
-        return result;
+        this->env()->step(act);
+        observation_ = this->env()->result().state;
     }
 
     virtual ObsType observation(ObsType& obs) = 0;
@@ -86,11 +85,10 @@ public:
 
     LAB_ARG(double, reward);
 public:
-    virtual StepResultType step(const ActType& act) override
+    virtual void step(const ActType& act) override
     {
-        StepResultType result = this->env()->step(act);
-        reward_ = result.reward;
-        return result;
+        this->env()->step(act);
+        reward_ = this->env()->result().reward;
     }
 
     virtual double reward(double r) = 0;
@@ -106,10 +104,10 @@ public:
 
     LAB_ARG(ActType, action);
 public:
-    virtual StepResultType step(const ActType& act) override
+    virtual void step(const ActType& act) override
     {
         action_ = act;
-        return this->env()->step(action_);
+        this->env()->step(action_);
     }
 
     virtual ActType action(ActType& act) = 0;

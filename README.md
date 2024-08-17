@@ -3,6 +3,7 @@
 - Ubuntu 22.04
 - CUDA 12.5
 - GCC 12.3.0
+- PyTorch 2.4.0
 
 ## Build
 
@@ -25,7 +26,7 @@ cmake .. -DCMAKE_CUDA_ARCHITECTURE=${GPU_COMPUTE_CAPABILITY}
 
 ## TODO
 
-- Support rendering
-- Support more environments
-- Create a framework for training
-- Add algorithms
+- [ ] Create a trainning framework.
+- [ ] Add DRL algorithms.
+- [ ] Support more environments.
+- [ ] Support real time rendering.

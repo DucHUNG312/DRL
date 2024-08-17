@@ -7,12 +7,6 @@ namespace utils
 Rand::Rand(uint64_t seed /* = 0 */)
     : seed(seed), generator(at::detail::createCPUGenerator(seed)) {}
 
-Rand::Rand(const Rand& other)
-    : generator(other.generator), seed(other.seed) {}
-
-Rand::Rand(Rand&& other) noexcept
-    : generator(std::move(other.generator)), seed(std::move(other.seed)) {}
-
 void Rand::set_seed(uint64_t _seed)
 {
     seed = _seed;

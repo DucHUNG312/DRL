@@ -23,34 +23,6 @@ namespace spaces
         high_ = high.to(torch::kDouble).clone();     
     }
 
-    Box::Box(const Box& box)
-        : SpaceBase(box), low_(box.low_.clone()), high_(box.high_.clone()) {}
-
-    Box::Box(Box&& box) noexcept
-        : SpaceBase(std::move(box)), low_(std::move(box.low_)), high_(std::move(box.high_)) {}
-
-    Box& Box::operator=(const Box& other) 
-    {
-        if (this != &other) 
-        {
-            SpaceBase::operator=(other);
-            low_ = other.low_;
-            high_ = other.high_;
-        }
-        return *this;
-    }
-
-    Box& Box::operator=(Box&& other) noexcept 
-    {
-        if (this != &other) 
-        {
-            SpaceBase::operator=(std::move(other));
-            low_ = std::move(other.low_);
-            high_ = std::move(other.high_);
-        }
-        return *this;
-    }
-
     torch::Tensor Box::sample()
     {
         torch::Tensor sample = rand().sample_real_uniform(low_, high_);

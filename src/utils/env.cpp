@@ -1,5 +1,6 @@
 #include "lab/utils/env.h"
 #include "lab/utils/convert.h"
+#include "lab/render/render.h"
 
 namespace lab
 {
@@ -34,7 +35,7 @@ EnvOptions::EnvOptions(
     bool _auto_reset,
     EnvType _type,
     const std::pair<double, double>& _reward_range,
-    const std::string& _render_mode,
+    bool _renderer_enabled,
     uint64_t _screen_width,
     uint64_t _screen_height,
     bool _is_open)
@@ -48,66 +49,12 @@ EnvOptions::EnvOptions(
     auto_reset = _auto_reset;
     type = _type;
     reward_range = _reward_range;
-    render_mode = _render_mode;
+    renderer_enabled = _renderer_enabled;
     screen_width = _screen_width;
     screen_height = _screen_height;
     is_open = _is_open;
 }
 
-EnvOptions::EnvOptions(const EnvOptions& other)
-{
-    copy_from(other);
-}
-
-EnvOptions::EnvOptions(EnvOptions&& other) noexcept
-{
-    move_from(std::move(other));
-}
-
-EnvOptions& EnvOptions::operator=(const EnvOptions& other) 
-{
-    if (this != &other) 
-        copy_from(other);
-    return *this;
-}
-EnvOptions& EnvOptions::operator=(EnvOptions&& other) noexcept 
-{
-    if (this != &other) 
-        move_from(std::move(other));
-    return *this;
-}
-
-void EnvOptions::copy_from(const EnvOptions& other)
-{
-    id = other.id;
-    reward_threshold = other.reward_threshold;
-    nondeterministic = other.nondeterministic;
-    seed = other.seed;
-    max_episode_steps = other.max_episode_steps;
-    auto_reset = other.auto_reset;
-    type = other.type;
-    reward_range = other.reward_range;
-    render_mode = other.render_mode;
-    screen_width = other.screen_width;
-    screen_height = other.screen_height;
-    is_open = other.is_open;
-}
-
-void EnvOptions::move_from(EnvOptions&& other) noexcept
-{
-    id = std::move(other.id);
-    reward_threshold = std::move(other.reward_threshold);
-    nondeterministic = std::move(other.nondeterministic);
-    seed = std::move(other.seed);
-    max_episode_steps = std::move(other.max_episode_steps);
-    auto_reset = std::move(other.auto_reset);
-    type = std::move(other.type);
-    reward_range = std::move(other.reward_range);
-    render_mode = std::move(other.render_mode);
-    screen_width = std::move(other.screen_width);
-    screen_height = std::move(other.screen_height);
-    is_open = std::move(other.is_open);
-}
 
 }
 }

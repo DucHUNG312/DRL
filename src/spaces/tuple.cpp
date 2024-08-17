@@ -31,12 +31,6 @@ Tuple::Tuple(const std::vector<c10::IValue>& spaces_vec)
     shape_ = utils::get_bounding_shape(shapes);
 }
 
-Tuple::Tuple(const Tuple& tup)
-    : SpaceBase(tup), spaces_(tup.spaces_) {}
-
-Tuple::Tuple(Tuple&& tup) noexcept
-    : SpaceBase(std::move(tup)), spaces_(std::move(tup.spaces_)) {}
-
 c10::intrusive_ptr<c10::ivalue::Tuple> Tuple::sample()
 {
     std::vector<c10::IValue> values;

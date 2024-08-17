@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lab/utils/logger.h"
 #include "lab/utils/file.h"
 #include "lab/utils/convert.h"
 #include "lab/utils/rand.h"
@@ -9,6 +10,8 @@
 #include "lab/utils/math.h"
 #include "lab/utils/shape.h"
 #include "lab/utils/optimizer.h"
+#include "lab/utils/spec_types.h"
+#include "lab/utils/spec.h"
 
 namespace lab
 {

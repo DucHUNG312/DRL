@@ -20,17 +20,11 @@ public:
         : Wrapper<ObsSpace, ActSpace>(env)
     {}
 
-    virtual StepResultType step(const ActType& action) override
+    virtual void step(const ActType& action) override
     {
-        StepResultType result = this->env()->step(action);
-        ObsType new_obs;
-        if (result.terminated || result.truncated)
-        {
-            new_obs = this->env()->reset();
-        }
-
-        result.next_state = new_obs;
-        return result;
+        this->env()->step(action);
+        if (this->env()->result().terminated || this->env()->result().truncated)
+            this->env()->reset();
     }
 };
 

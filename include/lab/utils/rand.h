@@ -15,30 +15,10 @@ public:
 public:
     Rand(uint64_t seed = 0);
     ~Rand() = default;
-
-    Rand(const Rand& other);
-
-    Rand(Rand&& other) noexcept;
-
-    Rand& operator=(const Rand& other) 
-    {
-        if (this != &other) 
-        {
-            generator = other.generator;
-            seed = other.seed;
-        }
-        return *this;
-    }
-
-    Rand& operator=(Rand&& other) noexcept 
-    {
-        if (this != &other) 
-        {
-            generator = std::move(other.generator);
-            seed = std::move(other.seed);
-        }
-        return *this;
-    }
+    Rand(const Rand& other) = default;
+    Rand(Rand&& other) noexcept = default;
+    Rand& operator=(const Rand& other) = default;
+    Rand& operator=(Rand&& other) noexcept = default;
 
     void set_seed(uint64_t seed);
 

@@ -22,7 +22,6 @@ public:
     LAB_ARG(std::vector<T>, data);
 public:
     constexpr Shape() : data_({0}) {}
-
     constexpr Shape(const T& ele) : data_({ele}) {}
 
     template<typename A>
