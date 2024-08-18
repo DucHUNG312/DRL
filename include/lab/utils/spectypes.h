@@ -163,8 +163,10 @@ struct NetSpec
 {
     NetType type;
     std::vector<int64_t> hid_layers;
-    std::vector<std::string> hid_layers_activation;
-    std::vector<int64_t> clip_grad_val;
+    std::string hid_layers_activation;
+    std::vector<std::string> out_layers_activation;
+    std::string init_fn;
+    //std::vector<int64_t> clip_grad_val;
     LossSpec loss_spec;
     OptimSpec optim_spec;
     LrSchedulerSpec lr_scheduler_spec;

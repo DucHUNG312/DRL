@@ -1,21 +1,21 @@
 #include "lab/utils/optimizer.h"
 #include "lab/utils/math.h"
 
-namespace lab
+namespace torch
 {
-namespace utils
+namespace optim
 {
 
 void GlobalAdam::share_memory()
 {
-    for (torch::optim::OptimizerParamGroup& group : param_groups_)
+    for (OptimizerParamGroup& group : param_groups_)
     {
-        auto& options = static_cast<torch::optim::AdamOptions&>(group.options());
+        auto& options = static_cast<AdamOptions&>(group.options());
         for(torch::Tensor& param : group.params())
         {
             if (state_.find(param.unsafeGetTensorImpl()) != state_.end())
             {
-                auto& state = static_cast<torch::optim::AdamParamState&>(*state_[param.unsafeGetTensorImpl()]);
+                auto& state = static_cast<AdamParamState&>(*state_[param.unsafeGetTensorImpl()]);
                 state.exp_avg().share_memory_();
                 state.exp_avg_sq().share_memory_();
                 if (options.amsgrad()) 
@@ -28,14 +28,14 @@ void GlobalAdam::share_memory()
 
 void GlobalRMSprop::share_memory()
 {
-    for (torch::optim::OptimizerParamGroup& group : param_groups_)
+    for (OptimizerParamGroup& group : param_groups_)
     {
-        auto& options = static_cast<torch::optim::RMSpropOptions&>(group.options());
+        auto& options = static_cast<RMSpropOptions&>(group.options());
         for(torch::Tensor& param : group.params())
         {
             if (state_.find(param.unsafeGetTensorImpl()) != state_.end())
             {
-                auto& state = static_cast<torch::optim::RMSpropParamState&>(*state_.at(param.unsafeGetTensorImpl()));
+                auto& state = static_cast<RMSpropParamState&>(*state_.at(param.unsafeGetTensorImpl()));
                 state.square_avg().share_memory_();
                 if (options.momentum() > 0)
                     state.momentum_buffer().share_memory_();
@@ -107,7 +107,7 @@ void RAdamParamState::serialize(torch::serialize::InputArchive& archive)
     _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(torch::Tensor, exp_avg_sq);
 }
 
-torch::Tensor RAdam::step(torch::optim::Optimizer::LossClosure closure /*= nullptr*/)
+torch::Tensor RAdam::step(Optimizer::LossClosure closure /*= nullptr*/)
 {
     torch::NoGradGuard no_grad;
     torch::Tensor loss = {};
@@ -169,7 +169,10 @@ torch::Tensor RAdam::step(torch::optim::Optimizer::LossClosure closure /*= nullp
                 N_sma = N_sma_max - 2 * state.step() * bias_correction2 / (1 - bias_correction2);
                 buffered[1].fill_(N_sma);
                 if(N_sma >= 5)
-                    step_size = utils::math::safe_sqrt((1 - bias_correction2) * (N_sma - 4) / (N_sma_max - 4) * (N_sma - 2) / N_sma * N_sma_max / (N_sma_max - 2)) / bias_correction1;
+                    step_size = lab::utils::math::safe_sqrt(
+                        ((1 - bias_correction2) * (N_sma - 4) * (N_sma - 2) * N_sma_max) / 
+                        ((N_sma_max - 4) *  N_sma * (N_sma_max - 2))
+                    ) / bias_correction1;
                 else
                     step_size = 1 / bias_correction1;
                 buffered[2].fill_(step_size);
@@ -211,7 +214,7 @@ void RAdam::load(torch::serialize::InputArchive& archive)
 
 void RAdam::share_memory()
 {
-    for (torch::optim::OptimizerParamGroup& group : param_groups_)
+    for (OptimizerParamGroup& group : param_groups_)
     {
         auto& options = static_cast<RAdamOptions&>(group.options());
         for(torch::Tensor& param : group.params())
@@ -225,55 +228,6 @@ void RAdam::share_memory()
         }
     }
 }
-
-LookaheadOptions::LookaheadOptions(double lr /*= 1e-3*/) : lr_(lr)  {}
-
-bool operator==(const LookaheadOptions& lhs, const LookaheadOptions& rhs) 
-{
-    return (lhs.lr() == rhs.lr()) &&
-        (lhs.k() == rhs.k()) &&
-        (lhs.step_counter() == rhs.step_counter()) &&
-        (lhs.alpha() == rhs.alpha()) &&
-        (torch::eq(lhs.slow_weights(), rhs.slow_weights()).all().item<bool>());
-}
-
-void LookaheadOptions::serialize(torch::serialize::OutputArchive& archive) const
-{
-    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(lr);
-    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(k);
-    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(step_counter);
-    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(alpha);
-    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(slow_weights);
-}
-
-void LookaheadOptions::serialize(torch::serialize::InputArchive& archive)
-{
-    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(double, lr);
-    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(uint64_t, k);
-    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(uint64_t, step_counter);
-    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(double, alpha);
-    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(torch::Tensor, slow_weights);
-}
-
-double LookaheadOptions::get_lr() const
-{
-    return lr();
-}
-
-void LookaheadOptions::set_lr(const double lr)
-{
-    this->lr(lr);
-}
-
-
-bool operator==(const LookaheadParamState& lhs, const LookaheadParamState& rhs) 
-{
-    return true;
-}
-
-void LookaheadParamState::serialize(torch::serialize::OutputArchive& archive) const {}
-
-void LookaheadParamState::serialize(torch::serialize::InputArchive& archive) {}
 
 }
 }

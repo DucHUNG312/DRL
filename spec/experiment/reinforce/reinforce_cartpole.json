@@ -23,7 +23,9 @@
         "net": {
           "type": "MLPNet",
           "hid_layers": [64],
-          "hid_layers_activation": ["selu"],
+          "hid_layers_activation": "SELU",
+          "out_layers_activation": ["Sigmoid"],
+          "init_fn": null,
           "clip_grad_val": null,
           "loss_spec": {
             "name": "MSELoss"
@@ -94,7 +96,9 @@
         "net": {
           "type": "MLPNet",
           "hid_layers": [128],
-          "hid_layers_activation": "selu",
+          "hid_layers_activation": "SELU",
+          "out_layers_activation": ["Sigmoid"],
+          "init_fn": null,
           "clip_grad_val": null,
           "loss_spec": {
             "name": "CrossEntropyLoss"

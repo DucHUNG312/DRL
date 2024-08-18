@@ -154,8 +154,10 @@ NetSpec SpecLoader::get_net_spec(const json& j)
         json j_net = j["net"];
         spec.type = str_to_net_type(j_net["type"]);
         spec.hid_layers = get_json_value<std::vector<int64_t>>(j_net["hid_layers"]);
-        spec.hid_layers_activation = get_json_value<std::vector<std::string>>(j_net["hid_layers_activation"]);
-        spec.clip_grad_val = get_json_value<std::vector<int64_t>>(j_net["clip_grad_val"]);
+        spec.hid_layers_activation = get_json_value<std::string>(j_net["hid_layers_activation"]);
+        spec.out_layers_activation = get_json_value<std::vector<std::string>>(j_net["out_layers_activation"]);
+        spec.init_fn = get_json_value<std::string>(j_net["init_fn"]);
+        //spec.clip_grad_val = get_json_value<std::vector<int64_t>>(j_net["clip_grad_val"]);
         spec.loss_spec = get_loss_fn_spec(j_net);
         spec.optim_spec = get_optim_spec(j_net);
         spec.lr_scheduler_spec = get_lr_scheduler_spec(j_net);

@@ -13,6 +13,9 @@
 #include "lab/utils/spectypes.h"
 #include "lab/utils/spec.h"
 #include "lab/utils/dataframe.h"
+#include "lab/utils/net.h"
+#include "lab/utils/algorithm.h"
+#include "lab/utils/device.h"
 
 namespace lab
 {

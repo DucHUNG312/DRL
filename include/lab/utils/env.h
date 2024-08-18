@@ -56,11 +56,10 @@ struct StepResult
 template<typename T>
 LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& os, const StepResult<T>& result)
 {
-    os << "result:\n";
-    os << "\tstate: " << result.state << "\n";
-    os << "\treward: " << result.reward << "\n";
-    os << "\tterminated: " << (result.terminated ? "true" : "false") << "\n";
-    os << "\ttruncated: " << (result.truncated ? "true" : "false");
+    os << "state: " << result.state << "\n";
+    os << "reward: " << result.reward << "\n";
+    os << "terminated: " << (result.terminated ? "true" : "false") << "\n";
+    os << "truncated: " << (result.truncated ? "true" : "false");
     return os;
 }
 
