@@ -25,10 +25,6 @@ set(TEST_LINKED_LIBRARIES
     lab
 )
 
-if(LAB_DEVICE STREQUAL "GPU")
-    list(APPEND TEST_LINKED_LIBRARIES lab_gpu)
-endif()
-
 add_executable(${PROJECT_NAME} main.test.cpp ${SRC_FILES} ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${TEST_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${TEST_LINKED_LIBRARIES})

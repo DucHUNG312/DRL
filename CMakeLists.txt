@@ -106,33 +106,56 @@ message(STATUS "Torch version ${Torch_VERSION}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_subdirectory("extern")
-
 find_package(spdlog REQUIRED)
 find_package(OpenGL)
 find_package(LZ4 REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
-set(LAB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment/")
+
+# common
+set(COMMON_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/common/include")
+set(COMMON_LINKED_LIBRARIES spdlog::spdlog_header_only)
+add_subdirectory("common")
+
+# renderer
+set(RENDERER_INCLUDE_DIRS
+    ${COMMON_INCLUDE_DIRS}
+    "${CMAKE_SOURCE_DIR}/renderer/include"
+)
+set(RENDERER_LINKED_LIBRARIES
+    ${COMMON_LINKED_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    common 
+)
+if(LAB_DEVICE STREQUAL "GPU")
+    list(APPEND RENDERER_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
+    list(APPEND RENDERER_LINKED_LIBRARIES ${CUDA_LIBRARIES})
+endif()
+add_subdirectory("renderer")
+
+# lab
 set(LAB_INCLUDE_DIRS
-    ${LAB_INCLUDE_DIR}
+    ${RENDERER_INCLUDE_DIRS}
+    "${CMAKE_SOURCE_DIR}/lab/include"
     "${CMAKE_SOURCE_DIR}/extern/dataframe/include"
 )
 set(LAB_LINKED_LIBRARIES
-    spdlog::spdlog_header_only
+    ${RENDERER_LINKED_LIBRARIES}
     ${TORCH_LIBRARIES}
-    ${OPENGL_LIBRARIES}
     ${LZ4_LIBRARIES}
     nlohmann_json::nlohmann_json
-    DataFrame::DataFrame
+    DataFrame::DataFrame 
+    renderer
 )
 if(LAB_DEVICE STREQUAL "GPU")
-    list(APPEND LAB_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
-    list(APPEND LAB_LINKED_LIBRARIES ${CUDA_LIBRARIES})
+    list(APPEND LAB_LINKED_LIBRARIES renderer_gpu)
 endif()
+add_subdirectory("lab")
 
-add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment/")
-
-add_subdirectory("src")
+# test
 add_subdirectory("test")
+
+# example
 add_subdirectory("example")
 
