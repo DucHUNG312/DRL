@@ -4,16 +4,6 @@
 #include "lab/agents/memory/memory.h"
 #include "lab/agents/net/net.h"
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-requires"
-#endif
-#include <DataFrame/DataFrame.h>
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-
 namespace lab
 {
 namespace agents
@@ -28,7 +18,6 @@ public:
     using EnvType = envs::Env<ObsSpace, ActSpace>;
     using MemoryType = Memory<ObsSpace, ActSpace>;
     using AgentType = Agent<ObsSpace, ActSpace>;
-    using TrainningDFType = hmdf::StdDataFrame<unsigned long>;
 
     LAB_ARG(EnvType, env);
     LAB_ARG(AgentType, agent);
@@ -44,7 +33,7 @@ public:
     LAB_ARG(double, mean_grad_norm);
     LAB_ARG(double, best_total_reward_ma);
     LAB_ARG(double, total_reward_ma);
-    LAB_ARG(TrainningDFType, train_df);
+    LAB_ARG(utils::DataFrame, train_df);
     LAB_ARG(ObsSpace, observation_space);
     LAB_ARG(ActSpace, action_space);
     LAB_ARG(int64_t, observable_dim);
@@ -62,20 +51,7 @@ public:
         e_ = aeb[1];
         b_ = aeb[2];
         
-        train_df_.load_column<std::string>("epi", std::vector<std::string>{});
-        train_df_.load_column<double>("t", std::vector<double>{});
-        train_df_.load_column<double>("wall_t", std::vector<double>{});
-        train_df_.load_column<int>("opt_step", std::vector<int>{});
-        train_df_.load_column<int>("frame", std::vector<int>{});
-        train_df_.load_column<double>("fps", std::vector<double>{});
-        train_df_.load_column<double>("total_reward", std::vector<double>{});
-        train_df_.load_column<double>("total_reward_ma", std::vector<double>{});
-        train_df_.load_column<double>("loss", std::vector<double>{});
-        train_df_.load_column<double>("lr", std::vector<double>{});
-        train_df_.load_column<double>("explore_var", std::vector<double>{});
-        train_df_.load_column<double>("entropy_coef", std::vector<double>{});
-        train_df_.load_column<double>("entropy", std::vector<double>{});
-        train_df_.load_column<double>("grad_norm", std::vector<double>{});
+        train_df_.load_df_columns({"epi", "time", "wall_time", "opt_step", "frame", "fps", "total_reward", "total_reward_ma", "loss", "lr", "explore_var", "entropy_coef", "entropy", "grad_norm"});
 
         observation_space_ = env_.observation_space();
         action_space_ = env_.action_space();
@@ -89,7 +65,11 @@ public:
 
     void calc_df_row()
     {
-
+        double frame = env_.clock().frame;
+        double wall_time = env_.clock().wall_time;
+        double fps = (wall_time == 0) ? 0 : (frame / wall_time);
+        double total_reward = env_.result().reward;
+        
     }
 };
 

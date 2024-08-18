@@ -23,17 +23,17 @@ void CartPole::init()
     action_space(spaces::Discrete(2));
     observation_space(spaces::Box(-high, high));
     result().state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
-    env_options().is_open = true;
+    env_spec().is_open = true;
 }
 
 CartPole::CartPole()
-    : ContinuousStateEnv(utils::get_default_env_option("CartPole"))
+    : ContinuousStateEnv(utils::SpecLoader::load_default_env_spec("CartPole"))
 {
     init();
 }
 
-CartPole::CartPole(const utils::EnvOptions& env_options)
-    : ContinuousStateEnv(env_options)
+CartPole::CartPole(const utils::EnvSpec& env_spec)
+    : ContinuousStateEnv(env_spec)
 {
     init();
 }
@@ -109,8 +109,8 @@ void CartPole::render()
 
 void CartPole::close()
 {
-    env_options().is_open = false;
-    if (env_options_.renderer_enabled)
+    env_spec().is_open = false;
+    if (env_spec_.renderer.enabled)
         render::Renderer::shutdown();
 }
 

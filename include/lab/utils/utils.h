@@ -10,8 +10,9 @@
 #include "lab/utils/math.h"
 #include "lab/utils/shape.h"
 #include "lab/utils/optimizer.h"
-#include "lab/utils/spec_types.h"
+#include "lab/utils/spectypes.h"
 #include "lab/utils/spec.h"
+#include "lab/utils/dataframe.h"
 
 namespace lab
 {

@@ -23,7 +23,7 @@
         "net": {
           "type": "MLPNet",
           "hid_layers": [64],
-          "hid_layers_activation": "selu",
+          "hid_layers_activation": ["selu"],
           "clip_grad_val": null,
           "loss_spec": {
             "name": "MSELoss"
@@ -37,8 +37,24 @@
       }],
       "env": [{
         "name": "CartPole",
-        "max_t": null,
-        "max_frame": 80000
+        "frame_op": null,
+        "frame_op_len": 0,
+        "max_time": null,
+        "max_frame": 80000,
+        "reward_threshold": 0,
+        "reward_scale": 1,
+        "reward_range": [0, 0],
+        "nondeterministic": true,
+        "seed": 0,
+        "auto_reset": false,
+        "normalize_state": false,
+        "is_open": false,
+        "renderer": {
+            "enabled": false,
+            "graphics": "OpenGL",
+            "screen_width": 1280,
+            "screen_height": 720
+        }
       }],
       "body": {
         "product": "outer",
@@ -47,6 +63,7 @@
       "meta": {
         "distributed": false,
         "eval_frequency": 2000,
+        "log_frequenc": 2000,
         "max_session": 1,
         "max_trial": 1
       }

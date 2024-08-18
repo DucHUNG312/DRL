@@ -19,24 +19,20 @@ public:
     LAB_ARG(ObsSpace, observation_space);
     LAB_ARG(utils::StepResult<ObsType>, result);
     LAB_ARG(ActSpace, action_space);
-    LAB_ARG(utils::EnvOptions, env_options);
+    LAB_ARG(utils::EnvSpec, env_spec);
     LAB_ARG(utils::Rand, rand);
+    LAB_ARG(utils::Clock, clock);
 public:
     Env(uint64_t seed = 0)
     {
         set_seed(seed);
     }
 
-    Env(const utils::EnvOptions& env_options = {})
-        : env_options_(env_options)
+    Env(const utils::EnvSpec& env_spec = {})
+        : env_spec_(env_spec)
     {
-        set_seed(env_options.seed);
+        set_seed(env_spec.seed);
     }
-
-    Env(const Env& other) = default;
-    Env(Env&& other) noexcept = default;
-    Env& operator=(const Env& other) = default;
-    Env& operator=(Env&& other) noexcept = default;
 
     virtual void reset(uint64_t seed = 0) = 0;
 
@@ -55,7 +51,7 @@ public:
 
     void enable_rendering()
     {
-        env_options_.renderer_enabled = true;
+        env_spec_.renderer.enabled = true;
         render::Renderer::init();
         render();
     }
@@ -89,6 +85,11 @@ public:
     bool is_discrete() const
     {
         return std::is_same_v<ActSpace, spaces::Discrete>;
+    }
+
+    void load_spec(const utils::EnvSpec& spec)
+    {
+
     }
 };
 

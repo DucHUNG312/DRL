@@ -50,7 +50,7 @@ enum SearchType
 {
     SEARCH_NONE,
     RANDOM
-};
+};;
 
 struct ExploreVarSpec
 {
@@ -162,9 +162,9 @@ struct LrSchedulerSpec
 struct NetSpec
 {
     NetType type;
-    torch::IntArrayRef hid_layers;
+    std::vector<int64_t> hid_layers;
     std::vector<std::string> hid_layers_activation;
-    torch::IntArrayRef clip_grad_val;
+    std::vector<int64_t> clip_grad_val;
     LossSpec loss_spec;
     OptimSpec optim_spec;
     LrSchedulerSpec lr_scheduler_spec;
@@ -196,6 +196,21 @@ struct AgentSpec
     ~AgentSpec() = default;
 };
 
+struct RendererSpec
+{
+    bool enabled;
+    std::string graphics;
+    uint64_t screen_width;
+    uint64_t screen_height;
+
+    RendererSpec() = default;
+    RendererSpec(const RendererSpec& other) = default;
+    RendererSpec& operator=(const RendererSpec& other) = default;
+    RendererSpec(RendererSpec&& other) noexcept = default;
+    RendererSpec& operator=(RendererSpec&& other) noexcept = default;
+    ~RendererSpec() = default;
+};
+
 struct EnvSpec
 {
     std::string name;
@@ -203,7 +218,15 @@ struct EnvSpec
     uint64_t frame_op_len;
     uint64_t max_time;
     uint64_t max_frame;
+    double reward_threshold;
+    double reward_scale;
+    std::vector<double> reward_range;
+    uint64_t seed;
+    bool nondeterministic;
+    bool auto_reset;
     bool normalize_state;
+    bool is_open;
+    RendererSpec renderer;
 
     EnvSpec() = default;
     EnvSpec(const EnvSpec& other) = default;
@@ -271,7 +294,6 @@ UpdateType str_to_update_type(const std::string& str);
 ActivationFnType str_to_activation_type(const std::string& str);
 
 SearchType str_to_search_type(const std::string& str);
-
 
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lab/agents/base.h"
-#include "lab/utils/spec_types.h"
+#include "lab/utils/spectypes.h"
 
 namespace lab
 {
@@ -27,27 +27,6 @@ public:
     Memory(const utils::MemorySpec& spec, const BodyType& body)
         : spec_(spec), body_(body) {}
     virtual ~Memory() = default;
-    Memory(const Memory& other)
-        : spec_(other.spec_), body_(other.body_) {}
-    Memory(Memory&& other) noexcept
-        : spec_(std::move(other.spec_)), body_(std::move(other.body_)) {}
-    Memory& operator=(const Memory& other) 
-    {
-        if (this != &other) 
-        {
-            spec_ = other.spec_;
-            body_ = other.body_;
-        }
-        return *this;
-    }
-    Memory& operator=(Memory&& other) noexcept 
-    {
-        if (this != &other) {
-            spec_ = std::move(other.spec_);
-            body_ = std::move(other.body_);
-        }
-        return *this;
-    }
 
     virtual void reset() = 0;
     virtual void update() = 0;

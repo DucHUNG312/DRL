@@ -12,7 +12,7 @@ class CartPole : public ContinuousStateEnv
 {
 public:
     CartPole();
-    CartPole(const utils::EnvOptions& env_options);
+    CartPole(const utils::EnvSpec& env_spec);
     virtual ~CartPole() = default;
     virtual void reset(uint64_t seed = 0) override;
     virtual void step(const int64_t& action) override;

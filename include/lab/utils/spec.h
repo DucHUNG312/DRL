@@ -2,7 +2,8 @@
 
 #include "lab/core.h"
 #include "lab/utils/file.h"
-#include "lab/utils/spec_types.h"
+#include "lab/utils/spectypes.h"
+#include "lab/utils/algorithm.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -12,8 +13,6 @@ namespace lab
 
 namespace utils
 {
-
-const std::string reinforce_carpole_exp_path = join_paths(std::string(EXPERIMENT_SPEC_DIR), "reinforce/reinforce_cartpole.json");
 
 class SpecLoader
 {
@@ -28,7 +27,7 @@ public:
 
     static json get_json_stream(const std::string& file_path, const std::string& experiment_name);
 
-    static void load_specs_from_file(const std::string& file_path, const std::string& experiment_nam);
+    static void load_specs_from_file(const std::string& file_path, const std::string& experiment_name);
 
     static ExploreVarSpec get_explore_var_spec(const json& j);
 
@@ -48,15 +47,27 @@ public:
 
     static AgentSpec get_agent_spec(const json& j, int64_t num = 0);
 
+    static RendererSpec get_renderer_spec(const json& j);
+
     static EnvSpec get_env_spec(const json& j, int64_t num = 0);
 
     static BodySpec get_body_spec(const json& j);
 
     static MetaSpec get_meta_info_spec(const json& j);
+
+    static std::string get_default_experiment_name(const std::string& env_name);
+
+    static EnvSpec load_default_env_spec(const std::string& env_name); 
 public:
     static LabSpec specs;
+    static std::unordered_map<std::string, std::string> default_env_spec_path;
 };
 
+template<typename T>
+LAB_FORCE_INLINE T get_json_value(const json& j)
+{
+    return j.is_null() ? T() : j.get<T>();
+}
 
 
 }

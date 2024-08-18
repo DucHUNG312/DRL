@@ -123,7 +123,7 @@ torch::Tensor RAdam::step(torch::optim::Optimizer::LossClosure closure /*= nullp
             if (!p.grad().defined())
                 continue;
 
-            auto grad = p.grad();
+            auto grad = p.grad().to(torch::kFloat);
 
             TORCH_CHECK(!grad.is_sparse(), "RAdam does not support sparse gradients" /*, please consider SparseAdam instead*/);
             
@@ -188,7 +188,7 @@ torch::Tensor RAdam::step(torch::optim::Optimizer::LossClosure closure /*= nullp
             else
                 p_data_fp32.add_(exp_avg, adap_lr);
             
-            p.copy_(p_data_fp32);
+            p.data().copy_(p_data_fp32);
         }
     }
     return loss;
@@ -225,6 +225,55 @@ void RAdam::share_memory()
         }
     }
 }
+
+LookaheadOptions::LookaheadOptions(double lr /*= 1e-3*/) : lr_(lr)  {}
+
+bool operator==(const LookaheadOptions& lhs, const LookaheadOptions& rhs) 
+{
+    return (lhs.lr() == rhs.lr()) &&
+        (lhs.k() == rhs.k()) &&
+        (lhs.step_counter() == rhs.step_counter()) &&
+        (lhs.alpha() == rhs.alpha()) &&
+        (torch::eq(lhs.slow_weights(), rhs.slow_weights()).all().item<bool>());
+}
+
+void LookaheadOptions::serialize(torch::serialize::OutputArchive& archive) const
+{
+    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(lr);
+    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(k);
+    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(step_counter);
+    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(alpha);
+    _TORCH_OPTIM_SERIALIZE_TORCH_ARG(slow_weights);
+}
+
+void LookaheadOptions::serialize(torch::serialize::InputArchive& archive)
+{
+    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(double, lr);
+    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(uint64_t, k);
+    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(uint64_t, step_counter);
+    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(double, alpha);
+    _TORCH_OPTIM_DESERIALIZE_TORCH_ARG(torch::Tensor, slow_weights);
+}
+
+double LookaheadOptions::get_lr() const
+{
+    return lr();
+}
+
+void LookaheadOptions::set_lr(const double lr)
+{
+    this->lr(lr);
+}
+
+
+bool operator==(const LookaheadParamState& lhs, const LookaheadParamState& rhs) 
+{
+    return true;
+}
+
+void LookaheadParamState::serialize(torch::serialize::OutputArchive& archive) const {}
+
+void LookaheadParamState::serialize(torch::serialize::InputArchive& archive) {}
 
 }
 }

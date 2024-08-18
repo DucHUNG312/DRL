@@ -41,7 +41,7 @@ if(LAB_DEVICE STREQUAL "GPU")
             message(WARNING "CMAKE_CUDA_ARCHITECTURE is not set. Use default architecture.")
         endif()
         message(STATUS "CMAKE_CUDA_ARCHITECTURE: ${CMAKE_CUDA_ARCHITECTURE}")
-        set(CMAKE_CUDA_STANDARD 20)
+        set(CMAKE_CUDA_STANDARD 17)
         set(CMAKE_CUDA_STANDARD_REQUIRED ON)
         # Add CUDA flags
         set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -fpermissive --expt-relaxed-constexpr --expt-extended-lambda -allow-unsupported-compiler -gencode arch=compute_${CMAKE_CUDA_ARCHITECTURE},code=sm_${CMAKE_CUDA_ARCHITECTURE}")
