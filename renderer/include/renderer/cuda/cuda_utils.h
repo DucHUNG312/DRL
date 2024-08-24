@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/core.h"
+#include "renderer/cuda/core.h"
 
 namespace lab
 {

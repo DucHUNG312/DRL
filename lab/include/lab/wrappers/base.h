@@ -8,115 +8,119 @@ namespace lab
 namespace wrappers
 {
 
-template<typename ObsSpace, typename ActSpace>
-class Wrapper : public envs::Env<ObsSpace, ActSpace>
+template<typename Env>
+class Wrapper
 {
+    using ActType = typename Env::ActType;
+protected:
+    c10::intrusive_ptr<Env> env_;
 public:
-    using EnvType = envs::Env<ObsSpace, ActSpace>;
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
+    Wrapper(const c10::intrusive_ptr<Env>& env)
+        : env_(std::move(env))
+    {}
 
-    LAB_ARG(c10::intrusive_ptr<EnvType>, env);
-public:
-    Wrapper(const EnvType& env)
-    {
-        env_ = c10::make_intrusive<EnvType>(env);
-    }
-
-    virtual void reset(uint64_t seed = 0) override
+    void reset(uint64_t seed = 0)
     {
         env_->reset(seed);
     }
 
-    virtual void step(const ActType& action) override
+    void step(const ActType& action)
     {
         env_->step(action);
     }
 
-    virtual void render() override
+    void render()
     {
         env_->render();
     }
 
-    virtual void close() override
+    void close()
     {
         env_->close();
     }
 
-    virtual c10::intrusive_ptr<EnvType> unwrapped() override
+    c10::intrusive_ptr<Env> unwrapped()
     {
-        return env_->unwrapped();
+        return env_;
     }
 };
 
-template<typename ObsSpace, typename ActSpace>
-class ObservationWrapper : public Wrapper<ObsSpace, ActSpace>
+template<typename Env>
+class ObservationWrapper : public Wrapper<Env>
 {
 public:
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
+    using ActType = typename Env::ActType;
+    using Wrapper<Env>::Wrapper;
 
-    LAB_ARG(ObsType, observation);
-public:
-    virtual void reset(uint64_t seed = 0) override
+    void reset(uint64_t seed = 0)
     {
-        this->env()->reset(seed);
-        observation_ = this->env()->result().state;
+        this->env_->reset(seed);
+        observation_ = this->env_->result_.state;
     }
 
-    virtual void step(const ActType& act) override
+    void step(const ActType& act)
     {
-        this->env()->step(act);
-        observation_ = this->env()->result().state;
+        this->env_->step(act);
+        observation_ = this->env_->result_.state;
     }
 
-    virtual ObsType observation(ObsType& obs) = 0;
+    torch::Tensor observation(torch::Tensor& obs)
+    {
+        LAB_UNIMPLEMENTED;
+        return torch::Tensor();
+    }
+protected:
+    torch::Tensor observation_;
 };
 
-template<typename ObsSpace, typename ActSpace>
-class RewardWrapper : public Wrapper<ObsSpace, ActSpace>
+template<typename Env>
+class RewardWrapper : public Wrapper<Env>
 {
 public:
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
+    using ActType = typename Env::ActType;
+    using Wrapper<Env>::Wrapper;
 
-    LAB_ARG(double, reward);
-public:
-    virtual void step(const ActType& act) override
+    void step(const ActType& act)
     {
-        this->env()->step(act);
-        reward_ = this->env()->result().reward;
+        this->env_->step(act);
+        reward_ = this->env_->result_.reward;
     }
 
-    virtual double reward(double r) = 0;
+    double reward(double r)
+    {
+        LAB_UNIMPLEMENTED;
+        return 0;
+    }
+protected:
+    double reward_;
 };
 
-template<typename ObsSpace, typename ActSpace>
-class ActionWrapper : public Wrapper<ObsSpace, ActSpace>
+template<typename Env>
+class ActionWrapper : public Wrapper<Env>
 {
 public:
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
+    using ActType = typename Env::ActType;
+    using Wrapper<Env>::Wrapper;
 
-    LAB_ARG(ActType, action);
-public:
-    virtual void step(const ActType& act) override
+    void step(const ActType& act)
     {
         action_ = act;
-        this->env()->step(action_);
+        this->env_->step(action_);
     }
 
-    virtual ActType action(ActType& act) = 0;
+    ActType action(ActType& act)
+    {
+        LAB_UNIMPLEMENTED;
+        return ActType();
+    }
 
-    virtual ActType reverse_action(ActType& act)
+    ActType reverse_action(ActType& act)
     {
         LAB_UNIMPLEMENTED;
         return action(act);
     }
+protected:
+    ActType action_;
 };
 
 }

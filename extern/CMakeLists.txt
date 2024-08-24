@@ -60,3 +60,32 @@ FetchContent_Declare(
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dataframe
 )
 FetchContent_MakeAvailable(extern_dataframe)
+
+# double-conversion
+FetchContent_Declare(
+    extern_double_conversion
+    GIT_REPOSITORY https://github.com/google/double-conversion.git
+    GIT_TAG v3.3.0
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/double_conversion
+)
+FetchContent_MakeAvailable(extern_double_conversion)
+
+# entt
+FetchContent_Declare(
+    extern_entt
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG v3.13.2
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/entt
+)
+FetchContent_MakeAvailable(extern_entt)
+
+# stduuid
+FetchContent_Declare(
+    extern_stduuid
+    GIT_REPOSITORY https://github.com/mariusbancila/stduuid.git
+    GIT_TAG v1.2.3
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stduuid
+)
+set(UUID_SYSTEM_GENERATOR ON CACHE BOOL "Use system generator" FORCE)
+
+FetchContent_MakeAvailable(extern_stduuid)

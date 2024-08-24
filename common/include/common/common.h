@@ -247,14 +247,21 @@
 
 #define LAB_NONCOPYABLE(class_name)							  \
     class_name(const class_name&)            = delete;		  \
-    class_name& operator=(const class_name&) = delete;
+    class_name& operator=(const class_name&) = delete
 #define LAB_NONCOPYMOVEABLE(class_name)					  \
     class_name(const class_name&)            = delete;		  \
     class_name& operator=(const class_name&) = delete;		  \
     class_name(class_name&&)                 = delete;		  \
-    class_name& operator=(class_name&&)      = delete;
+    class_name& operator=(class_name&&)      = delete
+#define LAB_DEFAULT_CONSTRUCT(Name)                       \
+    Name() = default;                                     \
+    Name(const Name& other) = default;                    \
+    Name& operator=(const Name& other) = default;         \
+    Name(Name&& other) noexcept = default;                \
+    Name& operator=(Name&& other) noexcept = default;     \
+    virtual ~Name() = default
 
-// Suppresses 'unused variable' warnings.
+// Suppresses 'unused variable' warning
 namespace lab
 {
     namespace internal

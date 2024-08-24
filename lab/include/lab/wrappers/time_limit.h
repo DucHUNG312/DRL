@@ -7,44 +7,40 @@ namespace lab
 namespace wrappers
 {
 
-template<typename ObsSpace, typename ActSpace>
-class TimeLimit : public Wrapper<ObsSpace, ActSpace>
+template<typename Env>
+class TimeLimit : public Wrapper<Env>
 {
 public:
-    using EnvType = envs::Env<ObsSpace, ActSpace>;
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
+    using ActType = typename Env::ActType;
 
-    LAB_ARG(int64_t, max_episode_steps);
-    LAB_ARG(int64_t, elapsed_steps);
-public:
-
-    TimeLimit(const EnvType& env, int64_t max_episode_steps = -1)
-        : Wrapper<ObsSpace, ActSpace>(env)
+    TimeLimit(const c10::intrusive_ptr<Env>& env, int64_t max_frame = -1)
+        : Wrapper<Env>(std::move(env))
     {
-        if(max_episode_steps == -1 && this->env()->env_options().max_episode_steps != -1)
-            max_episode_steps =  this->env()->env_options().max_episode_steps;
-        else if(this->env()->env_options().max_episode_steps == -1)
-            this->env()->env_options().max_episode_steps = max_episode_steps;
-        max_episode_steps_ = max_episode_steps;
+        if(max_frame == -1 && this->env_->env_spec_.max_frame != -1)
+            max_frame =  this->env_->env_spec_.max_frame;
+        else if(this->env_->env_spec_.max_frame == -1)
+            this->env_->env_spec_.max_frame = max_frame;
+        max_frame_ = max_frame;
         elapsed_steps_ = 0;
     }
 
-    virtual void reset(uint64_t seed = 0) override
+    void reset(uint64_t seed = 0)
     {
         elapsed_steps_ = 0;
-        this->env()->reset(seed);
+        this->env_->reset(seed);
     }
 
-    virtual void step(const ActType& action) override
+    void step(const ActType& action)
     {
-        this->env()->step(action);
+        this->env_->step(action);
         elapsed_steps_ += 1;
 
-        if(elapsed_steps_ >= max_episode_steps_)
-            this->env()->result().truncated = true;
+        if(elapsed_steps_ >= max_frame_)
+            this->env_->result_.truncated = true;
     }
+protected:
+    int64_t max_frame_;
+    int64_t elapsed_steps_;
 };
 
 

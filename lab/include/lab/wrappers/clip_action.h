@@ -8,26 +8,24 @@ namespace lab
 namespace wrappers
 {
 
-template<typename ObsSpace, typename ActSpace>
-class ClipAction : public ActionWrapper<ObsSpace, ActSpace>
+template<typename Env>
+class ClipAction : public ActionWrapper<Env>
 {
 public:
-    using EnvType = envs::Env<ObsSpace, ActSpace>;
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
-public:
+    using ActType = typename Env::ActType;
 
-    ClipAction(const EnvType& env)
-        : Wrapper<ObsSpace, ActSpace>(env)
+    ClipAction(const c10::intrusive_ptr<Env>& env)
+        : ActionWrapper<Env>(std::move(env))
     {
-        static_assert(std::is_same_v<ActSpace, spaces::Box>);
+        static_assert(std::is_same_v<ActType, torch::Tensor>);
 
     }
 
-    virtual ActType action(ActType& act) override
+    ActType action(ActType& act)
     {
-        return torch::clip(act, this->env()->action_space().low(), this->env()->action_space().high());
+        return torch::clip(act, 
+            this->env_->get_action_spaces()->template as<spaces::BoxImpl>()->low(), 
+            this->env_->get_action_spaces()->template as<spaces::BoxImpl>()->high());
     }
 };
 

@@ -1,5 +1,5 @@
 #include "lab/utils/optimizer.h"
-#include "lab/utils/math.h"
+#include <renderer/math/math.h>
 
 namespace torch
 {
@@ -169,7 +169,7 @@ torch::Tensor RAdam::step(Optimizer::LossClosure closure /*= nullptr*/)
                 N_sma = N_sma_max - 2 * state.step() * bias_correction2 / (1 - bias_correction2);
                 buffered[1].fill_(N_sma);
                 if(N_sma >= 5)
-                    step_size = lab::utils::math::safe_sqrt(
+                    step_size = lab::math::safe_sqrt(
                         ((1 - bias_correction2) * (N_sma - 4) * (N_sma - 2) * N_sma_max) / 
                         ((N_sma_max - 4) *  N_sma * (N_sma_max - 2))
                     ) / bias_correction1;

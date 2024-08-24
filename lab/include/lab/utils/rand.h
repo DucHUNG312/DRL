@@ -10,37 +10,30 @@ namespace utils
 class Rand
 {
 public:
-    torch::Generator generator;
-    uint64_t seed;
-public:
-    Rand(uint64_t seed = 0);
-    ~Rand() = default;
-    Rand(const Rand& other) = default;
-    Rand(Rand&& other) noexcept = default;
-    Rand& operator=(const Rand& other) = default;
-    Rand& operator=(Rand&& other) noexcept = default;
+    Rand(uint64_t seed);
+    LAB_DEFAULT_CONSTRUCT(Rand);
 
-    void set_seed(uint64_t seed);
+    void reset(uint64_t seed = 0);
 
-    int64_t choice(const torch::Tensor& prob, double u = -1);
+    void set_current_seed(uint64_t seed);
 
-    double sample_real_uniform(double a, double b);
+    uint64_t current_seed();
 
-    torch::Tensor sample_real_uniform(double a, double b, torch::IntArrayRef shape);
+    void set_state(const torch::Tensor& new_state);
 
-    torch::Tensor sample_real_uniform(double a, double b, const torch::Tensor& in);
+    torch::Tensor get_state() const;
 
-    torch::Tensor sample_real_uniform(const torch::Tensor& a, const torch::Tensor& b);
+    int64_t choice(const torch::Tensor& prob, std::optional<double> u = std::nullopt);
 
-    int64_t sample_int_uniform(int64_t a, int64_t b);
-
-    torch::Tensor sample_int_uniform(int64_t a, int64_t b, torch::IntArrayRef shape);
-
-    double sample_gaussian(double mu, double sigma);
+    torch::Tensor sample_uniform(const torch::Tensor& a, const torch::Tensor& b);
 
     torch::Tensor sample_gaussian(double mu, double sigma, torch::IntArrayRef shape);
 
     torch::Tensor gen_int_permutation(int64_t n);
+
+    int64_t sample_int_uniform(int64_t a, int64_t b);
+private:
+    torch::Generator generator_;
 };     
 }
 }

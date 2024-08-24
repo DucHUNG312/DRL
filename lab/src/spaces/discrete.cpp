@@ -5,31 +5,47 @@ namespace lab
 namespace spaces
 {
 
-Discrete::Discrete()
+DiscreteOptions::DiscreteOptions(int64_t n, int64_t start)
+    : n_(n), start_(start) {}
+
+DiscreteImpl::DiscreteImpl(const DiscreteOptions& options_)
+    : options(options_)
 {
-    name_ = SpaceType::DISCRETE; 
-    shape_ = utils::make_shape(int64_t(1)); 
-    n_ = 0; 
-    start_ = 0; 
+    reset();
 }
 
-Discrete::Discrete(int64_t _n, int64_t _start /*= 0*/)
+void DiscreteImpl::reset()
 {
-    name_ = SpaceType::DISCRETE; 
-    shape_ = utils::make_shape(int64_t(1)); 
-    n_ = _n;
-    start_ = _start;
+    n = register_parameter("n", torch::tensor({options.n()}, torch::kInt64));
+    start = register_parameter("start", torch::tensor({options.start()}, torch::kInt64));
+    shape_ = torch::tensor({1}, torch::kInt64);
+    name_ = "Discrete";
 }
 
-int64_t Discrete::sample()
+void DiscreteImpl::pretty_print(std::ostream& stream) const
 {
-    int64_t offset = rand().sample_int_uniform(0, n_);
-    return start_ + offset;
+    stream << std::boolalpha
+    << "lab::spaces::Discrete(n=" << options.n()
+    << ", start=" << options.start() << ")";
 }
 
-bool Discrete::contains(const int64_t& x) const
+int64_t DiscreteImpl::sample(/*const torch::Tensor& mask*/)
 {
-    return (x >= start_ && x < start_ + n_);
+    // if(mask.defined())
+    // {
+    //     LAB_CHECK(mask.dim() == 1 && mask.sizes() == n.sizes());
+    //     LAB_CHECK(!utils::has_all_zeros(mask));
+    //     torch::Tensor valid_indices = torch::nonzero(mask).to(torch::kInt64);
+    //     torch::Tensor random_index = start + valid_indices[rand_.sample_int_uniform(0, valid_indices.size(0))];
+    //     return random_index.item<int64_t>();
+    // }
+
+    return rand_.sample_int_uniform(options.start(), options.start() + options.n());
+}
+
+bool DiscreteImpl::contains(int64_t x) const
+{
+    return (options.start() <= x) && (x < options.start() + options.n());
 }
 
 }

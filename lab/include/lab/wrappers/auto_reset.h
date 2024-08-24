@@ -7,24 +7,21 @@ namespace lab
 namespace wrappers
 {
 
-template<typename ObsSpace, typename ActSpace>
-class AutoResetWrapper : public Wrapper<ObsSpace, ActSpace>
+template<typename Env>
+class AutoResetWrapper : public Wrapper<Env>
 {
 public:
-    using EnvType = envs::Env<ObsSpace, ActSpace>;
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using StepResultType = utils::StepResult<ObsType>;
-public:
-    AutoResetWrapper(const EnvType& env)
-        : Wrapper<ObsSpace, ActSpace>(env)
+    using ActType = typename Env::ActType;
+
+    AutoResetWrapper(const c10::intrusive_ptr<Env>& env)
+        : Wrapper<Env>(std::move(env))
     {}
 
-    virtual void step(const ActType& action) override
+    void step(const ActType& action)
     {
-        this->env()->step(action);
-        if (this->env()->result().terminated || this->env()->result().truncated)
-            this->env()->reset();
+        this->env_->step(action);
+        if (this->env_->result_.terminated || this->env_->result_.truncated)
+            this->env_->reset();
     }
 };
 

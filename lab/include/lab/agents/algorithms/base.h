@@ -7,30 +7,20 @@ namespace lab
 namespace agents
 {
 
-template<typename ObsSpace, typename ActSpace>
-class Agent;
-
-template<typename ObsSpace, typename ActSpace>
 class Algorithm
 {
 public:
-    using ObsType = typename ObsSpace::Type;
-    using ActType = typename ActSpace::Type;
-    using AgentType = Agent<ObsSpace, ActSpace>;
+    LAB_DEFAULT_CONSTRUCT(Algorithm);
 
-    LAB_ARG(AgentType, agent);
-public:
-    Algorithm(const AgentType& agent)
-    {
-
-    }
-
-    ActType act(const ActType& action)
-    {
-        return action;
-    }
-
+    template<typename ActType>
+    ActType act(const ActType& action);
 };
+
+template<typename ActType>
+ActType Algorithm::act(const ActType& action)
+{
+    return action;
+}
 
 }
 }

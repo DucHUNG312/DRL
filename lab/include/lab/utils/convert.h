@@ -20,5 +20,9 @@ Mat eigen_to_tensor(const torch::Tensor& in_tensor);
 
 std::vector<int64_t> get_arayref_data(torch::IntArrayRef arr);
 
+std::vector<double> get_data_from_tensor(const torch::Tensor& tensor);
+
+torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vector<int64_t>& shape);
+
 }
 }

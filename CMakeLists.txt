@@ -110,22 +110,31 @@ find_package(spdlog REQUIRED)
 find_package(OpenGL)
 find_package(LZ4 REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(Libuuid REQUIRED)
 
 add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment/")
 
 # common
 set(COMMON_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/common/include")
-set(COMMON_LINKED_LIBRARIES spdlog::spdlog_header_only)
+set(COMMON_LINKED_LIBRARIES 
+    spdlog::spdlog_header_only)
 add_subdirectory("common")
 
 # renderer
 set(RENDERER_INCLUDE_DIRS
     ${COMMON_INCLUDE_DIRS}
     "${CMAKE_SOURCE_DIR}/renderer/include"
+    "${CMAKE_SOURCE_DIR}/extern/entt/src"
+    "${CMAKE_SOURCE_DIR}/extern/stduuid/include"
+    "${CMAKE_SOURCE_DIR}/extern/stduuid"
+    "${CMAKE_SOURCE_DIR}/extern/glm"
 )
 set(RENDERER_LINKED_LIBRARIES
     ${COMMON_LINKED_LIBRARIES}
     ${OPENGL_LIBRARIES}
+    double-conversion
+    EnTT::EnTT 
+    stduuid
     common 
 )
 if(LAB_DEVICE STREQUAL "GPU")

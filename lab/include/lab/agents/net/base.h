@@ -14,37 +14,16 @@ class Net
     LAB_ARG(torch::IntArrayRef, out_dim);
     LAB_ARG(torch::Device, device) = torch::kCPU;
 public:
-    Net() = default;
-    Net(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim)
-    {
-        spec_ = spec;
-        in_dim_ = in_dim;
-        out_dim_ = out_dim;
+    Net(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim);
+    LAB_DEFAULT_CONSTRUCT(Net);
 
-        if(spec_.gpu && utils::get_torch_device() == torch::kCUDA)
-            device_ = torch::kCUDA;
-    }
+    torch::Tensor forward(torch::Tensor x);
 
-    virtual torch::Tensor forward(torch::Tensor x)
-    {
-        LAB_UNIMPLEMENTED;
-        return torch::Tensor();
-    }
-
-    virtual torch::Tensor train_step(
+    torch::Tensor train_step(
         torch::Tensor loss, 
         torch::optim::Optimizer& optimizer, 
         torch::optim::LRScheduler& lr_scheduler,
-        utils::Clock& clock
-        )
-    {
-        lr_scheduler.step();
-        optimizer.zero_grad();
-        loss.backward();
-        optimizer.step();
-        clock.tick_opt_step();
-        return loss;
-    }
+        utils::Clock& clock);
 };
 
 }

@@ -60,12 +60,7 @@ struct ExploreVarSpec
     uint64_t start_step;
     uint64_t end_step;
 
-    ExploreVarSpec() = default;
-    ExploreVarSpec(const ExploreVarSpec& other) = default;
-    ExploreVarSpec& operator=(const ExploreVarSpec& other) = default;
-    ExploreVarSpec(ExploreVarSpec&& other) noexcept = default;
-    ExploreVarSpec& operator=(ExploreVarSpec&& other) noexcept = default;
-    ~ExploreVarSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(ExploreVarSpec);
 };
 
 struct EntropyCoefSpec
@@ -76,12 +71,7 @@ struct EntropyCoefSpec
     uint64_t start_step;
     uint64_t end_step;
 
-    EntropyCoefSpec() = default;
-    EntropyCoefSpec(const EntropyCoefSpec& other) = default;
-    EntropyCoefSpec& operator=(const EntropyCoefSpec& other) = default;
-    EntropyCoefSpec(EntropyCoefSpec&& other) noexcept = default;
-    EntropyCoefSpec& operator=(EntropyCoefSpec&& other) noexcept = default;
-    ~EntropyCoefSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(EntropyCoefSpec);
 };
 
 struct AlgorithmSpec
@@ -97,12 +87,7 @@ struct AlgorithmSpec
     uint64_t training_iter;
     uint64_t training_start_step;
 
-    AlgorithmSpec() = default;
-    AlgorithmSpec(const AlgorithmSpec& other) = default;
-    AlgorithmSpec& operator=(const AlgorithmSpec& other) = default;
-    AlgorithmSpec(AlgorithmSpec&& other) noexcept = default;
-    AlgorithmSpec& operator=(AlgorithmSpec&& other) noexcept = default;
-    ~AlgorithmSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(AlgorithmSpec);
 };
 
 struct MemorySpec
@@ -112,24 +97,14 @@ struct MemorySpec
     uint64_t max_size;
     bool use_cer;
 
-    MemorySpec() = default;
-    MemorySpec(const MemorySpec& other) = default;
-    MemorySpec& operator=(const MemorySpec& other) = default;
-    MemorySpec(MemorySpec&& other) noexcept = default;
-    MemorySpec& operator=(MemorySpec&& other) noexcept = default;
-    ~MemorySpec() = default;
+    LAB_DEFAULT_CONSTRUCT(MemorySpec);
 };
 
 struct LossSpec
 {
     std::string name;
 
-    LossSpec() = default;
-    LossSpec(const LossSpec& other) = default;
-    LossSpec& operator=(const LossSpec& other) = default;
-    LossSpec(LossSpec&& other) noexcept = default;
-    LossSpec& operator=(LossSpec&& other) noexcept = default;
-    ~LossSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(LossSpec);
 };
 
 struct OptimSpec
@@ -137,12 +112,7 @@ struct OptimSpec
     std::string name;
     double lr;
 
-    OptimSpec() = default;
-    OptimSpec(const OptimSpec& other) = default;
-    OptimSpec& operator=(const OptimSpec& other) = default;
-    OptimSpec(OptimSpec&& other) noexcept = default;
-    OptimSpec& operator=(OptimSpec&& other) noexcept = default;
-    ~OptimSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(OptimSpec);
 };
 
 struct LrSchedulerSpec
@@ -151,12 +121,7 @@ struct LrSchedulerSpec
     uint64_t step_size;
     double gamma;
 
-    LrSchedulerSpec() = default;
-    LrSchedulerSpec(const LrSchedulerSpec& other) = default;
-    LrSchedulerSpec& operator=(const LrSchedulerSpec& other) = default;
-    LrSchedulerSpec(LrSchedulerSpec&& other) noexcept = default;
-    LrSchedulerSpec& operator=(LrSchedulerSpec&& other) noexcept = default;
-    ~LrSchedulerSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(LrSchedulerSpec);
 };
 
 struct NetSpec
@@ -175,12 +140,7 @@ struct NetSpec
     uint64_t polyak_coef;
     bool gpu;
 
-    NetSpec() = default;
-    NetSpec(const NetSpec& other) = default;
-    NetSpec& operator=(const NetSpec& other) = default;
-    NetSpec(NetSpec&& other) noexcept = default;
-    NetSpec& operator=(NetSpec&& other) noexcept = default;
-    ~NetSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(NetSpec);
 };
 
 struct AgentSpec
@@ -190,12 +150,7 @@ struct AgentSpec
     MemorySpec memory;
     NetSpec net;
 
-    AgentSpec() = default;
-    AgentSpec(const AgentSpec& other) = default;
-    AgentSpec& operator=(const AgentSpec& other) = default;
-    AgentSpec(AgentSpec&& other) noexcept = default;
-    AgentSpec& operator=(AgentSpec&& other) noexcept = default;
-    ~AgentSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(AgentSpec);
 };
 
 struct RendererSpec
@@ -205,12 +160,7 @@ struct RendererSpec
     uint64_t screen_width;
     uint64_t screen_height;
 
-    RendererSpec() = default;
-    RendererSpec(const RendererSpec& other) = default;
-    RendererSpec& operator=(const RendererSpec& other) = default;
-    RendererSpec(RendererSpec&& other) noexcept = default;
-    RendererSpec& operator=(RendererSpec&& other) noexcept = default;
-    ~RendererSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(RendererSpec);
 };
 
 struct EnvSpec
@@ -230,12 +180,7 @@ struct EnvSpec
     bool is_open;
     RendererSpec renderer;
 
-    EnvSpec() = default;
-    EnvSpec(const EnvSpec& other) = default;
-    EnvSpec& operator=(const EnvSpec& other) = default;
-    EnvSpec(EnvSpec&& other) noexcept = default;
-    EnvSpec& operator=(EnvSpec&& other) noexcept = default;
-    ~EnvSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(EnvSpec);
 };
 
 struct BodySpec
@@ -243,12 +188,7 @@ struct BodySpec
     std::string product;
     uint64_t num;
 
-    BodySpec() = default;
-    BodySpec(const BodySpec& other) = default;
-    BodySpec& operator=(const BodySpec& other) = default;
-    BodySpec(BodySpec&& other) noexcept = default;
-    BodySpec& operator=(BodySpec&& other) noexcept = default;
-    ~BodySpec() = default;
+    LAB_DEFAULT_CONSTRUCT(BodySpec);
 };
 
 struct MetaSpec
@@ -262,12 +202,7 @@ struct MetaSpec
     uint64_t max_trial;
     SearchType search;
 
-    MetaSpec() = default;
-    MetaSpec(const MetaSpec& other) = default;
-    MetaSpec& operator=(const MetaSpec& other) = default;
-    MetaSpec(MetaSpec&& other) noexcept = default;
-    MetaSpec& operator=(MetaSpec&& other) noexcept = default;
-    ~MetaSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(MetaSpec);
 };
 
 struct LabSpec
@@ -277,12 +212,7 @@ struct LabSpec
     BodySpec body;
     MetaSpec meta;
 
-    LabSpec() = default;
-    LabSpec(const LabSpec& other) = default;
-    LabSpec& operator=(const LabSpec& other) = default;
-    LabSpec(LabSpec&& other) noexcept = default;
-    LabSpec& operator=(LabSpec&& other) noexcept = default;
-    ~LabSpec() = default;
+    LAB_DEFAULT_CONSTRUCT(LabSpec);
 };
 
 ActionPdType str_to_action_pd_type(const std::string& str);

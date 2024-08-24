@@ -8,17 +8,18 @@ namespace lab
 namespace envs
 {
 
-class CartPole : public ContinuousStateEnv
+class CartPole : public Env
 {
 public:
+    using ActType = int64_t;
+
     CartPole();
-    CartPole(const utils::EnvSpec& env_spec);
-    virtual ~CartPole() = default;
-    virtual void reset(uint64_t seed = 0) override;
-    virtual void step(const int64_t& action) override;
-    virtual void close() override;
-    virtual void render() override;
-    virtual c10::intrusive_ptr<ContinuousStateEnv> unwrapped() override;
+    void reset(uint64_t seed = 0);
+    void step(int64_t action);
+    int64_t sample();
+    void close();
+    void render();
+    void enable_rendering();
 public:
     double gravity = 9.8;
     double masscart = 1.0;
@@ -29,13 +30,12 @@ public:
     double force_mag = 10.0;
     double tau = 0.02;
     std::string kinematics_integrator = "euler";
-    double theta_threshold_radians = 12 * 2 * utils::math::Pi / 360;
+    double theta_threshold_radians = 12 * 2 * lab::math::Pi / 360;
     double x_threshold = 2.4;
     int64_t steps_beyond_terminated = -1;
     double reset_low = -0.05;
     double reset_high = 0.05;
-private: 
-    void init();
+    std::string entity_id;
 };
 
 }

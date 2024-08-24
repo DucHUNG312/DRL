@@ -9,60 +9,6 @@ namespace lab
 namespace utils
 {
 
-template<typename T>
-struct StepResult
-{
-    T state;
-    double reward = 0;
-    bool terminated = false; 
-    bool truncated = false;
-
-    StepResult() = default;
-    StepResult(const T& state, double reward, bool terminated, bool truncated)
-        : state(state), reward(reward), terminated(terminated), truncated(truncated) {}
-    StepResult(const StepResult& other) = default;
-    StepResult(StepResult&& other) noexcept = default;
-    StepResult& operator=(const StepResult& other) = default;
-    StepResult& operator=(StepResult&& other) noexcept = default;
-    virtual ~StepResult() = default;
-
-    bool operator==(const StepResult& other) const 
-    {
-        return state == other.state &&
-               reward == other.reward &&
-               terminated == other.terminated &&
-               truncated == other.truncated;
-    }
-
-    bool operator==(StepResult& other) 
-    {
-        return state == other.state &&
-               reward == other.reward &&
-               terminated == other.terminated &&
-               truncated == other.truncated;
-    }
-
-    bool operator!=(const StepResult& other) const 
-    {
-        return !(*this == other);
-    }
-
-    bool operator!=(StepResult& other) 
-    {
-        return !(*this == other);
-    }
-};
-
-template<typename T>
-LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& os, const StepResult<T>& result)
-{
-    os << "state: " << result.state << "\n";
-    os << "reward: " << result.reward << "\n";
-    os << "terminated: " << (result.terminated ? "true" : "false") << "\n";
-    os << "truncated: " << (result.truncated ? "true" : "false");
-    return os;
-}
-
 class Clock
 {
 public:

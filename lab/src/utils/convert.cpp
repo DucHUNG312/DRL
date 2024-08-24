@@ -69,5 +69,27 @@ std::vector<int64_t> get_arayref_data(torch::IntArrayRef arr)
     std::copy(arr.begin(), arr.end(), result.begin());
     return result;
 }
+
+std::vector<double> get_data_from_tensor(const torch::Tensor& tensor)
+{
+    torch::Tensor tensor_ = tensor.to(torch::kDouble).view(-1);
+    return std::vector<double>(tensor_.data_ptr<double>(), tensor_.data_ptr<double>() + tensor_.numel());
+}
+
+torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vector<int64_t>& shape) 
+{
+    int64_t total_size = 1;
+    for (int64_t dim : shape)
+        total_size *= dim;
+
+    if(vec.size() != total_size) 
+        throw std::invalid_argument("Size of vector does not match the specified shape.");
+
+    auto options = torch::TensorOptions().dtype(torch::kDouble).requires_grad(false);
+    torch::Tensor tensor = torch::empty(shape, options);
+    std::memcpy(tensor.data_ptr(), vec.data(), vec.size() * sizeof(double));
+    
+    return tensor;
+}
 }
 }
