@@ -1,7 +1,8 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/utils.h"
+#include "lab/utils/rand.h"
+#include "lab/utils/spaceholder.h"
 
 namespace lab
 {
@@ -28,12 +29,6 @@ public:
     void save(torch::serialize::OutputArchive& archive) const;
 
     void load(torch::serialize::InputArchive& archive);
-
-    template <typename SpaceType>
-    SpaceType* as() noexcept;
-
-    template <typename SpaceType>
-    const SpaceType* as() const noexcept;
 
     template <typename SpaceType>
     std::shared_ptr<SpaceType> register_subspace(std::string name, std::shared_ptr<SpaceType> space);
@@ -72,6 +67,18 @@ public:
     {
         return children_.end();
     }
+
+    template <typename SpaceType>
+    typename SpaceType::ContainedType* as() noexcept;
+
+    template <typename SpaceType>
+    const typename SpaceType::ContainedType* as() const noexcept;
+
+    template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
+    SpaceType* as() noexcept;
+
+    template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
+    const SpaceType* as() const noexcept;
 private:
     template <typename Derived>
     friend class ClonableSpace;
@@ -84,19 +91,31 @@ torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& arc
 torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Space>& space);
 
 template <typename SpaceType>
-LAB_FORCE_INLINE SpaceType* Space::as() noexcept
+typename SpaceType::ContainedType* Space::as() noexcept 
+{
+    return as<typename SpaceType::ContainedType>();
+}
+
+template <typename SpaceType>
+const typename SpaceType::ContainedType* Space::as() const noexcept 
+{
+    return as<typename SpaceType::ContainedType>();
+}
+
+template <typename SpaceType, typename>
+SpaceType* Space::as() noexcept 
 {
     return dynamic_cast<SpaceType*>(this);
 }
 
-template <typename SpaceType>
-LAB_FORCE_INLINE const SpaceType* Space::as() const noexcept
+template <typename SpaceType, typename>
+const SpaceType* Space::as() const noexcept 
 {
     return dynamic_cast<const SpaceType*>(this);
 }
 
 template <typename SpaceType>
-LAB_FORCE_INLINE std::shared_ptr<SpaceType> Space::register_subspace(std::string name, std::shared_ptr<SpaceType> space)
+std::shared_ptr<SpaceType> Space::register_subspace(std::string name, std::shared_ptr<SpaceType> space)
 {
     LAB_CHECK(!name.empty());
     LAB_CHECK(name.find('.') == std::string::npos);
@@ -105,7 +124,7 @@ LAB_FORCE_INLINE std::shared_ptr<SpaceType> Space::register_subspace(std::string
 }
 
 template <typename SpaceType>
-LAB_FORCE_INLINE std::shared_ptr<SpaceType> Space::register_subspace(std::string name, utils::SpaceHolder<SpaceType> space_holder)
+std::shared_ptr<SpaceType> Space::register_subspace(std::string name, utils::SpaceHolder<SpaceType> space_holder)
 {
     return register_subspace(std::move(name), space_holder.ptr());
 }

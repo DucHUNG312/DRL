@@ -11,17 +11,13 @@ template<typename Env>
 class AutoResetWrapper : public Wrapper<Env>
 {
 public:
-    using ActType = typename Env::ActType;
+    using Wrapper<Env>::Wrapper;
 
-    AutoResetWrapper(const c10::intrusive_ptr<Env>& env)
-        : Wrapper<Env>(std::move(env))
-    {}
-
-    void step(const ActType& action)
+    void step(const torch::IValue& action)
     {
-        this->env_->step(action);
-        if (this->env_->result_.terminated || this->env_->result_.truncated)
-            this->env_->reset();
+        this->unwrapped()->step(action);
+        if (this->unwrapped()->result_.terminated || this->unwrapped()->result_.truncated)
+            this->unwrapped()->reset();
     }
 };
 

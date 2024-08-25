@@ -6,6 +6,16 @@ namespace lab
 namespace utils
 {
 
+bool is_torch_cuda_available()
+{
+    return torch::cuda::is_available();
+}
+
+torch::Device get_torch_device()
+{
+    return is_torch_cuda_available() ? torch::kCUDA : torch::kCPU;
+}
+
 torch::nn::Sequential build_fc_model(const std::vector<int64_t>& dims, const torch::nn::AnyModule& activation)
 {
     LAB_CHECK_GE(dims.size(), 2);
@@ -49,25 +59,25 @@ torch::nn::AnyModule get_loss_fn(const std::string& name)
     return torch::nn::AnyModule();
 }
 
-std::shared_ptr<torch::optim::Optimizer> get_optim(const torch::nn::Module& net, const OptimSpec& optim_spec)
+std::shared_ptr<torch::optim::Optimizer> get_optim(const std::shared_ptr<torch::nn::Module>& net, const OptimSpec& optim_spec)
 {
     std::string name = optim_spec.name;
     
     //if (name == "SGD") return std::make_shared<torch::optim::SGD>(net.parameters());
-    if (name == "Adam") return std::make_shared<torch::optim::Adam>(net.parameters());
-    else if (name == "GlobalAdam") return std::make_shared<torch::optim::GlobalAdam>(net.parameters());
-    else if (name == "RAdam") return std::make_shared<torch::optim::RAdam>(net.parameters());
-    else if (name == "RMSprop") return std::make_shared<torch::optim::RMSprop>(net.parameters());
-    else if (name == "GlobalRMSprop") return std::make_shared<torch::optim::GlobalRMSprop>(net.parameters());
+    if (name == "Adam") return std::make_shared<torch::optim::Adam>(net->parameters());
+    else if (name == "GlobalAdam") return std::make_shared<torch::optim::GlobalAdam>(net->parameters());
+    else if (name == "RAdam") return std::make_shared<torch::optim::RAdam>(net->parameters());
+    else if (name == "RMSprop") return std::make_shared<torch::optim::RMSprop>(net->parameters());
+    else if (name == "GlobalRMSprop") return std::make_shared<torch::optim::GlobalRMSprop>(net->parameters());
 
     LAB_LOG_FATAL("Unsupported optimizer!");
     return nullptr;
 }
 
-std::shared_ptr<torch::optim::LRScheduler> get_lr_schedular(torch::optim::Optimizer& optimizer, const LrSchedulerSpec& spec)
+std::shared_ptr<torch::optim::LRScheduler> get_lr_schedular(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec)
 {
     std::string name = spec.name;
-    if(name == "StepLR") return std::make_shared<torch::optim::StepLR>(optimizer, spec.step_size, spec.gamma);
+    if(name == "StepLR") return std::make_shared<torch::optim::StepLR>(*optimizer, spec.step_size, spec.gamma);
 
     LAB_LOG_FATAL("Unsupported Schedular!");
     return nullptr;

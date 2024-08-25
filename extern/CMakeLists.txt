@@ -52,15 +52,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(extern_json)
 
-#DataFrame
-FetchContent_Declare(
-    extern_dataframe
-    GIT_REPOSITORY https://github.com/hosseinmoein/DataFrame.git
-    GIT_TAG 2.1.0
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dataframe
-)
-FetchContent_MakeAvailable(extern_dataframe)
-
 # double-conversion
 FetchContent_Declare(
     extern_double_conversion

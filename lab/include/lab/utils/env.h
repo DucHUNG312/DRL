@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/dataframe.h"
 
 namespace lab
 {
@@ -23,7 +22,7 @@ public:
     static std::chrono::time_point<std::chrono::high_resolution_clock> now();
 
     void reset();
-    void load(utils::DataFrame& train_df);
+    void load();
     double get_elapsed_wall_time();
     void set_batch_size(int64_t size);
     void tick_time();

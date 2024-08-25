@@ -146,11 +146,19 @@ struct NetSpec
 struct AgentSpec
 {
     std::string name;
+
+    LAB_DEFAULT_CONSTRUCT(AgentSpec);
+};
+
+struct BodySpec
+{
+    std::string product;
+    uint64_t num;
     AlgorithmSpec algorithm;
     MemorySpec memory;
     NetSpec net;
 
-    LAB_DEFAULT_CONSTRUCT(AgentSpec);
+    LAB_DEFAULT_CONSTRUCT(BodySpec);
 };
 
 struct RendererSpec
@@ -181,14 +189,6 @@ struct EnvSpec
     RendererSpec renderer;
 
     LAB_DEFAULT_CONSTRUCT(EnvSpec);
-};
-
-struct BodySpec
-{
-    std::string product;
-    uint64_t num;
-
-    LAB_DEFAULT_CONSTRUCT(BodySpec);
 };
 
 struct MetaSpec

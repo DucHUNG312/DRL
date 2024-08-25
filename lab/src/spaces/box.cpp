@@ -1,4 +1,5 @@
 #include "lab/spaces/box.h"
+#include "lab/utils/tensor.h"
 
 namespace lab
 {

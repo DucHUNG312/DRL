@@ -12,20 +12,14 @@ template<typename Env>
 class ClipAction : public ActionWrapper<Env>
 {
 public:
-    using ActType = typename Env::ActType;
+    using ActionWrapper<Env>::ActionWrapper;
 
-    ClipAction(const c10::intrusive_ptr<Env>& env)
-        : ActionWrapper<Env>(std::move(env))
+    torch::IValue action(torch::IValue& act)
     {
-        static_assert(std::is_same_v<ActType, torch::Tensor>);
-
-    }
-
-    ActType action(ActType& act)
-    {
+        LAB_CHECK(act.isTensor());
         return torch::clip(act, 
-            this->env_->get_action_spaces()->template as<spaces::BoxImpl>()->low(), 
-            this->env_->get_action_spaces()->template as<spaces::BoxImpl>()->high());
+            this->unwrapped()->get_action_spaces()->template as<spaces::Box>()->low(), 
+            this->unwrapped()->get_action_spaces()->template as<spaces::Box>()->high());
     }
 };
 

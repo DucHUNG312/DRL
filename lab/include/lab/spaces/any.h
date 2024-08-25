@@ -2,6 +2,7 @@
 
 #include "lab/core.h"
 #include "lab/utils/anyspaceholder.h"
+#include "lab/utils/typetraits.h"
 
 namespace lab
 {

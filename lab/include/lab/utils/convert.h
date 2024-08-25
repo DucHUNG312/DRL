@@ -24,5 +24,26 @@ std::vector<double> get_data_from_tensor(const torch::Tensor& tensor);
 
 torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vector<int64_t>& shape);
 
+template<typename IteratorIn, typename IteratorOut>
+void void_to_string(IteratorIn first, IteratorIn last, IteratorOut out)
+{
+    std::transform(first, last, out, [](auto d) { return std::to_string(d); } );
+}
+
+template<typename IteratorIn, typename IteratorOut>
+void string_vec_to_const_char(IteratorIn first, IteratorIn last, IteratorOut out)
+{
+    std::transform(first, last, out, [](const std::string& s) { return s.c_str(); } );
+}
+
+template<typename IteratorIn, typename IteratorOut>
+void void_to_const_char(IteratorIn first, IteratorIn last, IteratorOut out)
+{
+    std::vector<std::string> temp;
+    temp.reserve(std::distance(first, last));
+    void_to_string(first, last, std::back_inserter(temp));
+    string_vec_to_const_char(temp.begin(), temp.end(), out);
+}
+
 }
 }

@@ -8,7 +8,7 @@ namespace lab
 namespace agents
 {
 
-class MLPNetImpl : public Net, public torch::nn::Module
+class MLPNetImpl : public NetImpl
 {
     LAB_ARG(torch::nn::Sequential, model);
     LAB_ARG(torch::nn::ModuleList, model_tail);

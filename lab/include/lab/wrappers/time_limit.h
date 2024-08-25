@@ -11,15 +11,13 @@ template<typename Env>
 class TimeLimit : public Wrapper<Env>
 {
 public:
-    using ActType = typename Env::ActType;
-
-    TimeLimit(const c10::intrusive_ptr<Env>& env, int64_t max_frame = -1)
+    TimeLimit(const utils::SpaceHolder<Env>& env, int64_t max_frame = -1)
         : Wrapper<Env>(std::move(env))
     {
-        if(max_frame == -1 && this->env_->env_spec_.max_frame != -1)
-            max_frame =  this->env_->env_spec_.max_frame;
-        else if(this->env_->env_spec_.max_frame == -1)
-            this->env_->env_spec_.max_frame = max_frame;
+        if(max_frame == -1 && this->unwrapped()->env_spec_.max_frame != -1)
+            max_frame_ =  this->unwrapped()->env_spec_.max_frame;
+        else if(this->unwrapped()->env_spec_.max_frame == -1)
+            this->unwrapped()->env_spec_.max_frame = max_frame;
         max_frame_ = max_frame;
         elapsed_steps_ = 0;
     }
@@ -27,16 +25,16 @@ public:
     void reset(uint64_t seed = 0)
     {
         elapsed_steps_ = 0;
-        this->env_->reset(seed);
+        this->unwrapped()->reset(seed);
     }
 
-    void step(const ActType& action)
+    void step(const torch::IValue& action)
     {
-        this->env_->step(action);
+        this->unwrapped()->step(action);
         elapsed_steps_ += 1;
 
         if(elapsed_steps_ >= max_frame_)
-            this->env_->result_.truncated = true;
+            this->unwrapped()->result_.truncated = true;
     }
 protected:
     int64_t max_frame_;

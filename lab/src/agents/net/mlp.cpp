@@ -1,5 +1,5 @@
 #include "lab/agents/net/mlp.h"
-
+#include "lab/utils/net.h"
 namespace lab
 {
 
@@ -8,10 +8,12 @@ namespace agents
 
 
 MLPNetImpl::MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim)
-    : Net(spec, in_dim, out_dim)
+    : NetImpl(spec, in_dim, out_dim)
 {
     spec_.hid_layers.insert(spec_.hid_layers.begin(), in_dim);
+
     model_ = utils::build_fc_model(spec_.hid_layers, utils::get_act_fn(spec_.hid_layers_activation));
+    
     if(out_dim.size() > 1 && spec_.out_layers_activation.size() == 1)
         for(int64_t i = 0; i < out_dim.size() - 1; i++)
             spec_.out_layers_activation.push_back(spec_.out_layers_activation[0]);

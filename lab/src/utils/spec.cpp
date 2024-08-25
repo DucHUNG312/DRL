@@ -169,16 +169,28 @@ NetSpec SpecLoader::get_net_spec(const json& j)
     return spec;
 }
 
-AgentSpec SpecLoader::get_agent_spec(const json& j, int64_t num /*= 0*/) 
+AgentSpec SpecLoader::get_agent_spec(const json& j) 
 {
     AgentSpec spec;
-    if(j.contains("agent") && j["agent"].size() > num)
+    if(j.contains("agent"))
     {
-        json j_agent = j["agent"][num];
+        json j_agent = j["agent"];
         spec.name = get_json_value<std::string>(j_agent["name"]);
-        spec.algorithm = get_algorithm_spec(j_agent);
-        spec.memory = get_memory_spec(j_agent);
-        spec.net = get_net_spec(j_agent);
+    }
+    return spec;
+}
+
+BodySpec SpecLoader::get_body_spec(const json& j, int64_t num /*= 0*/) 
+{
+    BodySpec spec;
+    if(j.contains("body") && j["body"].size() > num)
+    {
+        json j_body = j["body"][num];
+        spec.product = get_json_value<std::string>(j_body["product"]);
+        spec.num = get_json_value<uint64_t>(j_body["num"]);
+        spec.algorithm = get_algorithm_spec(j_body);
+        spec.memory = get_memory_spec(j_body);
+        spec.net = get_net_spec(j_body);
     }
     return spec;
 }
@@ -217,18 +229,6 @@ EnvSpec SpecLoader::get_env_spec(const json& j, int64_t num /*= 0*/)
         spec.normalize_state = get_json_value<bool>(j_env["normalize_state"]);
         spec.is_open = get_json_value<bool>(j_env["is_open"]);
         spec.renderer = get_renderer_spec(j_env);
-    }
-    return spec;
-}
-
-BodySpec SpecLoader::get_body_spec(const json& j) 
-{
-    BodySpec spec;
-    if(j.contains("body"))
-    {
-        json j_body = j["body"];
-        spec.product = get_json_value<std::string>(j_body["product"]);
-        spec.num = get_json_value<uint64_t>(j_body["num"]);
     }
     return spec;
 }

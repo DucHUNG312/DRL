@@ -1,21 +1,22 @@
 #pragma once
 
-#include "lab/agents/base.h"
+#include "lab/core.h"
+#include "lab/utils/env.h"
+#include "lab/utils/spec.h"
 
 namespace lab
 {
 namespace agents
 {
 
-class Net
+class NetImpl : public torch::nn::Module
 {
     LAB_ARG(utils::NetSpec, spec);
     LAB_ARG(int64_t, in_dim);
     LAB_ARG(torch::IntArrayRef, out_dim);
     LAB_ARG(torch::Device, device) = torch::kCPU;
 public:
-    Net(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim);
-    LAB_DEFAULT_CONSTRUCT(Net);
+    NetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim);
 
     torch::Tensor forward(torch::Tensor x);
 
@@ -25,6 +26,8 @@ public:
         torch::optim::LRScheduler& lr_scheduler,
         utils::Clock& clock);
 };
+
+TORCH_MODULE(Net);
 
 }
 }

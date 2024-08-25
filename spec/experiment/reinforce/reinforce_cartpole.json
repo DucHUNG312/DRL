@@ -1,7 +1,11 @@
 {
     "reinforce_cartpole": {
-      "agent": [{
-        "name": "Reinforce",
+      "agent": {
+        "name": "Reinforce"
+      },
+      "body": [{
+        "product": "outer",
+        "num": 1,
         "algorithm": {
           "name": "Reinforce",
           "action_pdtype": "default",
@@ -58,10 +62,6 @@
             "screen_height": 720
         }
       }],
-      "body": {
-        "product": "outer",
-        "num": 1
-      },
       "meta": {
         "distributed": false,
         "eval_frequency": 2000,

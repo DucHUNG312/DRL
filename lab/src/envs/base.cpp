@@ -5,8 +5,17 @@ namespace lab
 namespace envs
 {
 
-StepResult::StepResult(const torch::Tensor& state, double reward, bool terminated, bool truncated)
-    : state(state), reward(reward), terminated(terminated), truncated(truncated) {}
+StepResult::StepResult(
+    const torch::Tensor& state, 
+    const torch::IValue& action,
+    double reward, 
+    bool terminated, 
+    bool truncated)
+    : state(state), 
+    action(action),
+    reward(reward), 
+    terminated(terminated), 
+    truncated(truncated) {}
 
 void StepResult::pretty_print(std::ostream& stream, const std::string& indentation) const
 {
@@ -16,6 +25,7 @@ void StepResult::pretty_print(std::ostream& stream, const std::string& indentati
     stream << next_indentation << "Reward: " << reward << "\n";
     stream << next_indentation << "Terminated: " << (terminated ? "true" : "false") << "\n";
     stream << next_indentation << "Truncated: " << (truncated ? "true" : "false") << "\n";
+    stream << next_indentation << "Next State: " << next_state << "\n";
     stream << indentation << ")";
 }
 
@@ -29,15 +39,15 @@ void Env::reset(uint64_t seed /*= 0*/)
     LAB_UNIMPLEMENTED;
 }
 
-void Env::step(int64_t act)
+void Env::step(torch::IValue act)
 {
     LAB_UNIMPLEMENTED;
 }
 
-int64_t Env::sample()
+torch::IValue Env::sample()
 {
     LAB_UNIMPLEMENTED;
-    return 0;
+    return torch::IValue();
 }
 
 void Env::close()
@@ -75,6 +85,20 @@ std::shared_ptr<spaces::Space>& Env::get_action_spaces()
     return action_spaces_;
 }
 
+int64_t Env::get_state_dim() const
+{
+    LAB_CHECK(result_.state.defined());
+    return result_.state.dim();
+}
+
+int64_t Env::get_action_dim() const
+{
+    if(name_ == "Space") return 1;
+    else if(name_ == "Box") return 1;
+    LAB_LOG_FATAL("Unsupported action space");
+    return -1;
+}
+
 void Env::save(torch::serialize::OutputArchive& archive) const
 {
     observation_spaces_->save(archive);
@@ -84,6 +108,8 @@ void Env::save(torch::serialize::OutputArchive& archive) const
     archive.write("reward", result_.reward);
     archive.write("terminated", result_.terminated);
     archive.write("truncated", result_.truncated);
+    archive.write("action", result_.action);
+    archive.write("next_state", result_.next_state);
 }
 
 void Env::load(torch::serialize::InputArchive& archive)
@@ -96,6 +122,8 @@ void Env::load(torch::serialize::InputArchive& archive)
     torch::IValue truncated;
 
     archive.read("state", result_.state);
+    archive.read("next_state", result_.next_state);
+    archive.read("action", result_.action);
     archive.read("reward", reward);
     archive.read("terminated", terminated);
     archive.read("truncated", truncated);

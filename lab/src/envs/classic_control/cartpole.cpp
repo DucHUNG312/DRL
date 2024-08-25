@@ -1,5 +1,9 @@
 #include "lab/envs/classic_control/cartpole.h"
 #include "lab/envs/components.h"
+#include "lab/spaces/discrete.h"
+#include "lab/spaces/box.h"
+#include "lab/utils/convert.h"
+
 
 namespace lab
 {
@@ -60,7 +64,7 @@ void CartPole::enable_rendering()
 
 int64_t CartPole::sample()
 {
-    auto discrete_ptr = action_spaces_->template as<spaces::DiscreteImpl>();
+    auto discrete_ptr = action_spaces_->template as<spaces::Discrete>();
     if (!discrete_ptr) 
     {
         LAB_LOG_FATAL("Discrete space is not initialized correctly.");
@@ -71,7 +75,9 @@ int64_t CartPole::sample()
 
 void CartPole::step(int64_t action)
 {
-    LAB_CHECK(action_spaces_->template as<spaces::DiscreteImpl>()->contains(action));
+    LAB_CHECK(action_spaces_->template as<spaces::Discrete>()->contains(action));
+
+    result_.action = torch::IValue(action);
 
     double x = result_.state[0].item<double>(); 
     double x_dot = result_.state[1].item<double>();
@@ -122,6 +128,7 @@ void CartPole::step(int64_t action)
     result_.reward = reward;
     result_.terminated = terminated;
     result_.truncated = false;
+    result_.next_state = result_.state;
 
     // update entity
     if (env_spec_.renderer.enabled)

@@ -32,15 +32,9 @@ void Clock::reset()
     opt_step = 0;
 }
 
-void Clock::load(utils::DataFrame& train_df)
+void Clock::load()
 {
-    auto last_clock_vals = train_df.get_last_row({"epi", "time", "wall_time", "opt_step", "frame"});
-    epi = last_clock_vals.at<double>(0);
-    time = last_clock_vals.at<double>(1);
-    wall_time = last_clock_vals.at<double>(2);
-    opt_step = last_clock_vals.at<double>(3);
-    frame = last_clock_vals.at<double>(4);
-    start_wall_time = start_wall_time - duration_cast<nanoseconds>(duration<double>(wall_time));
+    
 }
 
 double Clock::get_elapsed_wall_time()

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/no_grad.h"
 
 namespace lab
 {

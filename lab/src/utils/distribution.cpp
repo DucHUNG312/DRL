@@ -23,13 +23,13 @@ Categorical::Categorical(const torch::Tensor& in, bool is_logits /*= false*/)
     param_ = is_logits ? logits_ : probs_;
 }
 
-torch::Tensor Categorical::sample(const utils::IShape& sample_shape)
+torch::Tensor Categorical::sample(torch::IntArrayRef sample_shape)
 {
     LAB_UNIMPLEMENTED;
     return torch::Tensor();
 }
 
-torch::Tensor Categorical::rsample(const utils::IShape& sample_shape)
+torch::Tensor Categorical::rsample(torch::IntArrayRef sample_shape)
 {
     return sample(sample_shape);
 }

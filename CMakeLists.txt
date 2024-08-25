@@ -154,7 +154,6 @@ set(LAB_LINKED_LIBRARIES
     ${TORCH_LIBRARIES}
     ${LZ4_LIBRARIES}
     nlohmann_json::nlohmann_json
-    DataFrame::DataFrame 
     renderer
 )
 if(LAB_DEVICE STREQUAL "GPU")

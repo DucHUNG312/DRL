@@ -3,7 +3,6 @@
 #include "lab/core.h"
 #include "lab/utils/file.h"
 #include "lab/utils/spectypes.h"
-#include "lab/utils/algorithm.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -45,13 +44,13 @@ public:
 
     static NetSpec get_net_spec(const json& j);
 
-    static AgentSpec get_agent_spec(const json& j, int64_t num = 0);
+    static AgentSpec get_agent_spec(const json& j);
 
     static RendererSpec get_renderer_spec(const json& j);
 
     static EnvSpec get_env_spec(const json& j, int64_t num = 0);
 
-    static BodySpec get_body_spec(const json& j);
+    static BodySpec get_body_spec(const json& j, int64_t num = 0);
 
     static MetaSpec get_meta_info_spec(const json& j);
 

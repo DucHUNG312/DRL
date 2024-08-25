@@ -1,27 +1,10 @@
 #include "lab/utils/tensor.h"
+#include "lab/utils/net.h"
 
 namespace lab
 {
 namespace utils
 {
-namespace internal
-{
-template<typename T>
-T get_bounding_shape(const std::vector<T>& array_refs)
-{
-    size_t max_dimensions = 0;
-    for (const auto& array : array_refs)
-        max_dimensions = std::max(max_dimensions, array.size());
-
-    std::vector<int64_t> bounding_shape(max_dimensions, 0);
-
-    for (const auto& array : array_refs)
-        for (size_t i = 0; i < array.size(); i++)
-            bounding_shape[i] = std::max(bounding_shape[i], array[i]);
-
-    return T(bounding_shape);
-}
-}
 
 bool has_no_zeros(const torch::Tensor& tensor)
 {
@@ -31,16 +14,6 @@ bool has_no_zeros(const torch::Tensor& tensor)
 bool has_all_zeros(const torch::Tensor& tensor)
 {
     return tensor.nonzero().numel() == 0;
-}
-
-torch::IntArrayRef get_bounding_shape(const std::vector<torch::IntArrayRef>& array_refs) 
-{
-    return internal::get_bounding_shape<torch::IntArrayRef>(array_refs);
-}
-
-IShape get_bounding_shape(const std::vector<IShape>& array_refs)
-{
-    return internal::get_bounding_shape<IShape>(array_refs);
 }
 
 bool tensor_eq(const torch::Tensor& tensor1, const torch::Tensor& tensor2)
@@ -105,20 +78,78 @@ std::string get_object_name(const c10::IValue& ivalue)
 torch::Tensor clamp_probs(const torch::Tensor& probs)
 {
     auto eps = (probs.dtype() == torch::kDouble) ? std::numeric_limits<double>::epsilon() : std::numeric_limits<float>::epsilon();
-    return torch::clamp(probs, eps, 1. - eps);
+    return torch::clamp(probs, eps, 1. - eps).to(utils::get_torch_device());
 } 
 
 torch::Tensor probs_to_logits(const torch::Tensor& probs, bool is_binary /*= false*/)
 {
     torch::Tensor ps_clamped = clamp_probs(probs);
     if(is_binary) return torch::log(ps_clamped) - torch::log1p(-ps_clamped);
-    return torch::log(ps_clamped);
+    return torch::log(ps_clamped).to(utils::get_torch_device());
 }
 
 torch::Tensor logits_to_probs(const torch::Tensor& logits, bool is_binary /*= false*/)
 {
     if(is_binary) return torch::sigmoid(logits);
-    return torch::nn::functional::softmax(logits, {-1});
+    return torch::nn::functional::softmax(logits, {-1}).to(utils::get_torch_device());
+}
+
+torch::Tensor center_mean(const torch::Tensor& tensor)
+{
+    torch::Tensor ret = tensor - torch::mean(tensor);
+    return ret.to(torch::kDouble).to(utils::get_torch_device());
+}
+
+torch::Tensor normalize(const torch::Tensor& tensor)
+{
+    auto range = tensor.max() - tensor.min();
+    range += 1e-08;  // division guard
+    torch::Tensor norm = (tensor - tensor.min()) / range;
+    return norm.to(torch::kDouble).to(utils::get_torch_device());
+}
+
+torch::Tensor standardize(const torch::Tensor& tensor)
+{
+    LAB_CHECK(tensor.numel() > 1);
+    torch::Tensor std = (tensor - torch::mean(tensor)) / (torch::std(tensor) + + 1e-08);
+    return std.to(torch::kDouble).to(utils::get_torch_device());
+}
+
+torch::Tensor to_one_hot(const torch::Tensor& tensor, int64_t num_classes) 
+{
+    LAB_CHECK((tensor.dtype() == torch::kInt64) && (tensor.dim() == 1));    
+    auto one_hot_tensor = torch::zeros(tensor.sizes().vec(), torch::kInt64)
+                            .unsqueeze(-1).expand({-1, -1, num_classes})
+                            .scatter_(-1, tensor.unsqueeze(-1), 1);
+    return one_hot_tensor.to(utils::get_torch_device());
+}
+
+torch::Tensor venv_pack(const torch::Tensor& batch_tensor, int64_t num_envs)
+{
+    torch::IntArrayRef shape = batch_tensor.sizes();
+    if(shape.size() < 2)
+        return batch_tensor.view({-1, num_envs}).to(utils::get_torch_device());
+   
+    std::vector<int64_t> pack_shape = {-1, num_envs};
+    pack_shape.insert(pack_shape.end(), shape.begin() + 1, shape.end());
+    return batch_tensor.view(pack_shape).to(utils::get_torch_device());
+}
+
+torch::Tensor venv_unpack(const torch::Tensor& batch_tensor)
+{
+    torch::IntArrayRef shape = batch_tensor.sizes();
+    if (shape.size() < 3)
+        return batch_tensor.view(-1).to(utils::get_torch_device());
+   
+    std::vector<int64_t> unpack_shape = {-1};
+    unpack_shape.insert(unpack_shape.end(), shape.begin() + 2, shape.end());
+    return batch_tensor.view(unpack_shape).to(utils::get_torch_device());
+}
+
+torch::Tensor calc_q_value_logits(const torch::Tensor& state_value, const torch::Tensor& raw_advantages)
+{
+    torch::Tensor mean_adv = raw_advantages.mean(-1).unsqueeze(-1);
+    return (state_value + raw_advantages - mean_adv).to(utils::get_torch_device());
 }
 
 }

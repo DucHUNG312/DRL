@@ -11,8 +11,6 @@ namespace envs
 class CartPole : public Env
 {
 public:
-    using ActType = int64_t;
-
     CartPole();
     void reset(uint64_t seed = 0);
     void step(int64_t action);
