@@ -4,7 +4,6 @@
 
 #include "lab/utils/anyspaceholder.h"
 #include "lab/utils/convert.h"
-#include "lab/utils/distribution.h"
 #include "lab/utils/env.h"
 #include "lab/utils/file.h"
 #include "lab/utils/math.h"
@@ -17,6 +16,9 @@
 #include "lab/utils/spectypes.h"
 #include "lab/utils/tensor.h"
 #include "lab/utils/typetraits.h"
+
+#include "lab/distributions/base.h"
+#include "lab/distributions/categorical.h"
 
 #include "lab/spaces/base.h"
 #include "lab/spaces/any.h"

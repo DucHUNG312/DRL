@@ -275,3 +275,26 @@ namespace lab
 }
 #define LAB_UNUSED_VARIABLE(var) ::lab::internal::ignore_unused_variable(var);
 #define LAB_ARRAYSIZE(array) (sizeof(::lab::internal::array_size_helper(array)))
+
+// Math constants
+
+namespace lab
+{
+namespace math
+{
+
+constexpr double Epsilon = 0.0001;
+constexpr double Pi = 3.14159265358979323846;
+constexpr double InvPi = 0.31830988618379067154;
+constexpr double Inv2Pi = 0.15915494309189533577;
+constexpr double Inv4Pi = 0.07957747154594766788;
+constexpr double PiOver2 = 1.57079632679489661923;
+constexpr double PiOver4 = 0.78539816339744830961;
+constexpr double Sqrt2 = 1.41421356237309504880;
+constexpr float Infinity = std::numeric_limits<float>::infinity();
+constexpr float DInfinity = std::numeric_limits<double>::infinity();
+const double Min = std::numeric_limits<double>::min();
+const double Max = std::numeric_limits<double>::max();
+
+}
+}

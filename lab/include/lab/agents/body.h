@@ -11,13 +11,17 @@ namespace lab
 namespace agents
 {
 
+class Algorithm;
+
 class Body : public std::enable_shared_from_this<Body>
 {
+    friend class Algorithm;
+
     LAB_ARG(std::shared_ptr<envs::Env>, env);
     LAB_ARG(std::shared_ptr<Memory>, memory);
     LAB_ARG(std::shared_ptr<Algorithm>, algorithm);
-    LAB_ARG(utils::BodySpec, spec);
     LAB_ARG(torch::Tensor, loss);
+    static utils::BodySpec spec_;
 public:
     Body(const std::shared_ptr<envs::Env>& env, const utils::BodySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Body);
@@ -48,6 +52,10 @@ public:
     {
 
     }
+
+    static utils::BodySpec& get_spec();
+
+    static std::shared_ptr<spaces::Space>& get_action_spaces();    
 };
 
 LAB_FORCE_INLINE torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Body>& body)

@@ -24,54 +24,25 @@ public:
     LAB_ARG(bool, ready) = false;
     LAB_ARG(std::vector<std::string>, keys) = {"state", "new_state", "action", "reward", "terminated", "truncated"};
 public:
-    Memory(const std::shared_ptr<Body>& body, const utils::MemorySpec& spec)
-        : body_(body), spec_(std::move(spec))
-    {
-        reset();
-    }
+    Memory(const std::shared_ptr<Body>& body, const utils::MemorySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Memory);
 
-    void reset()
-    {
-        LAB_UNIMPLEMENTED;    
-    }
+    void reset();
 
-    void update(const envs::StepResult& result)
-    {
-        LAB_UNIMPLEMENTED;
-    }
+    void update(const envs::StepResult& result);
 
-    ExperienceDict sample()
-    {
-        LAB_UNIMPLEMENTED;
-        return ExperienceDict();
-    }
+    ExperienceDict sample();
 
-    void save(torch::serialize::OutputArchive& archive) const
-    {
+    void save(torch::serialize::OutputArchive& archive) const;
 
-    }
-
-    void load(torch::serialize::InputArchive& archive)
-    {
-
-    }
+    void load(torch::serialize::InputArchive& archive);
 private:
-    void add_experience(const envs::StepResult& result)
-    {
-        LAB_UNIMPLEMENTED;
-    }
+    void add_experience(const envs::StepResult& result);
 };
 
-LAB_FORCE_INLINE torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Memory>& memory)
-{
-    return archive;
-}
+torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Memory>& memory);
 
-LAB_FORCE_INLINE torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Memory>& memory)
-{
-    return archive;
-}
+torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Memory>& memory);
 
 }
 }

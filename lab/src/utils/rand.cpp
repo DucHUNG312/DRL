@@ -5,6 +5,12 @@ namespace lab
 namespace utils
 {
 
+double Rand::rand()
+{
+    auto uniform_tensor = torch::rand({1}, torch::TensorOptions().dtype(torch::kDouble));
+    return uniform_tensor.item<double>();
+}
+
 Rand::Rand(uint64_t seed /* = 0 */)
 {
     reset(seed);
@@ -74,8 +80,16 @@ torch::Tensor Rand::gen_int_permutation(int64_t n)
 
 int64_t Rand::sample_int_uniform(int64_t a, int64_t b)
 {
+    LAB_CHECK_LT(a, b);
     auto uniform_tensor = torch::randint(a, b, {1}, generator_, torch::TensorOptions().dtype(torch::kInt64));
     return uniform_tensor.item<int64_t>();
+}
+
+double Rand::sample_double_uniform(double a, double b)
+{
+    LAB_CHECK_LT(a, b);
+    auto uniform_tensor = torch::rand({1}, generator_, torch::TensorOptions().dtype(torch::kDouble));
+    return uniform_tensor.item<double>() * (b - a) + a;
 }
 
 } 

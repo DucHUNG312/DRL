@@ -12,7 +12,8 @@ class MLPNetImpl : public NetImpl
 {
     LAB_ARG(torch::nn::Sequential, model);
     LAB_ARG(torch::nn::ModuleList, model_tail);
-    LAB_ARG(torch::nn::AnyModule, loss_fn);
+public:
+    static constexpr const char* name = "MLPNet";
 public:
     MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim);
 

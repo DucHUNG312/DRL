@@ -18,6 +18,8 @@ enum ActionPdType
 enum ActionPolicyType
 {
     ACTION_POLICY_NONE,
+    DEFAULT,
+    RANDOM_POLICY,
     EPSILON_GREEDY,
     BOLTZMANN
 };
@@ -50,37 +52,34 @@ enum SearchType
 {
     SEARCH_NONE,
     RANDOM
-};;
+};
 
-struct ExploreVarSpec
+enum VarUpdater
 {
-    std::string name;
+    UPDATER_NONE,
+    NO_DECAY,
+    LINEAR_DECAY,
+    RATE_DECAY,
+    PERIODIC_DECAY
+};
+
+struct VarSchedulerSpec
+{
+    VarUpdater updater;
     double start_val;
     double end_val;
     uint64_t start_step;
     uint64_t end_step;
 
-    LAB_DEFAULT_CONSTRUCT(ExploreVarSpec);
+    LAB_DEFAULT_CONSTRUCT(VarSchedulerSpec);
 };
-
-struct EntropyCoefSpec
-{
-    std::string name;
-    double start_val;
-    double end_val;
-    uint64_t start_step;
-    uint64_t end_step;
-
-    LAB_DEFAULT_CONSTRUCT(EntropyCoefSpec);
-};
-
 struct AlgorithmSpec
 {
     std::string name;
     ActionPdType action_pdtype;
     ActionPolicyType action_policy;
-    ExploreVarSpec explore_spec;
-    EntropyCoefSpec entropy_spec;
+    VarSchedulerSpec explore_spec;
+    VarSchedulerSpec entropy_spec;
     double gamma;
     uint64_t training_frequency;
     uint64_t training_batch_iter;
@@ -126,6 +125,7 @@ struct LrSchedulerSpec
 
 struct NetSpec
 {
+    std::string name;
     NetType type;
     std::vector<int64_t> hid_layers;
     std::string hid_layers_activation;
@@ -226,6 +226,8 @@ UpdateType str_to_update_type(const std::string& str);
 ActivationFnType str_to_activation_type(const std::string& str);
 
 SearchType str_to_search_type(const std::string& str);
+
+VarUpdater str_to_var_updater(const std::string& str);
 
 }
 

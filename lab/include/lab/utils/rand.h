@@ -31,8 +31,13 @@ public:
     torch::Tensor gen_int_permutation(int64_t n);
 
     int64_t sample_int_uniform(int64_t a, int64_t b);
+
+    double sample_double_uniform(double a, double b);
+
+    static double rand();
 private:
     torch::Generator generator_;
-};     
+};    
+
 }
 }

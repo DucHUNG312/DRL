@@ -1,5 +1,5 @@
 #include "lab/agents/net/mlp.h"
-#include "lab/utils/net.h"
+
 namespace lab
 {
 
@@ -12,21 +12,24 @@ MLPNetImpl::MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArr
 {
     spec_.hid_layers.insert(spec_.hid_layers.begin(), in_dim);
 
-    model_ = utils::build_fc_model(spec_.hid_layers, utils::get_act_fn(spec_.hid_layers_activation));
+    hid_layers_activation_ = utils::create_act(spec_.hid_layers_activation);
+    model_ = utils::create_fc_model(spec_.hid_layers, hid_layers_activation_);
     
     if(out_dim.size() > 1 && spec_.out_layers_activation.size() == 1)
         for(int64_t i = 0; i < out_dim.size() - 1; i++)
             spec_.out_layers_activation.push_back(spec_.out_layers_activation[0]);
 
     LAB_CHECK_EQ(out_dim.size(), spec_.out_layers_activation.size());
+    out_layers_activations_.reserve(out_dim.size());
 
     for (int64_t i = 0; i < out_dim.size(); i++)
     { 
         std::vector<int64_t> out_dims = { spec_.hid_layers[spec_.hid_layers.size() - 1], out_dim[i] }; 
-        model_tail_->push_back(utils::build_fc_model(out_dims, utils::get_act_fn(spec_.out_layers_activation[i])));
+        out_layers_activations_[i] = utils::create_act(spec_.out_layers_activation[i]);
+        model_tail_->push_back(utils::create_fc_model(out_dims, out_layers_activations_[i]));
     }
 
-    loss_fn_ = utils::get_loss_fn(spec_.loss_spec.name);
+    loss_function_ = utils::create_loss(spec_.loss_spec.name);
 
     this->to(device_);
     this->train();

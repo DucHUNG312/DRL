@@ -46,13 +46,13 @@ void SpecLoader::load_specs_from_file(const std::string& file_path, const std::s
     load_spec_json(j_lab);
 }
 
-ExploreVarSpec SpecLoader::get_explore_var_spec(const json& j) 
+VarSchedulerSpec SpecLoader::get_explore_var_spec(const json& j) 
 {
-    ExploreVarSpec spec;
+    VarSchedulerSpec spec;
     if(j.contains("explore_var_spec"))
     {
         json j_explore = j["explore_var_spec"];
-        spec.name = get_json_value<std::string>(j_explore["name"]);
+        spec.updater = str_to_var_updater(get_json_value<std::string>(j_explore["name"]));
         spec.start_val = get_json_value<double>(j_explore["start_val"]);
         spec.end_val = get_json_value<double>(j_explore["end_val"]);
         spec.start_step = get_json_value<uint64_t>(j_explore["start_step"]);
@@ -61,13 +61,13 @@ ExploreVarSpec SpecLoader::get_explore_var_spec(const json& j)
     return spec;
 }
 
-EntropyCoefSpec SpecLoader::get_entropy_coef_spec(const json& j) 
+VarSchedulerSpec SpecLoader::get_entropy_coef_spec(const json& j) 
 {
-    EntropyCoefSpec spec;
+    VarSchedulerSpec spec;
     if(j.contains("entropy_coef_spec"))
     {
         json j_entropy = j["entropy_coef_spec"];
-        spec.name = get_json_value<std::string>(j_entropy["name"]);
+        spec.updater = str_to_var_updater(get_json_value<std::string>(j_entropy["name"]));
         spec.start_val = get_json_value<double>(j_entropy["start_val"]);
         spec.end_val = get_json_value<double>(j_entropy["end_val"]);
         spec.start_step = get_json_value<uint64_t>(j_entropy["start_step"]);
@@ -152,6 +152,7 @@ NetSpec SpecLoader::get_net_spec(const json& j)
     if(j.contains("net"))
     {
         json j_net = j["net"];
+        spec.name = get_json_value<std::string>(j_net["type"]);
         spec.type = str_to_net_type(j_net["type"]);
         spec.hid_layers = get_json_value<std::vector<int64_t>>(j_net["hid_layers"]);
         spec.hid_layers_activation = get_json_value<std::string>(j_net["hid_layers_activation"]);

@@ -29,6 +29,9 @@ void StepResult::pretty_print(std::ostream& stream, const std::string& indentati
     stream << indentation << ")";
 }
 
+std::shared_ptr<spaces::Space> Env::observation_spaces_;
+std::shared_ptr<spaces::Space> Env::action_spaces_;
+
 Env::Env(const utils::EnvSpec& env_spec)
         : renderer::Scene(env_spec.name), env_spec_(env_spec) 
 {

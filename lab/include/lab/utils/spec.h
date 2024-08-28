@@ -28,9 +28,9 @@ public:
 
     static void load_specs_from_file(const std::string& file_path, const std::string& experiment_name);
 
-    static ExploreVarSpec get_explore_var_spec(const json& j);
+    static VarSchedulerSpec get_explore_var_spec(const json& j);
 
-    static EntropyCoefSpec get_entropy_coef_spec(const json& j);
+    static VarSchedulerSpec get_entropy_coef_spec(const json& j);
 
     static AlgorithmSpec get_algorithm_spec(const json& j);
 

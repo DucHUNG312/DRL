@@ -17,7 +17,11 @@ ActionPdType str_to_action_pd_type(const std::string& str)
 
 ActionPolicyType str_to_action_policy_type(const std::string& str)
 {
-    if (str == "epsilon_greedy")
+    if(str == "default")
+        return ActionPolicyType::DEFAULT;
+    else if (str == "random")
+        return ActionPolicyType::RANDOM_POLICY;
+    else if (str == "epsilon_greedy")
         return ActionPolicyType::EPSILON_GREEDY;
     else if(str == "boltzmann")
         return ActionPolicyType::BOLTZMANN;
@@ -62,6 +66,19 @@ SearchType str_to_search_type(const std::string& str)
     if (str == "RandomSearch")
         return SearchType::RANDOM;
     return SearchType::SEARCH_NONE;
+}
+
+VarUpdater str_to_var_updater(const std::string& str)
+{
+    if (str == "no_decay")
+        return VarUpdater::NO_DECAY;
+    else if (str == "linear_decay")
+        return VarUpdater::LINEAR_DECAY;
+    else if (str == "rate_decay")
+        return VarUpdater::RATE_DECAY;
+    else if (str == "periodic_decay")
+        return VarUpdater::PERIODIC_DECAY;
+    return VarUpdater::UPDATER_NONE;
 }
 
 }

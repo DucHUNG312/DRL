@@ -1,10 +1,8 @@
 #pragma once
 
 #include "lab/core.h"
-
-#include <torch/nn/module.h>
-#include <torch/optim/optimizer.h>
-#include <torch/optim/serialize.h>
+#include "lab/utils/placeholder.h"
+#include "lab/utils/typetraits.h"
 
 namespace torch {
 namespace serialize {
@@ -267,5 +265,177 @@ _TORCH_OPTIM_LOOKAHEAD_WITH_OPTIMIZER(Adam);
 _TORCH_OPTIM_LOOKAHEAD_WITH_OPTIMIZER(RAdam);
 _TORCH_OPTIM_LOOKAHEAD_WITH_OPTIMIZER(RMSprop);
 */
+
+struct AnyOptimPlaceholder : public lab::utils::Placeholder 
+{
+    using Placeholder::Placeholder;
+
+    virtual std::shared_ptr<Optimizer> ptr() = 0;
+
+    virtual std::unique_ptr<AnyOptimPlaceholder> copy() const = 0;
+};
+
+template <typename OptimType>
+struct AnyOptimHolder : public AnyOptimPlaceholder 
+{
+    explicit AnyOptimHolder(std::shared_ptr<OptimType>&& optim_)
+      : AnyOptimPlaceholder(typeid(OptimType)), optim(std::move(optim_)) {}
+
+    std::shared_ptr<Optimizer> ptr() override 
+    {
+        return optim;
+    }
+
+    std::unique_ptr<AnyOptimPlaceholder> copy() const override 
+    {
+        return std::make_unique<AnyOptimHolder>(*this);
+    }
+
+    std::shared_ptr<OptimType> optim;
+};
+
+class AnyOptim 
+{
+public:
+    AnyOptim() = default;
+
+    template <typename OptimType>
+    explicit AnyOptim(std::shared_ptr<OptimType> Optim);
+
+    template <typename OptimType, typename = lab::utils::enable_if_optim_t<OptimType>>
+    explicit AnyOptim(OptimType&& Optim);
+
+    AnyOptim(AnyOptim&&) = default;
+    AnyOptim& operator=(AnyOptim&&) = default;
+
+    AnyOptim(const AnyOptim& other);
+    AnyOptim& operator=(const AnyOptim& other);
+
+    template <typename OptimType>
+    AnyOptim& operator=(std::shared_ptr<OptimType> optim);
+
+    template <typename T, typename = lab::utils::enable_if_optim_t<T>>
+    T& get();
+
+    template <typename T, typename = lab::utils::enable_if_optim_t<T>>
+    const T& get() const;
+
+    template <typename T, typename ContainedType = typename T::ContainedType>
+    T get() const;
+
+    std::shared_ptr<Optimizer> ptr() const;
+
+    template <typename T, typename = lab::utils::enable_if_optim_t<T>>
+    std::shared_ptr<T> ptr() const;
+
+    const std::type_info& type_info() const;
+
+    bool is_empty() const noexcept;
+
+
+private:
+    template <typename OptimType>
+    std::unique_ptr<AnyOptimPlaceholder> make_holder(std::shared_ptr<OptimType>&& optim);
+
+    template <typename OptimType>
+    OptimType& get_() const;
+
+    std::unique_ptr<AnyOptimPlaceholder> content_;
+};
+
+template <typename OptimType>
+AnyOptim::AnyOptim(std::shared_ptr<OptimType> optim)
+    : content_(make_holder(std::move(optim))) 
+{
+    static_assert(lab::utils::is_optim<OptimType>::value);
+    static_assert(lab::utils::has_step<OptimType>::value);
+}
+
+template <typename OptimType, typename>
+AnyOptim::AnyOptim(OptimType&& optim)
+    : AnyOptim(std::make_shared<OptimType>(std::forward<OptimType>(optim))) {}
+
+inline AnyOptim::AnyOptim(const AnyOptim& other)
+    : content_(other.content_ ? other.content_->copy() : nullptr) {}
+
+inline AnyOptim& AnyOptim::operator=(const AnyOptim& other) 
+{
+    if (this != &other)
+        content_ = other.content_ ? other.content_->copy() : nullptr;
+    return *this;
+}
+
+template <typename OptimType>
+AnyOptim& AnyOptim::operator=(std::shared_ptr<OptimType> optim) 
+{
+  return (*this = AnyOptim(std::move(optim)));
+}
+
+template <typename T, typename>
+T& AnyOptim::get() 
+{
+    TORCH_CHECK(!is_empty(), "Cannot call get() on an empty AnyOptim");
+    return get_<T>();
+}
+
+template <typename T, typename>
+const T& AnyOptim::get() const 
+{
+    TORCH_CHECK(!is_empty(), "Cannot call get() on an empty AnyOptim");
+    return get_<T>();
+}
+
+template <typename T, typename ContainedType>
+T AnyOptim::get() const 
+{
+    return T(ptr<ContainedType>());
+}
+
+inline std::shared_ptr<Optimizer> AnyOptim::ptr() const 
+{
+    LAB_CHECK(!is_empty());
+    return content_->ptr();
+}
+
+template <typename T, typename>
+std::shared_ptr<T> AnyOptim::ptr() const 
+{
+    TORCH_CHECK(!is_empty(), "Cannot call ptr() on an empty AnyOptim");
+    get_<T>();
+    return std::dynamic_pointer_cast<T>(ptr());
+}
+
+inline const std::type_info& AnyOptim::type_info() const 
+{
+    TORCH_CHECK(!is_empty(), "Cannot call type_info() on an empty AnyOptim");
+    return content_->type_info;
+}
+
+inline bool AnyOptim::is_empty() const noexcept 
+{
+    return content_ == nullptr;
+}
+
+template <typename OptimType>
+std::unique_ptr<AnyOptimPlaceholder> AnyOptim::make_holder(std::shared_ptr<OptimType>&& optim) 
+{
+    return std::make_unique<AnyOptimHolder<std::decay_t<OptimType>>>(std::move(optim));
+}
+
+template <typename OptimType>
+OptimType& AnyOptim::get_() const 
+{
+    using M = typename std::remove_reference<OptimType>::type;
+    static_assert(lab::utils::has_step<M>::value, "Can only call AnyOptim::get<T> with a type T that has a step method");
+    if (typeid(OptimType).hash_code() == type_info().hash_code()) 
+    {
+        return *static_cast<AnyOptimHolder<OptimType>&>(*content_).optim;
+    }
+    AT_ERROR("Attempted to cast optimizer of type ",
+        c10::demangle(type_info().name()),
+        " to type ",
+        c10::demangle(typeid(OptimType).name()));
+}
+
 }
 }

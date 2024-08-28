@@ -44,8 +44,8 @@ protected:
     utils::Rand rand_;
     // utils::Clock clock_;
     StepResult result_;
-    std::shared_ptr<spaces::Space> observation_spaces_;
-    std::shared_ptr<spaces::Space> action_spaces_;
+    static std::shared_ptr<spaces::Space> observation_spaces_;
+    static std::shared_ptr<spaces::Space> action_spaces_;
 public:
     explicit Env(const utils::EnvSpec& env_spec);
     LAB_DEFAULT_CONSTRUCT(Env);
@@ -70,9 +70,9 @@ public:
 
     const utils::EnvSpec& get_env_spec() const;
 
-    std::shared_ptr<spaces::Space>& get_observation_spaces();
+    static std::shared_ptr<spaces::Space>& get_observation_spaces();
 
-    std::shared_ptr<spaces::Space>& get_action_spaces();
+    static std::shared_ptr<spaces::Space>& get_action_spaces();
 
     int64_t get_state_dim() const;
 
