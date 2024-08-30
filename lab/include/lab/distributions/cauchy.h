@@ -14,7 +14,9 @@ class Cauchy : public Distribution
 public:
     Cauchy(const torch::Tensor& loc, const torch::Tensor& scale);
 
-    torch::Tensor rsample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
+
+    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
 
     torch::Tensor log_prob(const torch::Tensor& value) override;
 
@@ -23,6 +25,9 @@ public:
     torch::Tensor icdf(const torch::Tensor& value) override;
 
     torch::Tensor entropy() override;
+
+    torch::Tensor sample_n(int64_t n) override;
+ 
 };
 
 }

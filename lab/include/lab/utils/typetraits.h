@@ -7,6 +7,8 @@ namespace lab
 namespace spaces
 {
 class Space;
+class DiscreteImpl;
+class BoxImpl;
 }
 namespace agents
 {
@@ -14,6 +16,7 @@ class Algorithm;
 }
 namespace distributions
 {
+class Distribution;
 class Bernoulli;
 class Beta;
 class Categorical;
@@ -28,24 +31,36 @@ namespace lab
 {
 namespace utils
 {
+// Helper to check for the `sample` method
+template <typename, typename T, typename = void>
+struct has_sample_method : std::false_type {};
+template <typename T, typename Ret, typename... Args>
+struct has_sample_method<T, Ret(Args...), std::void_t<decltype(std::declval<T>().sample(std::declval<Args>()...))>> : std::true_type {};
+
+// Helper to check for the `contains` method
+template <typename, typename T, typename = void>
+struct has_contains_method : std::false_type {};
+
+template <typename T, typename Ret, typename... Args>
+struct has_contains_method<T, Ret(Args...), std::void_t<decltype(std::declval<T>().contains(std::declval<Args>()...))>> : std::true_type {};
+
+template<typename T>
+struct space_sample_contain;
+template<>
+struct space_sample_contain<spaces::BoxImpl> { using type = torch::Tensor; };
+template<>
+struct space_sample_contain<spaces::DiscreteImpl> { using type = int64_t; };
+
+template<typename T>
+using space_sample_contain_t = typename space_sample_contain<T>::type;
+
+// Trait to check if a class has both `sample` and `contains` methods
 template <typename T>
-struct has_sample_and_contains
+struct has_sample_and_contains 
 {
-  using yes = int8_t;
-  using no = int16_t;
-
-  template <typename U>
-  static yes test_sample(decltype(&U::sample));
-  template <typename U>
-  static yes test_contains(decltype(&U::contains));
-  template <typename U>
-  static no test_sample(...);
-  template <typename U>
-  static no test_contains(...);
-
-  static constexpr bool value = (
-    sizeof(test_sample<T>(nullptr)) == sizeof(yes) && 
-    sizeof(test_contains<T>(nullptr)) == sizeof(yes));
+    static constexpr bool value = 
+        has_sample_method<T, space_sample_contain_t<T>()>::value &&
+        has_contains_method<T, bool(space_sample_contain_t<T>)>::value;
 };
 
 template <typename T>
@@ -58,7 +73,6 @@ struct has_step
   static yes test_step(decltype(&U::step));
   template <typename U>
   static no test_step(...);
-
   static constexpr bool value = sizeof(test_step<T>(nullptr)) == sizeof(yes);
 };
 
@@ -101,6 +115,10 @@ template <typename O>
 using is_optim = std::is_base_of<torch::optim::Optimizer, typename std::decay<O>::type>;
 template <typename O, typename T = void>
 using enable_if_optim_t = typename std::enable_if<is_optim<O>::value, T>::type;
+template <typename D>
+using is_distribution = std::is_base_of<lab::distributions::Distribution, typename std::decay<D>::type>;
+template <typename D, typename T = void>
+using enable_if_distribution_t = typename std::enable_if<is_distribution<D>::value, T>::type;
 
 template<typename T, typename... Ts>
 struct is_one_of : std::false_type {};
@@ -193,7 +211,25 @@ struct compose
     return Second{}(First{}( std::forward<Args>(args)... ));
   }
 };
-
+}
 }
 
+#define LAB_FUNC_CALL_MAKER(Func)                                           \
+namespace lab                                                               \
+{                                                                           \
+namespace utils                                                             \
+{                                                                           \
+struct Func##_call_maker                                                    \
+{                                                                           \
+  template<class Tag>                                                       \
+  constexpr auto operator()(Tag ttag)                                       \
+  {                                                                         \
+    using T=typename decltype(ttag)::type;                                  \
+    return [](auto&&...args){ return T::Func(decltype(args)(args)...); };   \
+  }                                                                         \
+};                                                                          \
+}                                                                           \
 }
+
+LAB_FUNC_CALL_MAKER(update)
+LAB_FUNC_CALL_MAKER(sample)

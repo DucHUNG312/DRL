@@ -1,3 +1,4 @@
+#include "lab/spaces/base.h"
 #include "lab/envs/base.h"
 
 namespace lab
@@ -28,9 +29,6 @@ void StepResult::pretty_print(std::ostream& stream, const std::string& indentati
     stream << next_indentation << "Next State: " << next_state << "\n";
     stream << indentation << ")";
 }
-
-std::shared_ptr<spaces::Space> Env::observation_spaces_;
-std::shared_ptr<spaces::Space> Env::action_spaces_;
 
 Env::Env(const utils::EnvSpec& env_spec)
         : renderer::Scene(env_spec.name), env_spec_(env_spec) 
@@ -78,12 +76,12 @@ const utils::EnvSpec& Env::get_env_spec() const
     return env_spec_;
 }
 
-std::shared_ptr<spaces::Space>& Env::get_observation_spaces()
+std::shared_ptr<spaces::AnySpace>& Env::get_observation_spaces()
 {
     return observation_spaces_;
 }
 
-std::shared_ptr<spaces::Space>& Env::get_action_spaces()
+std::shared_ptr<spaces::AnySpace>& Env::get_action_spaces()
 {
     return action_spaces_;
 }
@@ -104,8 +102,8 @@ int64_t Env::get_action_dim() const
 
 void Env::save(torch::serialize::OutputArchive& archive) const
 {
-    observation_spaces_->save(archive);
-    action_spaces_->save(archive);
+    observation_spaces_->ptr()->save(archive);
+    action_spaces_->ptr()->save(archive);
 
     archive.write("state", result_.state);
     archive.write("reward", result_.reward);
@@ -117,8 +115,8 @@ void Env::save(torch::serialize::OutputArchive& archive) const
 
 void Env::load(torch::serialize::InputArchive& archive)
 {
-    observation_spaces_->load(archive);
-    action_spaces_->load(archive);
+    observation_spaces_->ptr()->load(archive);
+    action_spaces_->ptr()->load(archive);
 
     torch::IValue reward;
     torch::IValue terminated;
@@ -149,10 +147,10 @@ void Env::pretty_print(std::ostream& stream, const std::string& indentation) con
     const std::string next_indentation = indentation + "  ";
 
     stream << next_indentation << "Observation Space" << "(\n";
-    observation_spaces_->pretty_print_recursive(stream, next_indentation);
+    observation_spaces_->ptr()->pretty_print_recursive(stream, next_indentation);
     stream << next_indentation << ")\n";
     stream << next_indentation << "Action Space" << "(\n";
-    action_spaces_->pretty_print_recursive(stream, next_indentation);
+    action_spaces_->ptr()->pretty_print_recursive(stream, next_indentation);
     stream << next_indentation << ")\n";
     result_.pretty_print(stream, next_indentation);
 

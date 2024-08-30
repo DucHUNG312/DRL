@@ -114,6 +114,26 @@ torch::Tensor& Space::get_parameter(std::string name)
     throw std::runtime_error("No key with name " + name + " exists in parameters!");
 }
 
+Space::Iterator Space::begin() 
+{
+    return children_.begin();
+}
+
+Space::ConstIterator Space::begin() const 
+{
+    return children_.begin();
+}
+
+Space::Iterator Space::end() 
+{
+    return children_.end();
+}
+
+Space::ConstIterator Space::end() const 
+{
+    return children_.end();
+}
+
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Space>& space)
 {
     LAB_CHECK(space != nullptr);

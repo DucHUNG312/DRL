@@ -19,13 +19,21 @@ public:
     LAB_DEFAULT_CONSTRUCT(Distribution);
 
     virtual torch::IntArrayRef extended_shape(torch::IntArrayRef sample_shape = {});
-    virtual torch::Tensor sample(torch::IntArrayRef sample_shape);
-    virtual torch::Tensor rsample(torch::IntArrayRef sample_shape);
-    virtual torch::Tensor sample_n(int64_t n);
-    virtual torch::Tensor log_prob(const torch::Tensor& value);
-    virtual torch::Tensor cdf(const torch::Tensor& value);
-    virtual torch::Tensor icdf(const torch::Tensor& value); 
-    virtual torch::Tensor entropy();
+
+    virtual torch::Tensor sample(torch::IntArrayRef sample_shape = {}) = 0;
+
+    virtual torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) = 0;
+
+    virtual torch::Tensor sample_n(int64_t n) = 0;
+
+    virtual torch::Tensor log_prob(const torch::Tensor& value) = 0;
+
+    virtual torch::Tensor cdf(const torch::Tensor& value) = 0;
+
+    virtual torch::Tensor icdf(const torch::Tensor& value) = 0;
+
+    virtual torch::Tensor entropy() = 0;
+
 };
 
 }

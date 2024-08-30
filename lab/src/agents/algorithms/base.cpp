@@ -13,9 +13,10 @@ Algorithm::Algorithm(const std::shared_ptr<Body>& body, const utils::AlgorithmSp
 {
     int64_t in_dim = body_->env()->get_state_dim();
     int64_t out_dim = body_->env()->get_action_dim();
-    net_ = utils::create_net(body_->spec_.net, in_dim, out_dim);
+    net_ = utils::create_net(body_->spec().net, in_dim, out_dim);
     optimizer_ = utils::create_optim(net_->spec().optim_spec.name, net_->parameters());
     lrscheduler_ = utils::create_lr_schedular(optimizer_, net_->spec().lr_scheduler_spec);
+    policy_ = utils::create_action_policy(spec_.action_policy);
     explore_var_scheduler_ = utils::VarScheduler(spec_.explore_spec);
     entropy_coef_scheduler_ = utils::VarScheduler(spec_.entropy_spec);
 }

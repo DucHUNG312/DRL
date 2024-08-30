@@ -19,6 +19,7 @@ class Algorithm
     LAB_ARG(std::shared_ptr<torch::optim::Optimizer>, optimizer);
     LAB_ARG(std::shared_ptr<torch::optim::LRScheduler>, lrscheduler);
     LAB_ARG(utils::AlgorithmSpec, spec);
+    LAB_ARG(utils::ActionPolicy, policy);
     LAB_ARG(utils::VarScheduler, explore_var_scheduler);
     LAB_ARG(utils::VarScheduler, entropy_coef_scheduler);
 public:

@@ -11,7 +11,7 @@ template<typename Env>
 class TimeLimit : public Wrapper<Env>
 {
 public:
-    TimeLimit(const utils::SpaceHolder<Env>& env, int64_t max_frame = -1)
+    TimeLimit(const spaces::SpaceHolder<Env>& env, int64_t max_frame = -1)
         : Wrapper<Env>(std::move(env))
     {
         if(max_frame == -1 && this->unwrapped()->env_spec_.max_frame != -1)

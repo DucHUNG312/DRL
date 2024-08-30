@@ -69,7 +69,10 @@ Dirichlet::Dirichlet(const torch::Tensor& concentration)
     natural_params_ = torch::TensorList(concentration);
 }
 
-torch::Tensor Dirichlet::rsample(torch::IntArrayRef sample_shape)
+Dirichlet::Dirichlet(const torch::Tensor& concentration, const torch::Tensor&)
+    : Dirichlet(concentration) {};
+
+torch::Tensor Dirichlet::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::IntArrayRef shape = extended_shape(sample_shape);
     torch::Tensor concentration = concentration_.expand(shape);

@@ -48,5 +48,25 @@ bool DiscreteImpl::contains(int64_t x) const
     return (options.start() <= x) && (x < options.start() + options.n());
 }
 
+bool DiscreteImpl::contains() const
+{
+    return false;
+}
+
+std::shared_ptr<DiscreteImpl> make_discrete_space_imp(int64_t n, int64_t start /*= 0*/) 
+{
+  return std::make_shared<DiscreteImpl>(n , start);
+}
+
+Discrete make_discrete_space(int64_t n, int64_t start /*= 0*/) 
+{
+  return static_cast<Discrete>(make_discrete_space_imp(n, start));
+}
+
+std::shared_ptr<AnySpace> make_discrete_space_any(int64_t n, int64_t start /*= 0*/) 
+{
+  return std::make_shared<AnySpace>(make_discrete_space_imp(n, start));
+}
+
 }
 }

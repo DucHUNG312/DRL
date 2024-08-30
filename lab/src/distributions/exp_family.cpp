@@ -5,11 +5,41 @@ namespace lab
 namespace distributions
 {
 
-torch::Tensor ExponentialFamily::log_normalizer(torch::TensorList params)
+torch::Tensor ExponentialFamily::sample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     LAB_UNIMPLEMENTED;
     return torch::Tensor();
 }
+
+torch::Tensor ExponentialFamily::rsample(torch::IntArrayRef sample_shape /*= {}*/)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor ExponentialFamily::sample_n(int64_t n)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor ExponentialFamily::log_prob(const torch::Tensor& value)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor ExponentialFamily::cdf(const torch::Tensor& value)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor ExponentialFamily::icdf(const torch::Tensor& value)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}   
 
 torch::Tensor ExponentialFamily::entropy()
 {

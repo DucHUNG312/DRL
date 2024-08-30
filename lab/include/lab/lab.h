@@ -2,7 +2,6 @@
 
 #include "lab/core.h"
 
-#include "lab/utils/anyspaceholder.h"
 #include "lab/utils/convert.h"
 #include "lab/utils/env.h"
 #include "lab/utils/file.h"
@@ -11,9 +10,7 @@
 #include "lab/utils/optimizer.h"
 #include "lab/utils/policy.h"
 #include "lab/utils/rand.h"
-#include "lab/utils/spaceholder.h"
 #include "lab/utils/spec.h"
-#include "lab/utils/spectypes.h"
 #include "lab/utils/tensor.h"
 #include "lab/utils/typetraits.h"
 

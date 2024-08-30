@@ -7,7 +7,6 @@
 
 namespace lab
 {
-
 namespace agents
 {
 class NetImpl;
@@ -16,6 +15,12 @@ class MLPNetImpl;
 
 namespace utils
 {
+
+struct Module : public torch::nn::Module
+{
+    using torch::nn::Module::Module;
+    torch::Tensor forward(torch::Tensor input);
+};
 
 class NoGradGuard
 {
@@ -26,178 +31,53 @@ private:
     std::unique_ptr<torch::NoGradGuard> no_grad_guard;
 };
 
-struct Module : public torch::nn::Module
-{
-    using torch::nn::Module::Module;
+#define LAB_ACTIVATION_DECLARE(Name)                                      \
+struct Name : public torch::nn::Name##Impl, public lab::utils::Module     \
+{                                                                         \
+    using torch::nn::Name##Impl::Name##Impl;                              \
+    static constexpr const char* name = #Name;                            \
+}
 
-    torch::Tensor forward(torch::Tensor input)
-    {
-        return torch::Tensor();
-    }
-};
+#define LAB_ACTIVATION_SOFMAX_DECLARE(Name)                               \
+struct Name : public torch::nn::Name##Impl, public lab::utils::Module     \
+{                                                                         \
+    using torch::nn::Name##Impl::Name##Impl;                              \
+    Name(int64_t dim = 1) : torch::nn::Name##Impl(dim) {}                 \
+    static constexpr const char* name = #Name;                            \
+}
 
-struct ReLU : public torch::nn::ReLUImpl, public Module
-{ 
-    using torch::nn::ReLUImpl::ReLUImpl;
-    static constexpr const char* name = "ReLU";
-};
-struct LeakyReLU : public torch::nn::LeakyReLUImpl, public Module 
-{ 
-    using torch::nn::LeakyReLUImpl::LeakyReLUImpl;
-    static constexpr const char* name = "LeakyReLU"; 
-};
-struct ELU : public torch::nn::ELUImpl, public Module 
-{ 
-    using torch::nn::ELUImpl::ELUImpl;
-    static constexpr const char* name = "ELU"; 
-};
-struct SELU : public torch::nn::SELUImpl, public Module 
-{ 
-    using torch::nn::SELUImpl::SELUImpl;
-    static constexpr const char* name = "SELU"; 
-};
-struct SiLU : public torch::nn::SiLUImpl, public Module 
-{ 
-    using torch::nn::SiLUImpl::SiLUImpl;
-    static constexpr const char* name = "SiLU"; 
-};
-struct Sigmoid : public torch::nn::SigmoidImpl, public Module 
-{ 
-    using torch::nn::SigmoidImpl::SigmoidImpl;
-    static constexpr const char* name = "Sigmoid"; 
-};
-struct LogSigmoid : public torch::nn::LogSigmoidImpl, public Module 
-{ 
-    using torch::nn::LogSigmoidImpl::LogSigmoidImpl;
-    static constexpr const char* name = "LogSigmoid"; 
-};
-struct Softmax : public torch::nn::SoftmaxImpl, public Module 
-{ 
-    using torch::nn::SoftmaxImpl::SoftmaxImpl;
-    Softmax(int64_t dim = 1) : torch::nn::SoftmaxImpl(dim) {}
-    static constexpr const char* name = "Softmax"; 
-};
-struct LogSoftmax : public torch::nn::LogSoftmaxImpl, public Module 
-{ 
-    using torch::nn::LogSoftmaxImpl::LogSoftmaxImpl;
-    LogSoftmax(int64_t dim = 1) : torch::nn::LogSoftmaxImpl(dim) {}
-    static constexpr const char* name = "LogSoftmax"; 
-};
-struct Tanh : public torch::nn::TanhImpl, public Module 
-{ 
-    using torch::nn::TanhImpl::TanhImpl;
-    static constexpr const char* name = "Tanh"; 
-};
-struct MSELoss : public torch::nn::MSELossImpl, public Module 
-{ 
-    using torch::nn::MSELossImpl::MSELossImpl;
-    static constexpr const char* name = "MSELoss"; 
-};
-struct CrossEntropyLoss : public torch::nn::CrossEntropyLossImpl, public Module 
-{ 
-    using torch::nn::CrossEntropyLossImpl::CrossEntropyLossImpl;
-    static constexpr const char* name = "CrossEntropyLoss"; 
-};
-struct NLLLoss : public torch::nn::NLLLossImpl, public Module 
-{ 
-    using torch::nn::NLLLossImpl::NLLLossImpl;
-    static constexpr const char* name = "NLLLoss"; 
-};
-struct BCELoss : public torch::nn::BCELossImpl, public Module 
-{ 
-    using torch::nn::BCELossImpl::BCELossImpl;
-    static constexpr const char* name = "BCELoss"; 
-};
-struct BCEWithLogitsLoss : public torch::nn::BCEWithLogitsLossImpl, public Module 
-{ 
-    using torch::nn::BCEWithLogitsLossImpl::BCEWithLogitsLossImpl;
-    static constexpr const char* name = "BCEWithLogitsLoss"; 
-}; 
-struct Adam : public torch::optim::Adam 
-{ 
-    using torch::optim::Adam::Adam;
-    static constexpr const char* name = "Adam"; 
-};
-struct GlobalAdam : public torch::optim::GlobalAdam 
-{ 
-    using torch::optim::GlobalAdam::GlobalAdam;
-    static constexpr const char* name = "GlobalAdam"; 
-};
-struct RAdam : public torch::optim::RAdam 
-{ 
-    using torch::optim::RAdam::RAdam;
-    static constexpr const char* name = "RAdam"; 
-};
-struct RMSprop : public torch::optim::RMSprop 
-{ 
-    using torch::optim::RMSprop::RMSprop;
-    static constexpr const char* name = "RMSprop"; 
-};
-struct GlobalRMSprop : public torch::optim::GlobalRMSprop 
-{ 
-    using torch::optim::GlobalRMSprop::GlobalRMSprop;
-    static constexpr const char* name = "GlobalRMSprop"; 
-};
-struct StepLR : public torch::optim::StepLR 
-{ 
-    using torch::optim::StepLR::StepLR;
-    static constexpr const char* name = "StepLR"; 
-};
-struct kLinear : public torch::enumtype::kLinear
-{
-    using torch::enumtype::kLinear::kLinear;
-    static constexpr const char* name = "kLinear";
-};
-struct kConv1D : public torch::enumtype::kConv1D
-{
-    using torch::enumtype::kConv1D::kConv1D;
-    static constexpr const char* name = "kConv1D";
-};
-struct kConv2D : public torch::enumtype::kConv2D
-{
-    using torch::enumtype::kConv2D::kConv2D;
-    static constexpr const char* name = "kConv2D";
-};
-struct kConv3D : public torch::enumtype::kConv3D
-{
-    using torch::enumtype::kConv3D::kConv3D;
-    static constexpr const char* name = "kConv3D";
-};
-struct kConvTranspose1D : public torch::enumtype::kConvTranspose1D
-{
-    using torch::enumtype::kConvTranspose1D::kConvTranspose1D;
-    static constexpr const char* name = "kConvTranspose1D";
-};
-struct kConvTranspose2D : public torch::enumtype::kConvTranspose2D
-{
-    using torch::enumtype::kConvTranspose2D::kConvTranspose2D;
-    static constexpr const char* name = "kConvTranspose2D";
-};
-struct kConvTranspose3D : public torch::enumtype::kConvTranspose3D
-{
-    using torch::enumtype::kConvTranspose3D::kConvTranspose3D;
-    static constexpr const char* name = "kConvTranspose3D";
-};
-struct kSigmoid : public torch::enumtype::kSigmoid
-{
-    using torch::enumtype::kSigmoid::kSigmoid;
-    static constexpr const char* name = "kSigmoid";
-};
-struct kTanh : public torch::enumtype::kTanh
-{
-    using torch::enumtype::kTanh::kTanh;
-    static constexpr const char* name = "kTanh";
-};
-struct kReLU : public torch::enumtype::kReLU
-{
-    using torch::enumtype::kReLU::kReLU;
-    static constexpr const char* name = "kReLU";
-};
-struct kLeakyReLU : public torch::enumtype::kLeakyReLU
-{
-    using torch::enumtype::kLeakyReLU::kLeakyReLU;
-    static constexpr const char* name = "kLeakyReLU";
-};
+LAB_ACTIVATION_DECLARE(ReLU);
+LAB_ACTIVATION_DECLARE(LeakyReLU);
+LAB_ACTIVATION_DECLARE(ELU);
+LAB_ACTIVATION_DECLARE(SELU);
+LAB_ACTIVATION_DECLARE(SiLU);
+LAB_ACTIVATION_DECLARE(Sigmoid);
+LAB_ACTIVATION_DECLARE(LogSigmoid);
+LAB_ACTIVATION_DECLARE(Tanh);
+LAB_ACTIVATION_DECLARE(MSELoss);
+LAB_ACTIVATION_DECLARE(CrossEntropyLoss);
+LAB_ACTIVATION_DECLARE(NLLLoss);
+LAB_ACTIVATION_DECLARE(BCELoss);
+LAB_ACTIVATION_DECLARE(BCEWithLogitsLoss);
+LAB_ACTIVATION_SOFMAX_DECLARE(Softmax);
+LAB_ACTIVATION_SOFMAX_DECLARE(LogSoftmax);
+LAB_TYPE_DECLARE(Adam, torch::optim);
+LAB_TYPE_DECLARE(GlobalAdam, torch::optim);
+LAB_TYPE_DECLARE(RAdam, torch::optim);
+LAB_TYPE_DECLARE(RMSprop, torch::optim);
+LAB_TYPE_DECLARE(GlobalRMSprop, torch::optim);
+LAB_TYPE_DECLARE(StepLR, torch::optim);
+LAB_TYPE_DECLARE(kLinear, torch::enumtype);
+LAB_TYPE_DECLARE(kConv1D, torch::enumtype);
+LAB_TYPE_DECLARE(kConv2D, torch::enumtype);
+LAB_TYPE_DECLARE(kConv3D, torch::enumtype);
+LAB_TYPE_DECLARE(kConvTranspose1D, torch::enumtype);
+LAB_TYPE_DECLARE(kConvTranspose2D, torch::enumtype);
+LAB_TYPE_DECLARE(kConvTranspose3D, torch::enumtype);
+LAB_TYPE_DECLARE(kSigmoid, torch::enumtype);
+LAB_TYPE_DECLARE(kTanh, torch::enumtype);
+LAB_TYPE_DECLARE(kReLU, torch::enumtype);
+LAB_TYPE_DECLARE(kLeakyReLU, torch::enumtype);
 
 using Activations = types_t<ReLU, LeakyReLU, ELU, /*SELU,*/ SiLU, Sigmoid, LogSigmoid, Softmax, LogSoftmax, Tanh>;
 using Losses = types_t<MSELoss, CrossEntropyLoss, NLLLoss, BCELoss, BCEWithLogitsLoss>;
@@ -206,12 +86,12 @@ using Schedulars = types_t<StepLR>;
 using Nets = types_t<lab::agents::MLPNetImpl>;
 using NonlinearityTypes = types_t<kLinear, kConv1D, kConv2D, kConv3D, kConvTranspose1D, kConvTranspose2D, kConvTranspose3D, kSigmoid, kTanh, kReLU, kLeakyReLU>;
 
-constexpr named_factory_t<std::shared_ptr<lab::utils::Module>, shared_ptr_maker, lab::utils::Activations> ActivationFactory;
-constexpr named_factory_t<std::shared_ptr<lab::utils::Module>, shared_ptr_maker, lab::utils::Losses> LossFactory;
-constexpr named_factory_t<std::shared_ptr<torch::optim::Optimizer>, shared_ptr_maker, lab::utils::Optims> OptimizerFactory;
-constexpr named_factory_t<std::shared_ptr<torch::optim::LRScheduler>, shared_ptr_maker, lab::utils::Schedulars> LRSchedularFactory;
-constexpr named_factory_t<std::shared_ptr<lab::agents::NetImpl>, shared_ptr_maker, lab::utils::Nets> NetFactory;
-constexpr named_factory_t<torch::nn::init::NonlinearityType , object_maker, lab::utils::NonlinearityTypes> NonlinearityFactory;
+constexpr named_factory_t<std::shared_ptr<lab::utils::Module>, shared_ptr_maker, Activations> ActivationFactory;
+constexpr named_factory_t<std::shared_ptr<lab::utils::Module>, shared_ptr_maker, Losses> LossFactory;
+constexpr named_factory_t<std::shared_ptr<torch::optim::Optimizer>, shared_ptr_maker, Optims> OptimizerFactory;
+constexpr named_factory_t<std::shared_ptr<torch::optim::LRScheduler>, shared_ptr_maker, Schedulars> LRSchedularFactory;
+constexpr named_factory_t<std::shared_ptr<lab::agents::NetImpl>, shared_ptr_maker, Nets> NetFactory;
+constexpr named_factory_t<torch::nn::init::NonlinearityType , object_maker, NonlinearityTypes> NonlinearityFactory;
 
 torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const std::shared_ptr<lab::utils::Module>& activation);
 
@@ -274,6 +154,7 @@ std::shared_ptr<lab::agents::MLPNetImpl> create_mlp_net(const utils::NetSpec& sp
 }
 
 }
+
 
 
 

@@ -21,7 +21,7 @@ Cauchy::Cauchy(const torch::Tensor& loc, const torch::Tensor& scale)
                 torch::TensorOptions().dtype(torch::kDouble).device(loc_.device()));
 }
 
-torch::Tensor Cauchy::rsample(torch::IntArrayRef sample_shape)
+torch::Tensor Cauchy::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::IntArrayRef shape = extended_shape(sample_shape);
     torch::Tensor eps = torch::empty(shape, loc_.options()).cauchy_();
@@ -50,6 +50,18 @@ torch::Tensor Cauchy::icdf(const torch::Tensor& value)
 torch::Tensor Cauchy::entropy()
 {
     return std::log(4 * math::Pi) + scale_.log();
+}
+
+torch::Tensor Cauchy::sample(torch::IntArrayRef sample_shape /*= {}*/)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor Cauchy::sample_n(int64_t n)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
 }
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lab/spaces/base.h"
+#include "lab/spaces/any.h"
 
 namespace lab
 {
@@ -26,9 +27,12 @@ public:
 
   void pretty_print(std::ostream& stream) const override;
 
-  int64_t sample(/*const torch::Tensor& mask**/);
+  int64_t sample(/*const torch::Tensor& mask*/);
 
   bool contains(int64_t x) const;
+
+  // Overload for zero arguments
+  bool contains() const;
 public:
   DiscreteOptions options;
   torch::Tensor n;
@@ -37,10 +41,11 @@ public:
 
 LAB_SPACE(Discrete);
 
-LAB_FORCE_INLINE Discrete make_discrete_space(int64_t n, int64_t start = 0) 
-{
-  return static_cast<Discrete>(std::make_shared<DiscreteImpl>(n , start));
-}
+std::shared_ptr<DiscreteImpl> make_discrete_space_imp(int64_t n, int64_t start = 0);
+
+Discrete make_discrete_space(int64_t n, int64_t start = 0);
+
+std::shared_ptr<AnySpace> make_discrete_space_any(int64_t n, int64_t start = 0);
 
 
 }

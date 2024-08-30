@@ -7,6 +7,12 @@ namespace lab
 namespace utils
 {
 
+torch::Tensor Module::forward(torch::Tensor input)
+{
+    LAB_UNREACHABLE;
+    return torch::Tensor();
+}
+
 NoGradGuard::NoGradGuard() 
 {
     no_grad_guard = std::make_unique<torch::NoGradGuard>();

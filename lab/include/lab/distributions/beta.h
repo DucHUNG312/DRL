@@ -16,9 +16,9 @@ class Beta : public ExponentialFamily
 public:
     Beta(const torch::Tensor& concentration0, const torch::Tensor& concentration1);
 
-    torch::Tensor rsample(torch::IntArrayRef sample_shape);
+    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
 
-    torch::Tensor log_prob(const torch::Tensor& value);
+    torch::Tensor log_prob(const torch::Tensor& value) override;
 
     torch::Tensor log_normalizer(torch::TensorList params) override;
 };

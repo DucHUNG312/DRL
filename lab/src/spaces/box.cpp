@@ -38,5 +38,30 @@ bool BoxImpl::contains(const torch::Tensor& x) const
     return (utils::tensor_ge(x, low) && utils::tensor_le(x, high));
 }
 
+bool BoxImpl::contains() const
+{
+    return false;
+}
+
+Box make_box_space(torch::IntArrayRef shape /*= torch::IntArrayRef(1)*/) 
+{
+  return static_cast<Box>(std::make_shared<BoxImpl>(torch::full(shape, 0, torch::kDouble), torch::full(shape, 1, torch::kDouble)));
+}
+
+std::shared_ptr<BoxImpl> make_box_space_impl(const torch::Tensor& low, const torch::Tensor& high) 
+{
+  return std::make_shared<BoxImpl>(low, high);
+}
+
+Box make_box_space(const torch::Tensor& low, const torch::Tensor& high) 
+{
+  return static_cast<Box>(make_box_space_impl(low, high));
+}
+
+std::shared_ptr<AnySpace> make_box_space_any(const torch::Tensor& low, const torch::Tensor& high) 
+{
+  return std::make_shared<AnySpace>(make_box_space_impl(low, high));
+}
+
 }
 }

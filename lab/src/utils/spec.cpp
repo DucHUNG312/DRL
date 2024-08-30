@@ -52,7 +52,7 @@ VarSchedulerSpec SpecLoader::get_explore_var_spec(const json& j)
     if(j.contains("explore_var_spec"))
     {
         json j_explore = j["explore_var_spec"];
-        spec.updater = str_to_var_updater(get_json_value<std::string>(j_explore["name"]));
+        spec.updater = get_json_value<std::string>(j_explore["name"]);
         spec.start_val = get_json_value<double>(j_explore["start_val"]);
         spec.end_val = get_json_value<double>(j_explore["end_val"]);
         spec.start_step = get_json_value<uint64_t>(j_explore["start_step"]);
@@ -67,7 +67,7 @@ VarSchedulerSpec SpecLoader::get_entropy_coef_spec(const json& j)
     if(j.contains("entropy_coef_spec"))
     {
         json j_entropy = j["entropy_coef_spec"];
-        spec.updater = str_to_var_updater(get_json_value<std::string>(j_entropy["name"]));
+        spec.updater = get_json_value<std::string>(j_entropy["name"]);
         spec.start_val = get_json_value<double>(j_entropy["start_val"]);
         spec.end_val = get_json_value<double>(j_entropy["end_val"]);
         spec.start_step = get_json_value<uint64_t>(j_entropy["start_step"]);
@@ -83,8 +83,8 @@ AlgorithmSpec SpecLoader::get_algorithm_spec(const json& j)
     {
         json j_algo = j["algorithm"];
         spec.name = j_algo["name"];
-        spec.action_pdtype = str_to_action_pd_type(get_json_value<std::string>(j_algo["action_pdtype"]));
-        spec.action_policy = str_to_action_policy_type(get_json_value<std::string>(j_algo["action_policy"]));
+        spec.action_pdtype = get_json_value<std::string>(j_algo["action_pdtype"]);
+        spec.action_policy = get_json_value<std::string>(j_algo["action_policy"]);
         spec.explore_spec = get_explore_var_spec(j_algo);
         spec.entropy_spec = get_entropy_coef_spec(j_algo);
         spec.gamma = get_json_value<double>(j_algo["gamma"]);
@@ -153,7 +153,6 @@ NetSpec SpecLoader::get_net_spec(const json& j)
     {
         json j_net = j["net"];
         spec.name = get_json_value<std::string>(j_net["type"]);
-        spec.type = str_to_net_type(j_net["type"]);
         spec.hid_layers = get_json_value<std::vector<int64_t>>(j_net["hid_layers"]);
         spec.hid_layers_activation = get_json_value<std::string>(j_net["hid_layers_activation"]);
         spec.out_layers_activation = get_json_value<std::vector<std::string>>(j_net["out_layers_activation"]);
@@ -162,7 +161,7 @@ NetSpec SpecLoader::get_net_spec(const json& j)
         spec.loss_spec = get_loss_fn_spec(j_net);
         spec.optim_spec = get_optim_spec(j_net);
         spec.lr_scheduler_spec = get_lr_scheduler_spec(j_net);
-        spec.update_type = str_to_update_type(get_json_value<std::string>(j_net["update_type"]));
+        spec.update_type = get_json_value<std::string>(j_net["update_type"]);
         spec.update_frequency = get_json_value<double>(j_net["update_frequency"]);
         spec.polyak_coef = get_json_value<uint64_t>(j_net["polyak_coef"]);
         spec.gpu = get_json_value<bool>(j_net["gpu"]);
@@ -247,7 +246,7 @@ MetaSpec SpecLoader::get_meta_info_spec(const json& j)
         spec.eval_frequency = get_json_value<uint64_t>(j_meta["eval_frequency"]);
         spec.max_session = get_json_value<uint64_t>(j_meta["max_session"]);
         spec.max_trial = get_json_value<uint64_t>(j_meta["max_trial"]);
-        spec.search = str_to_search_type(get_json_value<std::string>(j_meta["search"]));
+        spec.search = get_json_value<std::string>(j_meta["search"]);
     }
     return spec;
 }

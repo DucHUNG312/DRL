@@ -2,134 +2,109 @@
 
 #include "lab/core.h"
 #include "lab/utils/spec.h"
-#include "lab/utils/net.h"
-#include "lab/utils/math.h"
-#include "lab/utils/rand.h"
 #include "lab/utils/typetraits.h"
-#include "lab/distributions/base.h"
+#include "lab/distributions/bernoulli.h"
+#include "lab/distributions/beta.h"
+#include "lab/distributions/categorical.h"
+#include "lab/distributions/cauchy.h"
+#include "lab/distributions/dirichlet.h"
+#include "lab/distributions/normal.h"
+
+LAB_TYPE_DECLARE(Bernoulli, lab::distributions);
+LAB_TYPE_DECLARE(Beta, lab::distributions);
+LAB_TYPE_DECLARE(Categorical, lab::distributions);
+LAB_TYPE_DECLARE(Cauchy, lab::distributions);
+LAB_TYPE_DECLARE(Dirichlet, lab::distributions);
+LAB_TYPE_DECLARE(Normal, lab::distributions);
 
 namespace lab
 {
+namespace agents
+{
+class Algorithm;
+}
 
 namespace utils
 {
-
-double no_decay(const VarSchedulerSpec& exp_var, int64_t step);
-
-double linear_decay(const VarSchedulerSpec& exp_var, int64_t step);
-
-double rate_decay(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate = 0, int64_t frequency = 20);
-
-double periodic_decay(const VarSchedulerSpec& exp_var, int64_t step, int64_t frequency = 20);
-
 struct VarScheduler
 {
     LAB_ARG(VarSchedulerSpec, spec);
 public:
+    VarScheduler(const VarSchedulerSpec& spec);
     LAB_DEFAULT_CONSTRUCT(VarScheduler);
-    VarScheduler(const VarSchedulerSpec& spec)
-        : spec_(spec) {}
-
-    double update()
-    {
-        int64_t step = 0; // TODO
-        switch (spec_.updater)
-        {
-            case VarUpdater::NO_DECAY: return no_decay(spec_, step);
-            case VarUpdater::LINEAR_DECAY: return linear_decay(spec_, step);
-            case VarUpdater::RATE_DECAY: return rate_decay(spec_, step);
-            case VarUpdater::PERIODIC_DECAY: return periodic_decay(spec_, step);
-            default: LAB_UNREACHABLE;
-        }
-        return 0;
-    }
+    double update();
 };
 
-template<typename T, typename = enable_if_algorithm_t<T>>
-LAB_FORCE_INLINE torch::Tensor calc_pdparam (torch::Tensor state, const std::shared_ptr<T>& algorithm)
+struct NoDecay
 {
-    return algorithm->calc_pdparam(state.to(get_torch_device()));
-}
-
-template<typename Distribution, typename = void>
-LAB_FORCE_INLINE Distribution init_action_pd(const torch::Tensor& pdparam)
+    static constexpr const char* name = "no_decay";
+    static double update(const VarSchedulerSpec& exp_var, int64_t step);
+};
+struct LinearDecay
 {
-    LAB_UNIMPLEMENTED;
-    throw std::runtime_error("Unimplemented");
+    static constexpr const char* name = "linear_decay";
+    static double update(const VarSchedulerSpec& exp_var, int64_t step);
 };
 
-template<typename Distribution>
-LAB_FORCE_INLINE lab::utils::enable_if_discrete_pd_t<Distribution> init_action_pd(const torch::Tensor& pdparam)
+struct RateDecay
 {
-    return Distribution(pdparam, true);
-}
+    static constexpr const char* name = "rate_decay";
+    static double update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate = 0.9, int64_t frequency = 20);
+};
 
-template<typename Distribution>
-LAB_FORCE_INLINE lab::utils::enable_if_continuous_pd_t<Distribution> init_action_pd(const torch::Tensor& pdparam)
+struct PeriodicDecay
 {
-    torch::Tensor loc_scale = pdparam.transpose(0, 1);
-    torch::Tensor loc = loc_scale[0];
-    torch::Tensor scale = torch::clamp(loc_scale[1], -20, 2).exp();
-    return Distribution(loc, scale);
-}
+    static constexpr const char* name = "periodic_decay";
+    static double update(const VarSchedulerSpec& exp_var, int64_t step, int64_t frequency = 60);
+};
 
-template<typename Distribution>
-LAB_FORCE_INLINE torch::Tensor sample_action(const torch::Tensor& pdparam)
-{
-    Distribution action_pd = init_action_pd<Distribution>(pdparam);
-    return action_pd.sample();
-}
-
-template<typename Distribution, typename Body, typename Algorithm, ActionPolicyType>
 struct ActionPolicy
 {
-    static torch::Tensor sample(const torch::Tensor& state, const std::shared_ptr<Algorithm>& algorithm)
-    {
-        return torch::Tensor();
-    }
+    LAB_DEFAULT_CONSTRUCT(ActionPolicy);
 };
 
-template<typename Distribution, typename Body, typename Algorithm>
-struct ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::ACTION_POLICY_NONE>
+struct DefaultPolicy : public ActionPolicy
 {
-    static torch::Tensor sample(const torch::Tensor& state, const std::shared_ptr<Algorithm>& algorithm)
-    {
-        torch::Tensor pdparam = calc_pdparam(state, algorithm);
-        return sample_action<Distribution>(pdparam);
-    }
+    static constexpr const char* name = "default";
+    static torch::Tensor sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state); 
 };
 
-template<typename Distribution, typename Body, typename Algorithm>
-struct ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::RANDOM_POLICY>
+struct RandomPolicy : public ActionPolicy
 {
-    static torch::Tensor sample(const torch::Tensor& state, const std::shared_ptr<Algorithm>& algorithm)
-    { 
-        return Body::get_action_space()->sample();
-    }
+    static constexpr const char* name = "random";
+    static torch::Tensor sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state);
 };
 
-template<typename Distribution, typename Body, typename Algorithm>
-struct ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::EPSILON_GREEDY>
+struct EpsilonGreedyPolicy : public ActionPolicy
 {
-    static torch::Tensor sample(const torch::Tensor& state, const std::shared_ptr<Algorithm>& algorithm)
-    {
-        if constexpr(Body::get_spec().explore_spec.start_val > Rand::rand())
-            return ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::RANDOM_POLICY>::sample(state, algorithm);
-        else
-            return ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::ACTION_POLICY_NONE>::sample(state, algorithm);
-    }
+    static constexpr const char* name = "epsilon_greedy";
+    static torch::Tensor sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state); 
 };
 
-template<typename Distribution, typename Body, typename Algorithm>
-struct ActionPolicy<Distribution, Body, Algorithm, ActionPolicyType::BOLTZMANN>
+struct BoltzmannPolicy : public ActionPolicy
 {
-    static torch::Tensor sample(const torch::Tensor& state, const std::shared_ptr<Algorithm>& algorithm)
-    {
-       double tau = Body::get_spec().explore_spec.start_val;
-       torch::Tensor pdparam = calc_pdparam<Algorithm>(state, algorithm) / tau;
-       return sample_action<Distribution>(pdparam);
-    }
+    static constexpr const char* name = "boltzmann";
+    static torch::Tensor sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state);
 };
+
+using Updaters = types_t<NoDecay, LinearDecay, RateDecay, PeriodicDecay>;
+using DiscreteActionPDs = types_t<Bernoulli, Categorical>;
+using ContinuousActionPDs = types_t<Beta, Cauchy, Dirichlet, Normal>;
+using ActionPolicies = types_t<DefaultPolicy, RandomPolicy, EpsilonGreedyPolicy, BoltzmannPolicy>;
+
+constexpr named_factory_t<double, update_call_maker, Updaters> UpdaterCallFactory;
+constexpr named_factory_t<std::shared_ptr<distributions::Distribution>, shared_ptr_maker, DiscreteActionPDs> DiscreteActionPDFactory;
+constexpr named_factory_t<std::shared_ptr<distributions::Distribution>, shared_ptr_maker, ContinuousActionPDs> ContinuousActionPDFactory;
+constexpr named_factory_t<ActionPolicy, object_maker, ActionPolicies> ActionPolicyFactory;
+constexpr named_factory_t<torch::Tensor, sample_call_maker, ActionPolicies> ActionPolicySampleFactory;
+
+std::shared_ptr<distributions::Distribution> init_action_pd(std::string_view name, const torch::Tensor& pdparam);
+
+torch::Tensor calc_pdparam(torch::Tensor state, const std::shared_ptr<agents::Algorithm>& algorithm);
+
+torch::Tensor sample_action(std::string_view pdname, const torch::Tensor& pdparam);
+
+ActionPolicy create_action_policy(std::string_view policy_name);
 
 }
 

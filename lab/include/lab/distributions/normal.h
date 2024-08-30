@@ -14,9 +14,9 @@ class Normal : public ExponentialFamily
 public:
     Normal(const torch::Tensor& loc, const torch::Tensor& scale);
 
-    torch::Tensor sample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
 
-    torch::Tensor rsample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
 
     torch::Tensor log_prob(const torch::Tensor& value) override;
 

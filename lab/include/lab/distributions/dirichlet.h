@@ -25,9 +25,10 @@ class Dirichlet : public ExponentialFamily
     LAB_ARG(torch::Tensor, concentration);
 public:
     Dirichlet(const torch::Tensor& concentration);
+    Dirichlet(const torch::Tensor& concentration, const torch::Tensor&); // this constructor only used to satisfy the construction condition in ContinuousActionPDFactory
     LAB_DEFAULT_CONSTRUCT(Dirichlet);
 
-    torch::Tensor rsample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
 
     torch::Tensor log_prob(const torch::Tensor& value) override;
     

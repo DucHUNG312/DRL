@@ -18,8 +18,8 @@ public:
     {
         LAB_CHECK(act.isTensor());
         return torch::clip(act, 
-            this->unwrapped()->get_action_spaces()->template as<spaces::Box>()->low(), 
-            this->unwrapped()->get_action_spaces()->template as<spaces::Box>()->high());
+            this->unwrapped()->get_action_spaces()->template ptr<spaces::Box>()->low(), 
+            this->unwrapped()->get_action_spaces()->template ptr<spaces::Box>()->high());
     }
 };
 

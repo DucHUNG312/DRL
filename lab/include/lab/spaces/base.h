@@ -2,12 +2,95 @@
 
 #include "lab/core.h"
 #include "lab/utils/rand.h"
-#include "lab/utils/spaceholder.h"
+#include "lab/utils/typetraits.h"
 
 namespace lab
 {
 namespace spaces
 {
+    
+template <typename Contained>
+class SpaceHolder : public utils::SpaceHolderIndicator
+{
+protected:
+    /// The pointer this class wraps around
+    std::shared_ptr<Contained> impl_;
+public:
+    using ContainedType = Contained;
+
+    SpaceHolder() : impl_(default_construct()) 
+    {
+        static_assert(std::is_default_constructible<Contained>::value);
+    }
+
+    template <typename Head, typename... Tail, typename = typename std::enable_if<
+          !(utils::is_space_holder_of<Head, ContainedType>::value &&
+            (sizeof...(Tail) == 0))>::type>
+    explicit SpaceHolder(Head&& head, Tail&&... tail)
+        : impl_(new Contained(std::forward<Head>(head), std::forward<Tail>(tail)...)) {}
+
+    /* implicit */ SpaceHolder(std::nullptr_t) : impl_(nullptr) {}
+
+    /* implicit */ SpaceHolder(std::shared_ptr<Contained> space)
+        : impl_(std::move(space)) {}
+
+    explicit operator bool() const noexcept 
+    {
+        return !is_empty();
+    }
+
+    Contained* operator->() 
+    {
+        return get();
+    }
+
+    const Contained* operator->() const 
+    {
+        return get();
+    }
+
+    Contained& operator*() 
+    {
+        return *get();
+    }
+
+    const Contained& operator*() const 
+    {
+        return *get();
+    }
+
+    const std::shared_ptr<Contained>& ptr() const 
+    {
+        LAB_CHECK(!is_empty());
+        return impl_;
+    }
+
+    Contained* get() 
+    {
+        LAB_CHECK(!is_empty());
+        return impl_.get();
+    }
+
+    const Contained* get() const 
+    {
+        LAB_CHECK(!is_empty());
+        return impl_.get();
+    }
+
+    bool is_empty() const noexcept 
+    {
+        return impl_ == nullptr;
+    }
+private:
+    template <typename T = Contained>
+    std::shared_ptr<Contained> default_construct() 
+    {
+        if constexpr (std::is_default_constructible_v<T>) 
+            return std::make_shared<Contained>();
+        else
+            return nullptr;
+    }
+};
 
 class Space
 {
@@ -34,7 +117,7 @@ public:
     std::shared_ptr<SpaceType> register_subspace(std::string name, std::shared_ptr<SpaceType> space);
 
     template <typename SpaceType>
-    std::shared_ptr<SpaceType> register_subspace(std::string name, utils::SpaceHolder<SpaceType> space_holder);
+    std::shared_ptr<SpaceType> register_subspace(std::string name, SpaceHolder<SpaceType> space_holder);
 
     torch::Tensor& register_parameter(std::string name, torch::Tensor tensor, bool requires_grad = false);
     
@@ -48,25 +131,13 @@ public:
 
     std::ostream& operator<<(std::ostream& stream);
 
-    Iterator begin() 
-    {
-        return children_.begin();
-    }
+    Iterator begin();
 
-    ConstIterator begin() const 
-    {
-        return children_.begin();
-    }
+    ConstIterator begin() const;
 
-    Iterator end() 
-    {
-        return children_.end();
-    }
+    Iterator end();
 
-    ConstIterator end() const 
-    {
-        return children_.end();
-    }
+    ConstIterator end() const;
 
     template <typename SpaceType>
     typename SpaceType::ContainedType* as() noexcept;
@@ -124,10 +195,11 @@ std::shared_ptr<SpaceType> Space::register_subspace(std::string name, std::share
 }
 
 template <typename SpaceType>
-std::shared_ptr<SpaceType> Space::register_subspace(std::string name, utils::SpaceHolder<SpaceType> space_holder)
+std::shared_ptr<SpaceType> Space::register_subspace(std::string name, SpaceHolder<SpaceType> space_holder)
 {
     return register_subspace(std::move(name), space_holder.ptr());
 }
+
 template<typename Derived>
 class ClonableSpace : public Space
 {
@@ -172,9 +244,9 @@ private:
 };
 
 #define LAB_SPACE_IMPL(Name, ImplType)                                          \
-  class Name : public lab::utils::SpaceHolder<ImplType> { /* NOLINT */          \
+  class Name : public lab::spaces::SpaceHolder<ImplType> { /* NOLINT */          \
    public:                                                                      \
-    using lab::utils::SpaceHolder<ImplType>::SpaceHolder;                       \
+    using lab::spaces::SpaceHolder<ImplType>::SpaceHolder;                       \
   }
 
 #define LAB_SPACE(Name) LAB_SPACE_IMPL(Name, Name##Impl)

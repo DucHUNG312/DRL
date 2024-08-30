@@ -18,47 +18,5 @@ torch::IntArrayRef Distribution::extended_shape(torch::IntArrayRef sample_shape 
     return torch::IntArrayRef(combined_shape);
 }
 
-torch::Tensor Distribution::sample(torch::IntArrayRef sample_shape)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
-torch::Tensor Distribution::rsample(torch::IntArrayRef sample_shape)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
-torch::Tensor Distribution::sample_n(int64_t n)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
-torch::Tensor Distribution::log_prob(const torch::Tensor& value)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
-torch::Tensor Distribution::cdf(const torch::Tensor& value)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
-torch::Tensor Distribution::icdf(const torch::Tensor& value)
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}   
-
-torch::Tensor Distribution::entropy()
-{
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
-}
-
 }
 }

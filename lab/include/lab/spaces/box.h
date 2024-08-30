@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lab/spaces/base.h"
+#include "lab/spaces/any.h"
 
 namespace lab
 {
@@ -24,9 +25,12 @@ public:
 
     void reset() override;
 
-    torch::Tensor sample();
+    torch::Tensor sample(/*const torch::Tensor& mask*/);
 
     bool contains(const torch::Tensor& x) const;
+
+    // Overload for zero arguments
+    bool contains() const;
 public:
   BoxOptions options;
   torch::Tensor low;
@@ -35,15 +39,13 @@ public:
 
 LAB_SPACE(Box);
 
-LAB_FORCE_INLINE Box make_box_space(torch::IntArrayRef shape = torch::IntArrayRef(1)) 
-{
-  return static_cast<Box>(std::make_shared<BoxImpl>(torch::full(shape, 0, torch::kDouble), torch::full(shape, 1, torch::kDouble)));
-}
+Box make_box_space(torch::IntArrayRef shape = torch::IntArrayRef(1));
 
-LAB_FORCE_INLINE Box make_box_space(const torch::Tensor& low, const torch::Tensor& high) 
-{
-  return static_cast<Box>(std::make_shared<BoxImpl>(low, high));
-}
+Box make_box_space(const torch::Tensor& low, const torch::Tensor& high);
+
+std::shared_ptr<BoxImpl> make_box_space_impl(const torch::Tensor& low, const torch::Tensor& high);
+
+std::shared_ptr<AnySpace> make_box_space_any(const torch::Tensor& low, const torch::Tensor& high);
 
 }
 }

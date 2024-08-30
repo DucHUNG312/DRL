@@ -26,8 +26,8 @@ CartPole::CartPole()
     LAB_CHECK_LT(reset_low, reset_high);
 
     torch::Tensor high = torch::tensor({x_threshold * 2, lab::math::Max, theta_threshold_radians * 2, lab::math::Max}, torch::kDouble);
-    action_spaces_ = spaces::make_discrete_space(2).ptr();
-    observation_spaces_ = spaces::make_box_space(-high, high).ptr();
+    action_spaces_ = spaces::make_discrete_space_any(2);
+    observation_spaces_ = spaces::make_box_space_any(-high, high);
     result_.state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
     env_spec_.is_open = true;
 
@@ -64,7 +64,7 @@ void CartPole::enable_rendering()
 
 int64_t CartPole::sample()
 {
-    auto discrete_ptr = action_spaces_->template as<spaces::Discrete>();
+    auto discrete_ptr = action_spaces_->template ptr<spaces::Discrete>();
     if (!discrete_ptr) 
     {
         LAB_LOG_FATAL("Discrete space is not initialized correctly.");
@@ -75,7 +75,7 @@ int64_t CartPole::sample()
 
 void CartPole::step(int64_t action)
 {
-    LAB_CHECK(action_spaces_->template as<spaces::Discrete>()->contains(action));
+    LAB_CHECK(action_spaces_->template ptr<spaces::Discrete>()->contains(action));
 
     result_.action = torch::IValue(action);
 

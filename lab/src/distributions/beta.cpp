@@ -23,7 +23,7 @@ Beta::Beta(const torch::Tensor& concentration0, const torch::Tensor& concentrati
     variance_ = (concentration1_ * concentration0_) / ((concentration1_ + concentration0_).pow(2) * (concentration1_ + concentration0_ + 1));
 }
 
-torch::Tensor Beta::rsample(torch::IntArrayRef sample_shape)
+torch::Tensor Beta::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     return dirichlet_.rsample(sample_shape).select(-1, 0);
 }

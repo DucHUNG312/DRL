@@ -36,7 +36,7 @@ torch::IntArrayRef Categorical::params_shape()
     return params_.sizes();
 }
 
-torch::Tensor Categorical::sample(torch::IntArrayRef sample_shape)
+torch::Tensor Categorical::sample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     int64_t num_samples = 1;
     for (int64_t dim : sample_shape)
@@ -60,8 +60,31 @@ torch::Tensor Categorical::entropy()
     torch::Tensor clamped_logits = torch::clamp(logits(), min_real);
     torch::Tensor p_log_p = clamped_logits * probs();
     return -p_log_p.sum(-1);
-    
 }
+
+torch::Tensor Categorical::rsample(torch::IntArrayRef sample_shape /*= {}*/)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor Categorical::sample_n(int64_t n)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor Categorical::cdf(const torch::Tensor& value)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}
+
+torch::Tensor Categorical::icdf(const torch::Tensor& value)
+{
+    LAB_UNIMPLEMENTED;
+    return torch::Tensor();
+}   
        
 }
 }

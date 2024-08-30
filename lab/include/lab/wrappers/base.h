@@ -1,7 +1,7 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/spaceholder.h"
+#include "lab/spaces/base.h"
 
 namespace lab
 {
@@ -12,9 +12,9 @@ template<typename Env>
 class Wrapper
 {
 private:
-    utils::SpaceHolder<Env> env_;
+    spaces::SpaceHolder<Env> env_;
 public:
-    Wrapper(const utils::SpaceHolder<Env>& env)
+    Wrapper(const spaces::SpaceHolder<Env>& env)
         : env_(std::move(env))
     {}
 
@@ -38,7 +38,7 @@ public:
         env_->close();
     }
 
-    utils::SpaceHolder<Env>& unwrapped()
+    spaces::SpaceHolder<Env>& unwrapped()
     {
         return env_;
     }

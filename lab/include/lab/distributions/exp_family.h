@@ -14,9 +14,22 @@ class ExponentialFamily : public Distribution
 public:
     using Distribution::Distribution;
 
-    virtual torch::Tensor log_normalizer(torch::TensorList params);
+    virtual torch::Tensor log_normalizer(torch::TensorList params) = 0;
     
-    torch::Tensor entropy() override;
+    virtual torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
+
+    virtual torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
+
+    virtual torch::Tensor sample_n(int64_t n) override;
+
+    virtual torch::Tensor log_prob(const torch::Tensor& value) override;
+
+    virtual torch::Tensor cdf(const torch::Tensor& value) override;
+
+    virtual torch::Tensor icdf(const torch::Tensor& value) override;
+
+    virtual torch::Tensor entropy() override;
+
 };
 
 }

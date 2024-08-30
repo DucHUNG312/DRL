@@ -1,8 +1,10 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/spectypes.h"
 #include "lab/envs/base.h"
+#include "lab/utils/spec.h"
+#include "lab/utils/policy.h"
+
 namespace lab
 {
 namespace agents

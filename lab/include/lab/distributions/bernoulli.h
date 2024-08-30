@@ -20,13 +20,13 @@ public:
 
     torch::IntArrayRef params_shape();
 
-    torch::Tensor sample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
 
     torch::Tensor log_prob(const torch::Tensor& value) override;
 
     torch::Tensor entropy() override;
 
-    torch::Tensor log_normalizer(torch::TensorList params);
+    torch::Tensor log_normalizer(torch::TensorList params) override;
 };
 
 }

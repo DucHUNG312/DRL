@@ -18,14 +18,14 @@ Normal::Normal(const torch::Tensor& loc, const torch::Tensor& scale)
     natural_params_ = torch::TensorList({loc_ / scale_.pow(2), -0.5 * scale_.pow(2).reciprocal()});
 }
 
-torch::Tensor Normal::sample(torch::IntArrayRef sample_shape)
+torch::Tensor Normal::sample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::NoGradGuard no_grad;
     torch::IntArrayRef shape = extended_shape(sample_shape);
     return at::normal(loc_.expand(shape), scale_.expand(shape));
 }
 
-torch::Tensor Normal::rsample(torch::IntArrayRef sample_shape)
+torch::Tensor Normal::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::IntArrayRef shape = extended_shape(sample_shape);
     torch::Tensor eps = standard_normal(shape, loc_.dtype().toScalarType(), loc_.device());

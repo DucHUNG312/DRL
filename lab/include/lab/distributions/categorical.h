@@ -16,11 +16,23 @@ public:
     Categorical(const torch::Tensor& in, bool is_logits = false);
 
     torch::Tensor logits();
+
     torch::Tensor probs();
+    
     torch::IntArrayRef params_shape();
 
-    torch::Tensor sample(torch::IntArrayRef sample_shape) override;
+    torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
+    
+    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
+    
+    torch::Tensor sample_n(int64_t n) override;
+    
     torch::Tensor log_prob(const torch::Tensor& value) override;
+    
+    torch::Tensor cdf(const torch::Tensor& value) override;
+    
+    torch::Tensor icdf(const torch::Tensor& value) override;  
+    
     torch::Tensor entropy() override;
 };
 
