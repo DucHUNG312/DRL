@@ -16,14 +16,14 @@ struct StepResult
 {
     torch::Tensor state;
     torch::Tensor next_state;
-    torch::IValue action;
+    torch::Tensor action;
     double reward = 0;
     bool terminated = false; 
     bool truncated = false;
 
     StepResult(
         const torch::Tensor& state, 
-        const torch::IValue& action,
+        const torch::Tensor& action,
         double reward, 
         bool terminated, 
         bool truncated);
@@ -52,9 +52,11 @@ public:
 
     void reset(uint64_t seed = 0);
 
-    void step(torch::IValue act);
+    void step(const torch::Tensor& act);
 
-    torch::IValue sample();
+    bool done() const;
+
+    torch::Tensor sample();
 
     void close();
 

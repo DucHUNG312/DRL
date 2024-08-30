@@ -23,7 +23,7 @@ AnySpace AnySpace::clone(std::optional<torch::Device> device) const
     return clone;
 }
 
-torch::nn::AnyValue AnySpace::any_sample(/*torch::Tensor&& mask*/) 
+torch::Tensor AnySpace::sample(/*torch::Tensor&& mask*/) 
 {
     LAB_CHECK(!is_empty());
     return content_->sample(/*std::move(mask)*/);

@@ -38,16 +38,16 @@ void SequentialImpl::pretty_print(std::ostream& stream) const
     stream << "lab::spaces::Sequential";
 }
 
-std::vector<torch::nn::AnyValue> SequentialImpl::sample(/*std::vector<torch::Tensor>&& inputs*/) 
+std::vector<torch::Tensor> SequentialImpl::sample(/*std::vector<torch::Tensor>&& inputs*/) 
 {
     LAB_CHECK(!is_empty());
     //LAB_CHECK(inputs.size() == spaces_.size());
 
-    std::vector<torch::nn::AnyValue> values;
+    std::vector<torch::Tensor> values;
     values.reserve(spaces_.size());
 
     for (int64_t i = 0; i < spaces_.size(); i++)
-        values.push_back(spaces_[i].any_sample(/*std::forward<torch::Tensor>(inputs[i])*/));
+        values.push_back(spaces_[i].sample(/*std::forward<torch::Tensor>(inputs[i])*/));
 
     return values;
 }

@@ -44,23 +44,13 @@ struct has_contains_method : std::false_type {};
 template <typename T, typename Ret, typename... Args>
 struct has_contains_method<T, Ret(Args...), std::void_t<decltype(std::declval<T>().contains(std::declval<Args>()...))>> : std::true_type {};
 
-template<typename T>
-struct space_sample_contain;
-template<>
-struct space_sample_contain<spaces::BoxImpl> { using type = torch::Tensor; };
-template<>
-struct space_sample_contain<spaces::DiscreteImpl> { using type = int64_t; };
-
-template<typename T>
-using space_sample_contain_t = typename space_sample_contain<T>::type;
-
 // Trait to check if a class has both `sample` and `contains` methods
 template <typename T>
 struct has_sample_and_contains 
 {
     static constexpr bool value = 
-        has_sample_method<T, space_sample_contain_t<T>()>::value &&
-        has_contains_method<T, bool(space_sample_contain_t<T>)>::value;
+        has_sample_method<T, torch::Tensor()>::value &&
+        has_contains_method<T, bool(torch::Tensor)>::value;
 };
 
 template <typename T>

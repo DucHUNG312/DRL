@@ -24,7 +24,7 @@ public:
     LAB_ARG(int64_t, size) = 0;
     LAB_ARG(int64_t, seen_size) = 0;
     LAB_ARG(bool, ready) = false;
-    LAB_ARG(std::vector<std::string>, keys) = {"state", "new_state", "action", "reward", "terminated", "truncated"};
+    LAB_ARG(std::vector<std::string>, keys) = {"state", "next_state", "action", "reward", "terminated", "truncated"};
 public:
     Memory(const std::shared_ptr<Body>& body, const utils::MemorySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Memory);
@@ -35,12 +35,29 @@ public:
 
     ExperienceDict sample();
 
+    std::ostream& operator<<(std::ostream& stream);
+
     void save(torch::serialize::OutputArchive& archive) const;
 
     void load(torch::serialize::InputArchive& archive);
 private:
     void add_experience(const envs::StepResult& result);
+
+    void pretty_print(std::ostream& stream, const std::string& indentation) const;
+
+    template <typename Func>
+    void pretty_print_list(std::ostream& stream, const std::string& key, const std::string& indentation, Func get_value) const;
 };
+
+template <typename Func>
+void Memory::pretty_print_list(std::ostream& stream, const std::string& key, const std::string& indentation, Func get_value) const 
+{
+    const std::string next_indentation = indentation + "  ";
+    stream << indentation << key << "(\n";
+    for (const auto& value : experiences_.at(key))
+        stream << next_indentation << get_value(value) << "\n";
+    stream << indentation << ")\n";
+}
 
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Memory>& memory);
 

@@ -27,9 +27,9 @@ public:
 
   void pretty_print(std::ostream& stream) const override;
 
-  int64_t sample(/*const torch::Tensor& mask*/);
+  torch::Tensor sample(/*const torch::Tensor& mask*/);
 
-  bool contains(int64_t x) const;
+  bool contains(const torch::Tensor& x) const;
 
   // Overload for zero arguments
   bool contains() const;

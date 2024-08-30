@@ -13,8 +13,8 @@ class CartPole : public Env
 public:
     CartPole();
     void reset(uint64_t seed = 0);
-    void step(int64_t action);
-    int64_t sample();
+    void step(const torch::Tensor& action);
+    torch::Tensor sample();
     void close();
     void render();
     void enable_rendering();

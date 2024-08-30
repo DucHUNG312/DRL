@@ -8,7 +8,7 @@ namespace envs
 
 StepResult::StepResult(
     const torch::Tensor& state, 
-    const torch::IValue& action,
+    const torch::Tensor& action,
     double reward, 
     bool terminated, 
     bool truncated)
@@ -23,6 +23,7 @@ void StepResult::pretty_print(std::ostream& stream, const std::string& indentati
     const std::string next_indentation = indentation + "  ";
     stream << indentation << "Result" << "(\n";
     stream << next_indentation << "State: " << state << "\n";
+    stream << next_indentation << "Action: " << action << "\n";
     stream << next_indentation << "Reward: " << reward << "\n";
     stream << next_indentation << "Terminated: " << (terminated ? "true" : "false") << "\n";
     stream << next_indentation << "Truncated: " << (truncated ? "true" : "false") << "\n";
@@ -35,20 +36,25 @@ Env::Env(const utils::EnvSpec& env_spec)
 {
 }
 
+bool Env::done() const
+{
+    return result_.terminated;
+}
+
 void Env::reset(uint64_t seed /*= 0*/)
 {
     LAB_UNIMPLEMENTED;
 }
 
-void Env::step(torch::IValue act)
+void Env::step(const torch::Tensor& act)
 {
     LAB_UNIMPLEMENTED;
 }
 
-torch::IValue Env::sample()
+torch::Tensor Env::sample()
 {
     LAB_UNIMPLEMENTED;
-    return torch::IValue();
+    return torch::Tensor();
 }
 
 void Env::close()

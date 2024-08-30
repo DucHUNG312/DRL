@@ -29,7 +29,7 @@ void DiscreteImpl::pretty_print(std::ostream& stream) const
     << ", start=" << options.start() << ")";
 }
 
-int64_t DiscreteImpl::sample(/*const torch::Tensor& mask*/)
+torch::Tensor DiscreteImpl::sample(/*const torch::Tensor& mask*/)
 {
     // if(mask.defined())
     // {
@@ -40,12 +40,14 @@ int64_t DiscreteImpl::sample(/*const torch::Tensor& mask*/)
     //     return random_index.item<int64_t>();
     // }
 
-    return rand_.sample_int_uniform(options.start(), options.start() + options.n());
+    return torch::tensor({rand_.sample_int_uniform(options.start(), options.start() + options.n())}, torch::kInt64);
 }
 
-bool DiscreteImpl::contains(int64_t x) const
+bool DiscreteImpl::contains(const torch::Tensor& x) const
 {
-    return (options.start() <= x) && (x < options.start() + options.n());
+    LAB_CHECK(x.sizes() == torch::IntArrayRef({1}));
+    LAB_CHECK(x.dtype() == torch::kInt64);
+    return (options.start() <= x.item<int64_t>()) && (x.item<int64_t>() < options.start() + options.n());
 }
 
 bool DiscreteImpl::contains() const

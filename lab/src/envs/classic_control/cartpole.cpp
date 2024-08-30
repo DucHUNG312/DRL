@@ -62,28 +62,28 @@ void CartPole::enable_rendering()
     render();
 }
 
-int64_t CartPole::sample()
+torch::Tensor CartPole::sample()
 {
     auto discrete_ptr = action_spaces_->template ptr<spaces::Discrete>();
     if (!discrete_ptr) 
     {
         LAB_LOG_FATAL("Discrete space is not initialized correctly.");
-        return -1;
+        return torch::Tensor();
     }
     return discrete_ptr->sample();
 }
 
-void CartPole::step(int64_t action)
+void CartPole::step(const torch::Tensor& action)
 {
     LAB_CHECK(action_spaces_->template ptr<spaces::Discrete>()->contains(action));
 
-    result_.action = torch::IValue(action);
+    result_.action = action;
 
     double x = result_.state[0].item<double>(); 
     double x_dot = result_.state[1].item<double>();
     double theta = result_.state[2].item<double>();
     double theta_dot = result_.state[3].item<double>();
-    double force = (action == 1) ? force_mag : -force_mag;
+    double force = (action.item<int64_t>() == 1) ? force_mag : -force_mag;
     double costheta = std::cos(theta);
     double sintheta = std::sin(theta);
     double temp = (force + polemass_length * std::pow(theta_dot, 2) * sintheta) / total_mass;
@@ -133,7 +133,7 @@ void CartPole::step(int64_t action)
     // update entity
     if (env_spec_.renderer.enabled)
     {
-        registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, action);
+        registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, action.item<int64_t>());
         registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), result_.reward, result_.terminated, result_.truncated);
     }
 }

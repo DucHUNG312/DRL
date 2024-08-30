@@ -12,7 +12,7 @@ namespace agents
 
 class Body;
 
-class Algorithm
+class Algorithm : public std::enable_shared_from_this<Algorithm>
 {
     LAB_ARG(std::shared_ptr<Body>, body);
     LAB_ARG(std::shared_ptr<lab::agents::NetImpl>, net);

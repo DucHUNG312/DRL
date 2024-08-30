@@ -30,7 +30,7 @@ public:
 
   void pretty_print(std::ostream& stream) const override;
 
-  std::vector<torch::nn::AnyValue> sample(/*std::vector<torch::Tensor>&& inputs*/);
+  std::vector<torch::Tensor> sample(/*std::vector<torch::Tensor>&& inputs*/);
 
   template <typename... InputTypes>
   std::vector<bool> contains(InputTypes&&... inputs);

@@ -42,6 +42,25 @@ void Memory::add_experience(const envs::StepResult& result)
     LAB_UNIMPLEMENTED;
 }
 
+void Memory::pretty_print(std::ostream& stream, const std::string& indentation) const
+{
+    const std::string next_indentation = indentation + "  ";
+    stream << "Memory(\n";
+    pretty_print_list(stream, "state", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
+    pretty_print_list(stream, "next_state", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
+    pretty_print_list(stream, "action", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
+    pretty_print_list(stream, "reward", next_indentation, [](const torch::IValue& value) { return value.toDouble(); });
+    pretty_print_list(stream, "terminated", next_indentation, [](const torch::IValue& value) { return value.toBool(); });
+    pretty_print_list(stream, "truncated", next_indentation, [](const torch::IValue& value) { return value.toBool(); });
+    stream << ")";
+}
+
+std::ostream& Memory::operator<<(std::ostream& stream)
+{
+    pretty_print(stream, "");
+    return stream;
+}
+
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Memory>& memory)
 {
     return archive;

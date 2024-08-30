@@ -100,9 +100,11 @@ constexpr named_factory_t<torch::Tensor, sample_call_maker, ActionPolicies> Acti
 
 std::shared_ptr<distributions::Distribution> init_action_pd(std::string_view name, const torch::Tensor& pdparam);
 
-torch::Tensor calc_pdparam(torch::Tensor state, const std::shared_ptr<agents::Algorithm>& algorithm);
+torch::Tensor calc_pdparam(const std::shared_ptr<agents::Algorithm>& algorithm, torch::Tensor state);
 
-torch::Tensor sample_action(std::string_view pdname, const torch::Tensor& pdparam);
+torch::Tensor sample_action_with_pd(std::string_view pdname, const torch::Tensor& pdparam);
+
+torch::Tensor sample_action_with_policy(std::string_view policy_name, const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state);
 
 ActionPolicy create_action_policy(std::string_view policy_name);
 

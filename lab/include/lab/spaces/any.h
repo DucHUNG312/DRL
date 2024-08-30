@@ -14,7 +14,7 @@ struct AnySpacePlaceholder : public utils::Placeholder
 {
     using utils::Placeholder::Placeholder;
     
-    virtual torch::nn::AnyValue sample(/*torch::Tensor&& argument*/) = 0;
+    virtual torch::Tensor sample(/*torch::Tensor&& argument*/) = 0;
 
     virtual bool contains(torch::nn::AnyValue&& arguments) = 0;
 
@@ -45,9 +45,9 @@ struct AnySpaceHolder : public AnySpacePlaceholder
 
     struct InvokeSample
     {
-        torch::nn::AnyValue operator()(/*torch::Tensor&& ts*/) 
+        torch::Tensor operator()(/*torch::Tensor&& ts*/) 
         {
-            return torch::nn::AnyValue(space_->sample(/*std::forward<torch::Tensor>(ts)*/));
+            return torch::Tensor(space_->sample(/*std::forward<torch::Tensor>(ts)*/));
         }
         std::shared_ptr<SpaceType>& space_;
     };
@@ -66,9 +66,9 @@ struct AnySpaceHolder : public AnySpacePlaceholder
         : AnySpacePlaceholder(typeid(SpaceType)), space(std::move(space_)) {}
 
     
-    torch::nn::AnyValue sample(/*torch::Tensor&& argument*/) override 
+    torch::Tensor sample(/*torch::Tensor&& argument*/) override 
     {    
-        return torch::nn::AnyValue(InvokeSample{space}());
+        return torch::Tensor(InvokeSample{space}());
     }
 
     bool contains(torch::nn::AnyValue&& argument) override 
@@ -120,10 +120,7 @@ public:
     template <typename SpaceType>
     AnySpace& operator=(std::shared_ptr<SpaceType> space);
 
-    torch::nn::AnyValue any_sample(/*torch::Tensor&& mask*/);
-
-    template <typename ReturnType>
-    ReturnType sample(/*torch::Tensor&& mask*/);
+    torch::Tensor sample(/*torch::Tensor&& mask*/);
 
     template<typename ArgumentType>
     bool contains(ArgumentType&& argument);
@@ -179,12 +176,6 @@ AnySpace& AnySpace::operator=(std::shared_ptr<SpaceType> space)
 {
     // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature)
     return (*this = AnySpace(std::move(space)));
-}
-
-template <typename ReturnType>
-ReturnType AnySpace::sample(/*torch::Tensor&& mask*/) 
-{
-    return any_sample(/*std::forward<torch::Tensor>(mask)*/).template get<ReturnType>();
 }
 
 template<typename ArgumentType>

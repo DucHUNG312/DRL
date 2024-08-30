@@ -7,7 +7,7 @@ int main(int argc, char** argv)
     lab::envs::CartPole env;
     // // env.enable_rendering();
 
-    for(int i = 0; i < 50; i ++) 
+    while(!env.done()) 
     {
         env.step(env.sample());
         LAB_LOG_DEBUG(env.get_result());

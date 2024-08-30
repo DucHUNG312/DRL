@@ -60,15 +60,14 @@ double PeriodicDecay::update(const VarSchedulerSpec& exp_var, int64_t step, int6
 
 torch::Tensor DefaultPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
 {
-    torch::Tensor pdparam = calc_pdparam(state, algorithm);
-    return sample_action(algorithm->spec().action_pdtype, pdparam);
+    torch::Tensor pdparam = calc_pdparam(algorithm, state);
+    return sample_action_with_pd(algorithm->spec().action_pdtype, pdparam);
 }   
 
 torch::Tensor RandomPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
 {
-    // TODO: Ensure body()->get_action_spaces() is a continous space type
-    return algorithm->body()->get_action_spaces()->sample<torch::Tensor>();
-}   
+    return algorithm->body()->get_action_spaces()->sample();
+}
 
 torch::Tensor EpsilonGreedyPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
 {
@@ -81,11 +80,11 @@ torch::Tensor EpsilonGreedyPolicy::sample(const std::shared_ptr<agents::Algorith
 torch::Tensor BoltzmannPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
 {
     double tau = algorithm->spec().explore_spec.start_val;
-    torch::Tensor pdparam = calc_pdparam(state, algorithm) / tau;
-    return sample_action(algorithm->spec().action_pdtype, pdparam);
+    torch::Tensor pdparam = calc_pdparam(algorithm, state) / tau;
+    return sample_action_with_pd(algorithm->spec().action_pdtype, pdparam);
 }
 
-torch::Tensor calc_pdparam(torch::Tensor state, const std::shared_ptr<agents::Algorithm>& algorithm)
+torch::Tensor calc_pdparam(const std::shared_ptr<agents::Algorithm>& algorithm, torch::Tensor state)
 {
     return algorithm->calc_pdparam(state.to(get_torch_device()));
 }
@@ -101,10 +100,15 @@ std::shared_ptr<distributions::Distribution> init_action_pd(std::string_view nam
     return ContinuousActionPDFactory(name, loc, scale);
 }
 
-torch::Tensor sample_action(std::string_view pdname, const torch::Tensor& pdparam)
+torch::Tensor sample_action_with_pd(std::string_view pdname, const torch::Tensor& pdparam)
 {
     auto action_pd = init_action_pd(pdname, pdparam);
     return action_pd->sample();
+}
+
+torch::Tensor sample_action_with_policy(std::string_view policy_name, const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
+{
+    return ActionPolicySampleFactory(policy_name, algorithm, state);
 }
 
 ActionPolicy create_action_policy(std::string_view policy_name)
