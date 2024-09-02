@@ -3,6 +3,7 @@
 #include "lab/core.h"
 
 #include "lab/utils/convert.h"
+#include "lab/utils/clock.h"
 #include "lab/utils/env.h"
 #include "lab/utils/file.h"
 #include "lab/utils/math.h"

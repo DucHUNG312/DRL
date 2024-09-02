@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lab/distributions/exp_family.h"
-#include <ATen/ATen.h>
 
 namespace lab
 {

@@ -28,7 +28,7 @@ set(TEST_LINKED_LIBRARIES
 add_executable(${PROJECT_NAME} main.test.cpp ${SRC_FILES} ${HEADER_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${TEST_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${TEST_LINKED_LIBRARIES})
-target_precompile_headers(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/main.h")
+#target_precompile_headers(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/main.h")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES

@@ -4,7 +4,6 @@
 #include "lab/spaces/box.h"
 #include "lab/utils/convert.h"
 
-
 namespace lab
 {
 namespace envs
@@ -34,15 +33,15 @@ CartPole::CartPole(const utils::EnvSpec& env_spec)
     result_.state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
     is_open_ = true;
 
-    if (env_spec.renderer.enabled)
-    {
-        entity_id = registry_.create(name);
-        registry_.add_component<StepResultComponent>(entity_id);
-        registry_.add_component<CartPoleActionComponent>(entity_id);
-        registry_.add_component<renderer::Velocity>(entity_id);
-        registry_.add_component<renderer::ExternalForce>(entity_id, force_mag);
-        registry_.add_component<renderer::RigidBody2DComponent>(entity_id, total_mass);
-    }
+    // if (env_spec.renderer.enabled)
+    // {
+    //     entity_id = registry_.create(name);
+    //     registry_.add_component<StepResultComponent>(entity_id);
+    //     registry_.add_component<CartPoleActionComponent>(entity_id);
+    //     registry_.add_component<renderer::Velocity>(entity_id);
+    //     registry_.add_component<renderer::ExternalForce>(entity_id, force_mag);
+    //     registry_.add_component<renderer::RigidBody2DComponent>(entity_id, total_mass);
+    // }
 }
 
 void CartPole::reset(uint64_t seed /*= 0*/)
@@ -56,11 +55,11 @@ void CartPole::reset(uint64_t seed /*= 0*/)
     result_.truncated = false;
     steps_beyond_terminated = -1;
 
-    if (env_spec_.renderer.enabled)
-    {
-        registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), 0, false, false);
-        registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, 0);
-    }
+    // if (env_spec_.renderer.enabled)
+    // {
+    //     registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), 0, false, false);
+    //     registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, 0);
+    // }
 }
 
 torch::Tensor CartPole::sample()
@@ -136,26 +135,26 @@ void CartPole::step(const torch::Tensor& action)
     total_reward_ += reward;
 
     // update entity
-    if (env_spec_.renderer.enabled)
-    {
-        registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, action.item<int64_t>());
-        registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), result_.reward, result_.terminated, result_.truncated);
-    }
+    // if (env_spec_.renderer.enabled)
+    // {
+    //     registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, action.item<int64_t>());
+    //     registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), result_.reward, result_.terminated, result_.truncated);
+    // }
 }
 
 void CartPole::render()
 {
-    if (env_spec_.renderer.enabled)
-    {
-        render::Renderer::render();
-    }
+    // if (env_spec_.renderer.enabled)
+    // {
+    //     render::Renderer::render();
+    // }
 }
 
 void CartPole::close()
 {
     is_open_ = false;
-    if (env_spec_.renderer.enabled)
-        render::Renderer::shutdown();
+    // if (env_spec_.renderer.enabled)
+    //     render::Renderer::shutdown();
 }
 
 }

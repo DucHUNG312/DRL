@@ -1,5 +1,5 @@
 #include "lab/agents/net/base.h"
-#include "lab/utils/net.h"
+#include "lab/utils/clock.h"
 
 namespace lab
 {

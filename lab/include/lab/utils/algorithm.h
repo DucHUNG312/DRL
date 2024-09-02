@@ -1,18 +1,10 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/spec.h"
 #include "lab/utils/typetraits.h"
 
 namespace lab
 {
-
-namespace agents
-{
-class Algorithm;
-class Reinforce;
-}
-
 namespace utils
 {
 

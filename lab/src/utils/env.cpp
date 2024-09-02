@@ -1,8 +1,7 @@
 #include "lab/utils/env.h"
+#include "lab/utils/spec.h"
 #include "lab/envs/base.h"
 #include "lab/envs/classic_control/cartpole.h"
-
-using namespace std::chrono;
 
 namespace lab
 {
@@ -14,73 +13,62 @@ std::shared_ptr<envs::Env> create_env(const EnvSpec& spec)
     return EnvFactory(spec.name, spec);
 }
 
-Clock::Clock()
+StepResult::StepResult(
+    const torch::Tensor& state, 
+    const torch::Tensor& action,
+    double reward, 
+    bool terminated, 
+    bool truncated)
+    : state(state.to(torch::kDouble)),
+    next_state(torch::empty_like(state, torch::TensorOptions().dtype(torch::kDouble))),
+    action(action.to(torch::kDouble)),
+    reward(reward), 
+    terminated(terminated), 
+    truncated(truncated) {}
+
+StepResult StepResult::clone() const
 {
-    reset();
-}
-Clock::Clock(int64_t max_frame, int64_t clock_speed /*= 1*/)
-    : max_frame(max_frame), clock_speed(clock_speed)
-{
-    reset();
+    StepResult result;
+    result.state = state.clone();
+    result.next_state = next_state.clone();
+    result.action = action.clone();
+    result.reward = reward;
+    result.terminated = terminated;
+    result.truncated = truncated;
+    return result;
 }
 
-time_point<high_resolution_clock> Clock::now()
+StepResult& StepResult::to(torch::Device device)
 {
-    return high_resolution_clock::now();
+    state.to(device);
+    next_state.to(device);
+    action.to(device);
+    return *this;
 }
 
-void Clock::reset()
+void StepResult::pretty_print(std::ostream& stream, const std::string& indentation) const
 {
-    time = 0;
-    frame = 0;
-    epi = 0;
-    start_wall_time = now();
-    elapsed_wall_time = 0;
-    batch_size = 1;
-    opt_step = 0;
+    //const std::string next_indentation = indentation + "  ";
+    //stream << indentation << "Result" << "(\n";
+    //stream << next_indentation << "State: " << state << "\n";
+    // stream << next_indentation << "Action: " << action << "\n";
+    // stream << next_indentation << "Reward: " << reward << "\n";
+    // stream << next_indentation << "Terminated: " << (terminated ? "true" : "false") << "\n";
+    // stream << next_indentation << "Truncated: " << (truncated ? "true" : "false") << "\n";
+    //stream << next_indentation << "Next State: " << next_state << "\n";
+    //stream << indentation << ")";
+
+    stream << indentation << "state: " << state << "\n";
+    stream << indentation << "action: " << action << "; ";
+    stream << indentation << "reward: " << reward << "; ";
+    stream << indentation << "terminated: " << (terminated ? "true" : "false") << "; ";
+    stream << indentation << "truncated: " << (truncated ? "true" : "false") << "\n";
 }
 
-void Clock::load(
-    double time_, 
-    double elapsed_wall_time_, 
-    int64_t epi_, 
-    int64_t opt_step_, 
-    int64_t frame_)
+std::ostream& operator<<(std::ostream& stream, const StepResult& result)
 {
-    time = time_;
-    elapsed_wall_time = elapsed_wall_time_;
-    epi = epi_;
-    opt_step = opt_step_;
-    frame = frame_;
-    start_wall_time = start_wall_time - duration_cast<nanoseconds>(duration<double>(elapsed_wall_time_));
-}
-
-double Clock::get_elapsed_wall_time()
-{
-    return duration<double>(now() - start_wall_time).count();
-}
-
-void Clock::set_batch_size(int64_t size)
-{
-    batch_size = size;
-}
-
-void Clock::tick_time()
-{
-    time += clock_speed;
-    frame += clock_speed;
-    elapsed_wall_time = get_elapsed_wall_time();
-}
-
-void Clock::tick_epi()
-{
-    epi += 1;
-    time = 0;
-}
-
-void Clock::tick_opt_step()
-{
-    opt_step += batch_size;
+    result.pretty_print(stream, "");
+    return stream;
 }
 
 }

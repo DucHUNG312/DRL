@@ -1,17 +1,10 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/optimizer.h"
-#include "lab/utils/spec.h"
 #include "lab/utils/typetraits.h"
 
 namespace lab
 {
-namespace agents
-{
-class NetImpl;
-class MLPNetImpl;
-}
 
 namespace utils
 {
@@ -85,12 +78,6 @@ LAB_LOSS_FN_DECLARE(CrossEntropyLoss);
 LAB_LOSS_FN_DECLARE(NLLLoss);
 LAB_LOSS_FN_DECLARE(BCELoss);
 LAB_LOSS_FN_DECLARE(BCEWithLogitsLoss);
-LAB_TYPE_DECLARE(Adam, torch::optim);
-LAB_TYPE_DECLARE(GlobalAdam, torch::optim);
-LAB_TYPE_DECLARE(RAdam, torch::optim);
-LAB_TYPE_DECLARE(RMSprop, torch::optim);
-LAB_TYPE_DECLARE(GlobalRMSprop, torch::optim);
-LAB_TYPE_DECLARE(StepLR, torch::optim);
 LAB_TYPE_DECLARE(kLinear, torch::enumtype);
 LAB_TYPE_DECLARE(kConv1D, torch::enumtype);
 LAB_TYPE_DECLARE(kConv2D, torch::enumtype);
@@ -105,15 +92,11 @@ LAB_TYPE_DECLARE(kLeakyReLU, torch::enumtype);
 
 using Activations = types_t<ReLU, LeakyReLU, ELU, SELU, SiLU, Sigmoid, LogSigmoid, Softmax, LogSoftmax, Tanh>;
 using Losses = types_t<MSELoss, CrossEntropyLoss, NLLLoss, BCELoss, BCEWithLogitsLoss>;
-using Optims = types_t<Adam, GlobalAdam, RAdam, RMSprop, GlobalRMSprop>;
-using Schedulars = types_t<StepLR>;
 using Nets = types_t<lab::agents::MLPNetImpl>;
 using NonlinearityTypes = types_t<kLinear, kConv1D, kConv2D, kConv3D, kConvTranspose1D, kConvTranspose2D, kConvTranspose3D, kSigmoid, kTanh, kReLU, kLeakyReLU>;
 
 constexpr named_factory_t<std::shared_ptr<lab::utils::ActivationModule>, shared_ptr_maker, Activations> ActivationFactory;
 constexpr named_factory_t<std::shared_ptr<lab::utils::LossModule>, shared_ptr_maker, Losses> LossFactory;
-constexpr named_factory_t<std::shared_ptr<torch::optim::Optimizer>, shared_ptr_maker, Optims> OptimizerFactory;
-constexpr named_factory_t<std::shared_ptr<torch::optim::LRScheduler>, shared_ptr_maker, Schedulars> LRSchedularFactory;
 constexpr named_factory_t<std::shared_ptr<lab::agents::NetImpl>, shared_ptr_maker, Nets> NetFactory;
 constexpr named_factory_t<torch::nn::init::NonlinearityType , object_maker, NonlinearityTypes> NonlinearityFactory;
 
@@ -125,13 +108,9 @@ std::shared_ptr<lab::utils::ActivationModule> create_act(std::string_view name);
 
 std::shared_ptr<lab::utils::LossModule> create_loss(std::string_view name);
 
-std::shared_ptr<torch::optim::Optimizer> create_optim(std::string_view name, const std::vector<torch::Tensor>& params);
-
-std::shared_ptr<torch::optim::LRScheduler> create_lr_schedular(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec);
-
 torch::nn::init::NonlinearityType create_nonlinearirty_type(std::string_view name);
 
-std::shared_ptr<lab::agents::NetImpl> create_net(const utils::NetSpec& spec, int64_t in_dim, int64_t out_dim);
+std::shared_ptr<lab::agents::NetImpl> create_net(const NetSpec& spec, int64_t in_dim, int64_t out_dim);
 
 std::shared_ptr<torch::nn::ReLUImpl> create_activation_relu(); 
 
@@ -163,19 +142,7 @@ std::shared_ptr<torch::nn::BCELossImpl> create_bce_loss();
 
 std::shared_ptr<torch::nn::BCEWithLogitsLossImpl> create_bce_with_logits_loss(); 
 
-std::shared_ptr<torch::optim::Adam> create_optim_adam(const std::vector<torch::Tensor>& params); 
-
-std::shared_ptr<torch::optim::GlobalAdam> create_optim_global_adam(const std::vector<torch::Tensor>& params);
-
-std::shared_ptr<torch::optim::RAdam> create_optim_radam(const std::vector<torch::Tensor>& params);
-
-std::shared_ptr<torch::optim::RMSprop> create_optim_rmsprop(const std::vector<torch::Tensor>& params);
-
-std::shared_ptr<torch::optim::GlobalRMSprop> create_optim_global_rmsprop(const std::vector<torch::Tensor>& params);
-
-std::shared_ptr<torch::optim::StepLR> create_lr_schedular_step(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec);
-
-std::shared_ptr<lab::agents::MLPNetImpl> create_mlp_net(const utils::NetSpec& spec, int64_t in_dim, int64_t out_dim);
+std::shared_ptr<lab::agents::MLPNetImpl> create_mlp_net(const NetSpec& spec, int64_t in_dim, int64_t out_dim);
 
 }
 

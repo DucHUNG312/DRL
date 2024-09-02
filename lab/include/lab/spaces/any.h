@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lab/core.h"
 #include "lab/spaces/base.h"
 #include "lab/utils/placeholder.h"
 

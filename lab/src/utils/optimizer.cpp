@@ -1,4 +1,5 @@
 #include "lab/utils/optimizer.h"
+#include "lab/utils/spec.h"
 #include <renderer/math/math.h>
 
 namespace torch
@@ -230,4 +231,54 @@ void RAdam::share_memory()
 }
 
 }
+}
+
+namespace lab
+{
+
+namespace utils
+{
+
+std::shared_ptr<torch::optim::Optimizer> create_optim(std::string_view name, const std::vector<torch::Tensor>& params)
+{
+    return OptimizerFactory(name, params);
+}
+
+std::shared_ptr<torch::optim::LRScheduler> create_lr_schedular(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec)
+{
+    return LRSchedularFactory(spec.name, *optimizer, spec.step_size, spec.gamma);
+}
+
+std::shared_ptr<torch::optim::Adam> create_optim_adam(const std::vector<torch::Tensor>& params)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::Adam>(create_optim("Adam", params)); 
+}
+
+std::shared_ptr<torch::optim::GlobalAdam> create_optim_global_adam(const std::vector<torch::Tensor>& params)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::GlobalAdam>(create_optim("GlobalAdam", params)); 
+}
+
+std::shared_ptr<torch::optim::RAdam> create_optim_radam(const std::vector<torch::Tensor>& params)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::RAdam>(create_optim("RAdam", params)); 
+}
+
+std::shared_ptr<torch::optim::RMSprop> create_optim_rmsprop(const std::vector<torch::Tensor>& params)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::RMSprop>(create_optim("RMSprop", params)); 
+}
+
+std::shared_ptr<torch::optim::GlobalRMSprop> create_optim_global_rmsprop(const std::vector<torch::Tensor>& params)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::GlobalRMSprop>(create_optim("GlobalRMSprop", params)); 
+}
+
+std::shared_ptr<torch::optim::StepLR> create_lr_schedular_step(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec)
+{ 
+    return std::dynamic_pointer_cast<torch::optim::StepLR>(create_lr_schedular(optimizer, spec)); 
+}
+
+}
+
 }

@@ -1,4 +1,5 @@
 #include "lab/agents/algorithms/reinforce.h"
+#include "lab/distributions/base.h"
 #include "lab/utils/policy.h"
 #include "lab/utils/tensor.h"
 #include "lab/utils/convert.h"

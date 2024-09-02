@@ -1,11 +1,7 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/utils/file.h"
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
+#include <nlohmann/json_fwd.hpp>
 namespace lab
 {
 
@@ -176,33 +172,25 @@ public:
     static EnvSpec load_default_env_spec(const std::string& env_name);
     static void load_specs_from_file(const std::string& file_path, const std::string& experiment_name);
 private:
-    static void load_spec_json(const json& j);
-    static json get_json_stream(const std::string& file_path, const std::string& experiment_name);
-    static VarSchedulerSpec get_explore_var_spec(const json& j);
-    static VarSchedulerSpec get_entropy_coef_spec(const json& j);
-    static AlgorithmSpec get_algorithm_spec(const json& j);
-    static MemorySpec get_memory_spec(const json& j);
-    static LossSpec get_loss_fn_spec(const json& j);
-    static OptimSpec get_optim_spec(const json& j);
-    static LrSchedulerSpec get_lr_scheduler_spec(const json& j);
-    static NetSpec get_net_spec(const json& j);
-    static AgentSpec get_agent_spec(const json& j);
-    static RendererSpec get_renderer_spec(const json& j);
-    static EnvSpec get_env_spec(const json& j, int64_t num = 0);
-    static BodySpec get_body_spec(const json& j, int64_t num = 0);
-    static MetaSpec get_meta_info_spec(const json& j);
-    template<typename T>
-    static T get_json_value(const json& j);
+    static void load_spec_json(const nlohmann::json& j);
+    static nlohmann::json get_json_stream(const std::string& file_path, const std::string& experiment_name);
+    static VarSchedulerSpec get_explore_var_spec(const nlohmann::json& j);
+    static VarSchedulerSpec get_entropy_coef_spec(const nlohmann::json& j);
+    static AlgorithmSpec get_algorithm_spec(const nlohmann::json& j);
+    static MemorySpec get_memory_spec(const nlohmann::json& j);
+    static LossSpec get_loss_fn_spec(const nlohmann::json& j);
+    static OptimSpec get_optim_spec(const nlohmann::json& j);
+    static LrSchedulerSpec get_lr_scheduler_spec(const nlohmann::json& j);
+    static NetSpec get_net_spec(const nlohmann::json& j);
+    static AgentSpec get_agent_spec(const nlohmann::json& j);
+    static RendererSpec get_renderer_spec(const nlohmann::json& j);
+    static EnvSpec get_env_spec(const nlohmann::json& j, int64_t num = 0);
+    static BodySpec get_body_spec(const nlohmann::json& j, int64_t num = 0);
+    static MetaSpec get_meta_info_spec(const nlohmann::json& j);
 public:
     static LabSpec specs;
     static std::unordered_map<std::string, std::string> default_env_spec_path;
 };
-
-template<typename T>
-T SpecLoader::get_json_value(const json& j)
-{
-    return j.is_null() ? T() : j.get<T>();
-}
 
 
 }

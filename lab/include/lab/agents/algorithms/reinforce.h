@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lab/agents/algorithms/base.h"
-#include "lab/envs/base.h"
 
 namespace lab
 {

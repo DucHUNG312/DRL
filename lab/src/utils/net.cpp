@@ -1,4 +1,5 @@
 #include "lab/utils/net.h"
+#include "lab/utils/spec.h"
 #include "lab/agents/net/mlp.h"
 
 namespace lab
@@ -55,22 +56,12 @@ std::shared_ptr<lab::utils::LossModule> create_loss(std::string_view name)
     return LossFactory(name);
 }
 
-std::shared_ptr<torch::optim::Optimizer> create_optim(std::string_view name, const std::vector<torch::Tensor>& params)
-{
-    return OptimizerFactory(name, params);
-}
-
-std::shared_ptr<torch::optim::LRScheduler> create_lr_schedular(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec)
-{
-    return LRSchedularFactory(spec.name, *optimizer, spec.step_size, spec.gamma);
-}
-
 torch::nn::init::NonlinearityType create_nonlinearirty_type(std::string_view name)
 {
     return NonlinearityFactory(name);
 }
 
-std::shared_ptr<lab::agents::NetImpl> create_net(const utils::NetSpec& spec, int64_t in_dim, int64_t out_dim) 
+std::shared_ptr<lab::agents::NetImpl> create_net(const NetSpec& spec, int64_t in_dim, int64_t out_dim) 
 { 
     return NetFactory(spec.name, std::move(spec), in_dim, out_dim); 
 }
@@ -150,37 +141,7 @@ std::shared_ptr<torch::nn::BCEWithLogitsLossImpl> create_bce_with_logits_loss()
     return std::dynamic_pointer_cast<torch::nn::BCEWithLogitsLossImpl>(create_loss("BCEWithLogitsLoss")); 
 }
 
-std::shared_ptr<torch::optim::Adam> create_optim_adam(const std::vector<torch::Tensor>& params)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::Adam>(create_optim("Adam", params)); 
-}
-
-std::shared_ptr<torch::optim::GlobalAdam> create_optim_global_adam(const std::vector<torch::Tensor>& params)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::GlobalAdam>(create_optim("GlobalAdam", params)); 
-}
-
-std::shared_ptr<torch::optim::RAdam> create_optim_radam(const std::vector<torch::Tensor>& params)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::RAdam>(create_optim("RAdam", params)); 
-}
-
-std::shared_ptr<torch::optim::RMSprop> create_optim_rmsprop(const std::vector<torch::Tensor>& params)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::RMSprop>(create_optim("RMSprop", params)); 
-}
-
-std::shared_ptr<torch::optim::GlobalRMSprop> create_optim_global_rmsprop(const std::vector<torch::Tensor>& params)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::GlobalRMSprop>(create_optim("GlobalRMSprop", params)); 
-}
-
-std::shared_ptr<torch::optim::StepLR> create_lr_schedular_step(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec)
-{ 
-    return std::dynamic_pointer_cast<torch::optim::StepLR>(create_lr_schedular(optimizer, spec)); 
-}
-
-std::shared_ptr<lab::agents::MLPNetImpl> create_mlp_net(const utils::NetSpec& spec, int64_t in_dim, int64_t out_dim)
+std::shared_ptr<lab::agents::MLPNetImpl> create_mlp_net(const NetSpec& spec, int64_t in_dim, int64_t out_dim)
 { 
     return std::dynamic_pointer_cast<lab::agents::MLPNetImpl>(create_net(spec, in_dim, out_dim)); 
 }

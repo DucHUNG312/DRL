@@ -1,5 +1,4 @@
 #include "lab/agents/algorithms/base.h"
-#include "lab/utils/net.h"
 #include "lab/utils/convert.h"
 #include "lab/utils/tensor.h"
 

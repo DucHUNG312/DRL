@@ -1,10 +1,10 @@
 #pragma once
 
+#include "lab/core.h"
 #include "lab/envs/base.h"
 #include "lab/agents/net/base.h"
-#include "lab/agents/net/mlp.h"
 #include "lab/utils/policy.h"
-#include "lab/utils/optimizer.h"
+#include "lab/utils/spec.h"
 
 namespace lab
 {

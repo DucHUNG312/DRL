@@ -1,6 +1,5 @@
 #pragma once
 
-#include "lab/core.h"
 #include "lab/envs/base.h"
 
 namespace lab

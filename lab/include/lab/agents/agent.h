@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lab/core.h"
 #include "lab/agents/body.h"
 #include "lab/utils/spec.h"
 

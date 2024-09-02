@@ -2,6 +2,7 @@
 #include "lab/utils/algorithm.h"
 #include "lab/utils/memory.h"
 #include "lab/utils/net.h"
+#include "lab/utils/optimizer.h"
 #include "lab/utils/policy.h"
 
 namespace lab

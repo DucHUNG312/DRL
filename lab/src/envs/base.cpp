@@ -1,73 +1,13 @@
-#include "lab/spaces/base.h"
-#include "lab/spaces/discrete.h"
-#include "lab/spaces/box.h"
 #include "lab/envs/base.h"
+#include "lab/utils/env.h"
 
 namespace lab
 {
 namespace envs
 {
 
-StepResult::StepResult(
-    const torch::Tensor& state, 
-    const torch::Tensor& action,
-    double reward, 
-    bool terminated, 
-    bool truncated)
-    : state(state.to(torch::kDouble)),
-    next_state(torch::empty_like(state, torch::TensorOptions().dtype(torch::kDouble))),
-    action(action.to(torch::kDouble)),
-    reward(reward), 
-    terminated(terminated), 
-    truncated(truncated) {}
-
-StepResult StepResult::clone() const
-{
-    StepResult result;
-    result.state = state.clone();
-    result.next_state = next_state.clone();
-    result.action = action.clone();
-    result.reward = reward;
-    result.terminated = terminated;
-    result.truncated = truncated;
-    return result;
-}
-
-StepResult& StepResult::to(torch::Device device)
-{
-    state.to(device);
-    next_state.to(device);
-    action.to(device);
-    return *this;
-}
-
-void StepResult::pretty_print(std::ostream& stream, const std::string& indentation) const
-{
-    //const std::string next_indentation = indentation + "  ";
-    //stream << indentation << "Result" << "(\n";
-    //stream << next_indentation << "State: " << state << "\n";
-    // stream << next_indentation << "Action: " << action << "\n";
-    // stream << next_indentation << "Reward: " << reward << "\n";
-    // stream << next_indentation << "Terminated: " << (terminated ? "true" : "false") << "\n";
-    // stream << next_indentation << "Truncated: " << (truncated ? "true" : "false") << "\n";
-    //stream << next_indentation << "Next State: " << next_state << "\n";
-    //stream << indentation << ")";
-
-    stream << indentation << "state: " << state << "\n";
-    stream << indentation << "action: " << action << "; ";
-    stream << indentation << "reward: " << reward << "; ";
-    stream << indentation << "terminated: " << (terminated ? "true" : "false") << "; ";
-    stream << indentation << "truncated: " << (truncated ? "true" : "false") << "\n";
-}
-
-std::ostream& operator<<(std::ostream& stream, const StepResult& result)
-{
-    result.pretty_print(stream, "");
-    return stream;
-}
-
 Env::Env(const utils::EnvSpec& env_spec)
-        : renderer::Scene(env_spec.name), 
+        : /*renderer::Scene(env_spec.name),*/ 
           env_spec_(env_spec),
           rand_(env_spec.seed),
           clock_(std::make_shared<utils::Clock>(env_spec.max_frame, env_spec.clock_speed))
@@ -86,11 +26,11 @@ bool Env::is_venv() const
 void Env::enable_rendering()
 {
     env_spec_.renderer.enabled = true;
-    render::Renderer::init();
+    //render::Renderer::init();
     render();
 }
 
-const StepResult& Env::get_result() const
+const utils::StepResult& Env::get_result() const
 {
     return result_;
 }

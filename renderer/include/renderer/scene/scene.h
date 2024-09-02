@@ -1,5 +1,6 @@
 #pragma once
 
+#include "renderer/core.h"
 #include "renderer/scene/register.h"
 
 namespace lab

@@ -7,14 +7,14 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+project(RL VERSION 1.0.0 LANGUAGES C CXX CUDA)
+
 # Check LTO
 include(CheckIPOSupported)
 check_ipo_supported(
     RESULT LAB_IPO_SUPPORT 
     OUTPUT LAB_IPO_ERROR
 )
-
-project(RL VERSION 1.0.0 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -131,6 +131,9 @@ add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment
 if(LAB_IPO_SUPPORT)
     message(STATUS "Enabled LTO.")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+else()
+    message(STATUS "LTO is not supported: ${LAB_IPO_ERROR}.")
+    message(STATUS "Compile without LTO.")
 endif()
 
 # common

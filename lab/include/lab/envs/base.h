@@ -3,49 +3,25 @@
 #include "lab/core.h"
 #include "lab/spaces/any.h"
 #include "lab/utils/rand.h"
-#include "lab/utils/env.h"
 #include "lab/utils/spec.h"
+#include "lab/utils/clock.h"
+#include "lab/utils/env.h"
 
-#include <renderer/renderer.h>
+//#include <renderer/renderer.h>
+
 namespace lab
 {
 namespace envs
 {
 
-struct StepResult
-{
-    torch::Tensor state;
-    torch::Tensor next_state;
-    torch::Tensor action;
-    double reward = 0;
-    bool terminated = false; 
-    bool truncated = false;
-
-    StepResult(
-        const torch::Tensor& state, 
-        const torch::Tensor& action,
-        double reward, 
-        bool terminated, 
-        bool truncated);
-    LAB_DEFAULT_CONSTRUCT(StepResult);
-
-    StepResult clone() const;
-
-    StepResult& to(torch::Device device); 
-
-    void pretty_print(std::ostream& stream, const std::string& indentation) const;
-};
-
-std::ostream& operator<<(std::ostream& stream, const StepResult& result);
-
-class Env : public renderer::Scene
+class Env /*: public renderer::Scene*/
 {
 protected:
     LAB_ARG(utils::EnvSpec, env_spec);
     LAB_ARG(std::shared_ptr<spaces::AnySpace>, observation_spaces);
     LAB_ARG(std::shared_ptr<spaces::AnySpace>, action_spaces);
     LAB_ARG(utils::Rand, rand);
-    LAB_ARG(StepResult, result);
+    LAB_ARG(utils::StepResult, result);
     LAB_ARG(std::shared_ptr<utils::Clock>, clock);
     LAB_ARG(double, total_reward);
     LAB_ARG(bool, is_open) = false;
@@ -73,7 +49,7 @@ public:
 
     void load(torch::serialize::InputArchive& archive);
 
-    const StepResult& get_result() const;
+    const utils::StepResult& get_result() const;
 
     const utils::EnvSpec& get_env_spec() const;
 

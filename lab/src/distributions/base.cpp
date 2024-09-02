@@ -1,5 +1,4 @@
 #include "lab/distributions/base.h"
-#include "lab/utils/tensor.h"
 
 namespace lab
 {

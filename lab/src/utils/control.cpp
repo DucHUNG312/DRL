@@ -1,6 +1,8 @@
 #include "lab/utils/control.h"
+#include "lab/agents/agent.h"
 #include "lab/agents/body.h"
 #include "lab/envs/base.h"
+#include "lab/utils/spec.h"
 
 namespace lab
 {

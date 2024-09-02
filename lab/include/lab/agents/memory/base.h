@@ -1,9 +1,8 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/envs/base.h"
+#include "lab/utils/env.h"
 #include "lab/utils/spec.h"
-#include "lab/utils/policy.h"
 
 namespace lab
 {
@@ -15,7 +14,7 @@ public:
     using ExperienceDict = torch::Dict<std::string, torch::List<torch::IValue>>;
 
     LAB_ARG(utils::MemorySpec, spec);
-    LAB_ARG(envs::StepResult, most_recent);
+    LAB_ARG(utils::StepResult, most_recent);
     LAB_ARG(ExperienceDict, experiences);
     LAB_ARG(int64_t, size) = 0;
     LAB_ARG(int64_t, seen_size) = 0;
@@ -27,7 +26,7 @@ public:
 
     virtual void reset();
 
-    virtual void update(const envs::StepResult& result) = 0;
+    virtual void update(const utils::StepResult& result) = 0;
 
     virtual ExperienceDict sample() = 0;
 
@@ -39,7 +38,7 @@ public:
 
     void load(torch::serialize::InputArchive& archive);
 private:
-    virtual void add_experience(const envs::StepResult& result) = 0;
+    virtual void add_experience(const utils::StepResult& result) = 0;
 
     void pretty_print(std::ostream& stream, const std::string& indentation) const;
 

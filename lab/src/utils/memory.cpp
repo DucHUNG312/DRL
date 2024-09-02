@@ -1,4 +1,5 @@
 #include "lab/utils/memory.h"
+#include "lab/utils/spec.h"
 #include "lab/agents/memory/base.h"
 #include "lab/agents/memory/onpolicy.h"
 

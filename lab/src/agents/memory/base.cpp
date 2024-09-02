@@ -16,7 +16,7 @@ void Memory::reset()
 {
     size_ = 0;
     ready_ = 0;
-    most_recent_ = envs::StepResult();
+    most_recent_ = utils::StepResult();
     experiences_.clear();
     for (const auto& key : keys_)
         experiences_.insert(key, c10::impl::GenericList(c10::AnyType::get()));     

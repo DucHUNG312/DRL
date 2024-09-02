@@ -439,3 +439,42 @@ OptimType& AnyOptim::get_() const
 
 }
 }
+
+namespace lab
+{
+
+namespace utils
+{
+
+LAB_TYPE_DECLARE(Adam, torch::optim);
+LAB_TYPE_DECLARE(GlobalAdam, torch::optim);
+LAB_TYPE_DECLARE(RAdam, torch::optim);
+LAB_TYPE_DECLARE(RMSprop, torch::optim);
+LAB_TYPE_DECLARE(GlobalRMSprop, torch::optim);
+LAB_TYPE_DECLARE(StepLR, torch::optim);
+
+using Optims = types_t<Adam, GlobalAdam, RAdam, RMSprop, GlobalRMSprop>;
+using Schedulars = types_t<StepLR>;
+
+constexpr named_factory_t<std::shared_ptr<torch::optim::Optimizer>, shared_ptr_maker, Optims> OptimizerFactory;
+constexpr named_factory_t<std::shared_ptr<torch::optim::LRScheduler>, shared_ptr_maker, Schedulars> LRSchedularFactory;
+
+std::shared_ptr<torch::optim::Optimizer> create_optim(std::string_view name, const std::vector<torch::Tensor>& params);
+
+std::shared_ptr<torch::optim::LRScheduler> create_lr_schedular(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec);
+
+std::shared_ptr<torch::optim::Adam> create_optim_adam(const std::vector<torch::Tensor>& params); 
+
+std::shared_ptr<torch::optim::GlobalAdam> create_optim_global_adam(const std::vector<torch::Tensor>& params);
+
+std::shared_ptr<torch::optim::RAdam> create_optim_radam(const std::vector<torch::Tensor>& params);
+
+std::shared_ptr<torch::optim::RMSprop> create_optim_rmsprop(const std::vector<torch::Tensor>& params);
+
+std::shared_ptr<torch::optim::GlobalRMSprop> create_optim_global_rmsprop(const std::vector<torch::Tensor>& params);
+
+std::shared_ptr<torch::optim::StepLR> create_lr_schedular_step(const std::shared_ptr<torch::optim::Optimizer>& optimizer, const LrSchedulerSpec& spec);
+
+}
+
+}

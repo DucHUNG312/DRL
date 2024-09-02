@@ -6,7 +6,7 @@ namespace lab
 namespace agents
 {
 
-void OnPolicyReplay::update(const envs::StepResult& result)
+void OnPolicyReplay::update(const utils::StepResult& result)
 {
     add_experience(result);
 }
@@ -18,7 +18,7 @@ Memory::ExperienceDict OnPolicyReplay::sample()
     return batch.copy();
 }
 
-void OnPolicyReplay::add_experience(const envs::StepResult& result)
+void OnPolicyReplay::add_experience(const utils::StepResult& result)
 {
     most_recent_ = result;
 
