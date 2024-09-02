@@ -11,7 +11,10 @@ namespace envs
 {
 
 CartPole::CartPole()
-    : Env(utils::SpecLoader::load_default_env_spec("CartPole"))
+    : CartPole(utils::SpecLoader::load_default_env_spec(name)) {}
+
+CartPole::CartPole(const utils::EnvSpec& env_spec)
+    : Env(env_spec)
 {
     LAB_CHECK_GE(gravity, 0);
     LAB_CHECK_GE(masscart, 0);
@@ -29,11 +32,11 @@ CartPole::CartPole()
     action_spaces_ = spaces::make_discrete_space_any(2);
     observation_spaces_ = spaces::make_box_space_any(-high, high);
     result_.state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
-    env_spec_.is_open = true;
+    is_open_ = true;
 
-    if (env_spec_.renderer.enabled)
+    if (env_spec.renderer.enabled)
     {
-        entity_id = registry_.create("CartPole");
+        entity_id = registry_.create(name);
         registry_.add_component<StepResultComponent>(entity_id);
         registry_.add_component<CartPoleActionComponent>(entity_id);
         registry_.add_component<renderer::Velocity>(entity_id);
@@ -45,7 +48,12 @@ CartPole::CartPole()
 void CartPole::reset(uint64_t seed /*= 0*/)
 {
     rand_.reset(seed);
-    result_.state = rand_.sample_uniform(reset_low * result_.state, reset_high * result_.state);
+    total_reward_ = 0;
+    result_.state = rand_.sample_uniform(reset_low * result_.state, reset_high * result_.state).to(torch::kDouble);
+    result_.next_state = torch::empty_like(result_.state, torch::TensorOptions().dtype(torch::kDouble));
+    result_.reward = 0;
+    result_.terminated = false;
+    result_.truncated = false;
     steps_beyond_terminated = -1;
 
     if (env_spec_.renderer.enabled)
@@ -53,13 +61,6 @@ void CartPole::reset(uint64_t seed /*= 0*/)
         registry_.add_or_replace_component<StepResultComponent>(entity_id, utils::get_data_from_tensor(result_.state), 0, false, false);
         registry_.add_or_replace_component<CartPoleActionComponent>(entity_id, 0);
     }
-}
-
-void CartPole::enable_rendering()
-{
-    env_spec_.renderer.enabled = true;
-    render::Renderer::init();
-    render();
 }
 
 torch::Tensor CartPole::sample()
@@ -75,6 +76,8 @@ torch::Tensor CartPole::sample()
 
 void CartPole::step(const torch::Tensor& action)
 {
+    action.to(torch::kInt64);
+    
     LAB_CHECK(action_spaces_->template ptr<spaces::Discrete>()->contains(action));
 
     result_.action = action;
@@ -130,6 +133,8 @@ void CartPole::step(const torch::Tensor& action)
     result_.truncated = false;
     result_.next_state = result_.state;
 
+    total_reward_ += reward;
+
     // update entity
     if (env_spec_.renderer.enabled)
     {
@@ -148,7 +153,7 @@ void CartPole::render()
 
 void CartPole::close()
 {
-    env_spec_.is_open = false;
+    is_open_ = false;
     if (env_spec_.renderer.enabled)
         render::Renderer::shutdown();
 }

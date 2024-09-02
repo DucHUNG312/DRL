@@ -7,12 +7,6 @@ namespace lab
 namespace utils
 {
 
-torch::Tensor Module::forward(torch::Tensor input)
-{
-    LAB_UNREACHABLE;
-    return torch::Tensor();
-}
-
 NoGradGuard::NoGradGuard() 
 {
     no_grad_guard = std::make_unique<torch::NoGradGuard>();
@@ -23,7 +17,10 @@ NoGradGuard::~NoGradGuard()
     no_grad_guard.reset();
 }
 
-torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const std::shared_ptr<lab::utils::Module>& activation)
+namespace internal
+{
+template<typename T>
+torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const std::shared_ptr<T>& activation)
 {
     LAB_CHECK_GE(dims.size(), 2);
     torch::nn::Sequential model;
@@ -31,18 +28,29 @@ torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const st
     {
         auto linear = torch::nn::Linear(dims[i], dims[i + 1]);
         model->push_back(linear);
-        auto act = std::dynamic_pointer_cast<lab::utils::Module>(activation->clone());
-        model->push_back(act);
+        //auto act = activation->clone();
+        model->push_back(activation);
     }
     return model;
 }
+}
 
-std::shared_ptr<lab::utils::Module> create_act(std::string_view name)
+torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const std::shared_ptr<lab::utils::ActivationModule>& activation)
+{
+    return internal::create_fc_model(dims, activation);
+}
+
+torch::nn::Sequential create_fc_model(const std::vector<int64_t>& dims, const std::shared_ptr<lab::utils::LossModule>& loss)
+{
+    return internal::create_fc_model(dims, loss);
+}
+
+std::shared_ptr<lab::utils::ActivationModule> create_act(std::string_view name)
 {
     return ActivationFactory(name);
 }
 
-std::shared_ptr<lab::utils::Module> create_loss(std::string_view name)
+std::shared_ptr<lab::utils::LossModule> create_loss(std::string_view name)
 {
     return LossFactory(name);
 }

@@ -33,7 +33,8 @@ torch::IntArrayRef Bernoulli::params_shape()
 torch::Tensor Bernoulli::sample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::NoGradGuard no_grad;
-    torch::IntArrayRef shape = extended_shape(sample_shape);
+    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
     return torch::bernoulli(probs().expand(shape));
 }
 

@@ -1,6 +1,5 @@
 #include "lab/utils/policy.h"
 #include "lab/agents/algorithms/base.h"
-#include "lab/agents/body.h"
 #include "lab/utils/rand.h"
 
 namespace lab
@@ -11,19 +10,17 @@ namespace utils
 VarScheduler::VarScheduler(const VarSchedulerSpec& spec)
     : spec_(spec) {}
 
-double VarScheduler::update()
+double VarScheduler::update(int64_t step)
 {
-    int64_t step = 0; // TODO
-    LAB_UNIMPLEMENTED;
     return UpdaterCallFactory(spec_.updater, spec_, step);
 }
 
-double NoDecay::update(const VarSchedulerSpec& exp_var, int64_t step)
+double NoDecay::update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate /*= 0*/, int64_t frequency /*= 0*/)
 {
     return exp_var.start_val;
 }
 
-double LinearDecay::update(const VarSchedulerSpec& exp_var, int64_t step)
+double LinearDecay::update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate /*= 0*/, int64_t frequency /*= 0*/)
 {
     if(step < exp_var.start_step)
         return exp_var.start_val;
@@ -44,7 +41,7 @@ double RateDecay::update(const VarSchedulerSpec& exp_var, int64_t step, double d
     return val;
 }
 
-double PeriodicDecay::update(const VarSchedulerSpec& exp_var, int64_t step, int64_t frequency /*= 60*/)
+double PeriodicDecay::update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate /*= 0*/, int64_t frequency /*= 60*/)
 {
     if(step < exp_var.start_step)
         return exp_var.start_val;
@@ -66,7 +63,7 @@ torch::Tensor DefaultPolicy::sample(const std::shared_ptr<agents::Algorithm>& al
 
 torch::Tensor RandomPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
 {
-    return algorithm->body()->get_action_spaces()->sample();
+    return algorithm->env()->get_action_spaces()->sample();
 }
 
 torch::Tensor EpsilonGreedyPolicy::sample(const std::shared_ptr<agents::Algorithm>& algorithm, const torch::Tensor& state)
@@ -86,7 +83,7 @@ torch::Tensor BoltzmannPolicy::sample(const std::shared_ptr<agents::Algorithm>& 
 
 torch::Tensor calc_pdparam(const std::shared_ptr<agents::Algorithm>& algorithm, torch::Tensor state)
 {
-    return algorithm->calc_pdparam(state.to(get_torch_device()));
+    return algorithm->calc_pdparam(state.to(get_torch_device()).to(torch::kDouble));
 }
 
 std::shared_ptr<distributions::Distribution> init_action_pd(std::string_view name, const torch::Tensor& pdparam)

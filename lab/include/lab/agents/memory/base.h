@@ -9,15 +9,11 @@ namespace lab
 {
 namespace agents
 {
-
-class Body;
-
 class Memory
 {
 public:
     using ExperienceDict = torch::Dict<std::string, torch::List<torch::IValue>>;
 
-    LAB_ARG(std::shared_ptr<Body>, body);
     LAB_ARG(utils::MemorySpec, spec);
     LAB_ARG(envs::StepResult, most_recent);
     LAB_ARG(ExperienceDict, experiences);
@@ -26,14 +22,16 @@ public:
     LAB_ARG(bool, ready) = false;
     LAB_ARG(std::vector<std::string>, keys) = {"state", "next_state", "action", "reward", "terminated", "truncated"};
 public:
-    Memory(const std::shared_ptr<Body>& body, const utils::MemorySpec& spec);
+    Memory(const utils::MemorySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Memory);
 
-    void reset();
+    virtual void reset();
 
-    void update(const envs::StepResult& result);
+    virtual void update(const envs::StepResult& result) = 0;
 
-    ExperienceDict sample();
+    virtual ExperienceDict sample() = 0;
+
+    torch::List<torch::IValue> get_experiences(const std::string& key) const;
 
     std::ostream& operator<<(std::ostream& stream);
 
@@ -41,7 +39,7 @@ public:
 
     void load(torch::serialize::InputArchive& archive);
 private:
-    void add_experience(const envs::StepResult& result);
+    virtual void add_experience(const envs::StepResult& result) = 0;
 
     void pretty_print(std::ostream& stream, const std::string& indentation) const;
 

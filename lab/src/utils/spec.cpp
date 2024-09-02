@@ -88,6 +88,7 @@ AlgorithmSpec SpecLoader::get_algorithm_spec(const json& j)
         spec.explore_spec = get_explore_var_spec(j_algo);
         spec.entropy_spec = get_entropy_coef_spec(j_algo);
         spec.gamma = get_json_value<double>(j_algo["gamma"]);
+        spec.policy_loss_coef = get_json_value<double>(j_algo["policy_loss_coef"]);
         spec.training_frequency = get_json_value<uint64_t>(j_algo["training_frequency"]);
         spec.training_batch_iter = get_json_value<uint64_t>(j_algo["training_batch_iter"]);
         spec.training_iter = get_json_value<uint64_t>(j_algo["training_iter"]);
@@ -219,15 +220,16 @@ EnvSpec SpecLoader::get_env_spec(const json& j, int64_t num /*= 0*/)
         spec.frame_op = get_json_value<std::string>(j_env["frame_op"]);
         spec.frame_op_len = get_json_value<uint64_t>(j_env["frame_op_len"]);
         spec.max_time = get_json_value<uint64_t>(j_env["max_time"]);
-        spec.max_frame = get_json_value<uint64_t>(j_env["max_frame"]);
+        spec.max_frame = get_json_value<int64_t>(j_env["max_frame"]);
+        spec.clock_speed = get_json_value<int64_t>(j_env["clock_speed"]);
         spec.reward_threshold = get_json_value<double>(j_env["reward_threshold"]);
         spec.reward_scale = get_json_value<double>(j_env["reward_scale"]);
         spec.reward_range = get_json_value<std::vector<double>>(j_env["reward_range"]);
+        spec.num_envs = get_json_value<uint64_t>(j_env["num_envs"]);
         spec.seed = get_json_value<uint64_t>(j_env["seed"]);
         spec.nondeterministic = get_json_value<bool>(j_env["nondeterministic"]);
         spec.auto_reset = get_json_value<bool>(j_env["auto_reset"]);
         spec.normalize_state = get_json_value<bool>(j_env["normalize_state"]);
-        spec.is_open = get_json_value<bool>(j_env["is_open"]);
         spec.renderer = get_renderer_spec(j_env);
     }
     return spec;

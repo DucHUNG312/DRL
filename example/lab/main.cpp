@@ -1,19 +1,18 @@
 #include <lab/lab.h>
 
+using namespace lab;
+
 int main(int argc, char** argv)
 {
     LAB_INIT_LOG();
 
-    lab::envs::CartPole env;
-    // // env.enable_rendering();
+    std::string path = utils::join_paths(std::string(EXPERIMENT_SPEC_DIR), "reinforce/reinforce_cartpole.json");
+    utils::SpecLoader::load_specs_from_file(path, "reinforce_cartpole");
+    
+    control::Session session(utils::SpecLoader::specs);
 
-    while(!env.done()) 
-    {
-        env.step(env.sample());
-        LAB_LOG_DEBUG(env.get_result());
-    }
+    session.run();
 
-    env.close();
     LAB_SHUTDOWN_LOG();
 
     return 0;

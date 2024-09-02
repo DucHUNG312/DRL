@@ -10,7 +10,7 @@ std::vector<double> calc_returns(const std::vector<double>& rewards, const std::
     LAB_CHECK(rewards.size() == dones.size());
     std::vector<double> rets(rewards.size(), 0);
     double future_ret = 0;
-    std::vector<bool> not_dones;
+    std::vector<bool> not_dones(dones.size());
     std::transform(dones.begin(), dones.end(), not_dones.begin(), [](bool done){
         return !done;
     });

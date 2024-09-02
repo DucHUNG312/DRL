@@ -74,7 +74,8 @@ Dirichlet::Dirichlet(const torch::Tensor& concentration, const torch::Tensor&)
 
 torch::Tensor Dirichlet::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
-    torch::IntArrayRef shape = extended_shape(sample_shape);
+    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
     torch::Tensor concentration = concentration_.expand(shape);
     return Dirichlet_::apply(concentration_);
 }

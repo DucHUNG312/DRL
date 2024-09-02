@@ -8,10 +8,11 @@
         "num": 1,
         "algorithm": {
           "name": "Reinforce",
-          "action_pdtype": "default",
+          "action_pdtype": "Categorical",
           "action_policy": "default",
           "explore_var_spec": null,
           "gamma": 0.99,
+          "policy_loss_coef": 1.0,
           "entropy_coef_spec": {
             "name": "linear_decay",
             "start_val": 0.01,
@@ -26,7 +27,7 @@
         },
         "net": {
           "type": "MLPNet",
-          "hid_layers": [64],
+          "hid_layers": [32, 64, 32],
           "hid_layers_activation": "SELU",
           "out_layers_activation": ["Sigmoid"],
           "init_fn": null,
@@ -38,7 +39,12 @@
             "name": "Adam",
             "lr": 0.002
           },
-          "lr_scheduler_spec": null
+          "lr_scheduler_spec": {
+            "name": "StepLR",
+            "step_size": 500,
+            "gamma": 0.9
+          },
+          "gpu": true
         }
       }],
       "env": [{
@@ -46,15 +52,16 @@
         "frame_op": null,
         "frame_op_len": 0,
         "max_time": null,
-        "max_frame": 80000,
+        "max_frame": 100000,
+        "clock_speed": 1,
         "reward_threshold": 0,
         "reward_scale": 1,
         "reward_range": [0, 0],
+        "num_envs": 1,
         "nondeterministic": true,
         "seed": 0,
         "auto_reset": false,
         "normalize_state": false,
-        "is_open": false,
         "renderer": {
             "enabled": false,
             "graphics": "OpenGL",
@@ -68,69 +75,6 @@
         "log_frequenc": 2000,
         "max_session": 1,
         "max_trial": 1
-      }
-    },
-    "reinforce_cross_entropy_cartpole": {
-      "agent": [{
-        "name": "Reinforce",
-        "algorithm": {
-          "name": "Reinforce",
-          "action_pdtype": "Categorical",
-          "action_policy": "default",
-          "center_return": true,
-          "explore_var_spec": null,
-          "gamma": 0.99,
-          "entropy_coef_spec": {
-            "name": "linear_decay",
-            "start_val": 0.01,
-            "end_val": 0.001,
-            "start_step": 0,
-            "end_step": 20000
-          },
-          "training_frequency": 16
-        },
-        "memory": {
-          "name": "OnPolicyCrossEntropy",
-          "cross_entropy": 0.5
-        },
-        "net": {
-          "type": "MLPNet",
-          "hid_layers": [128],
-          "hid_layers_activation": "SELU",
-          "out_layers_activation": ["Sigmoid"],
-          "init_fn": null,
-          "clip_grad_val": null,
-          "loss_spec": {
-            "name": "CrossEntropyLoss"
-          },
-          "optim_spec": {
-            "name": "Adam",
-            "lr": 0.02
-          },
-          "lr_scheduler_spec": null
-        }
-      }],
-      "env": [{
-        "name": "CartPole",
-        "max_t": null,
-        "max_frame": 100000
-      }],
-      "body": {
-        "product": "outer",
-        "num": 1
-      },
-      "meta": {
-        "distributed": false,
-        "eval_frequency": 2000,
-        "max_session": 4,
-        "max_trial": 1
-      },
-      "search": {
-        "agent": [{
-          "algorithm": {
-            "gamma__grid_search": [0.1, 0.5, 0.7, 0.8, 0.90, 0.99, 0.999]
-          }
-        }]
       }
     }
   }

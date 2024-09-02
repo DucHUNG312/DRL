@@ -1,18 +1,10 @@
 #include "lab/agents/memory/onpolicy.h"
-#include "lab/agents/body.h"
 
 namespace lab
 {
 
 namespace agents
 {
-
-void OnPolicyReplay::reset()
-{
-    experiences_.clear();
-    for (const auto& key : keys_)
-        experiences_.insert(key, c10::impl::GenericList(c10::AnyType::get()));     
-}
 
 void OnPolicyReplay::update(const envs::StepResult& result)
 {
@@ -39,9 +31,11 @@ void OnPolicyReplay::add_experience(const envs::StepResult& result)
     ADD_EXPERIENCE(truncated);
 #undef ADD_EXPERIENCE
 
-    if(result.terminated) ready(true);
-    size(size_ + 1);
-    seen_size(seen_size_ + 1);
+    if(result.terminated)
+        ready_ = true;
+        
+    size_ = size_ + 1;
+    seen_size_ = seen_size_ + 1;
 }
 
 

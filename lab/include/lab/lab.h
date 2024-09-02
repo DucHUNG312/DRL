@@ -7,6 +7,8 @@
 #include "lab/utils/file.h"
 #include "lab/utils/math.h"
 #include "lab/utils/net.h"
+#include "lab/utils/algorithm.h"
+#include "lab/utils/memory.h"
 #include "lab/utils/optimizer.h"
 #include "lab/utils/policy.h"
 #include "lab/utils/rand.h"
@@ -40,6 +42,8 @@
 #include "lab/agents/memory/onpolicy.h"
 #include "lab/agents/net/base.h"
 #include "lab/agents/net/mlp.h"
+
+#include "lab/control/control.h"
 
 
 

@@ -3,10 +3,10 @@
 #include "lab/core.h"
 #include "lab/spaces/any.h"
 #include "lab/utils/rand.h"
+#include "lab/utils/env.h"
 #include "lab/utils/spec.h"
 
 #include <renderer/renderer.h>
-
 namespace lab
 {
 namespace envs
@@ -29,40 +29,45 @@ struct StepResult
         bool truncated);
     LAB_DEFAULT_CONSTRUCT(StepResult);
 
+    StepResult clone() const;
+
+    StepResult& to(torch::Device device); 
+
     void pretty_print(std::ostream& stream, const std::string& indentation) const;
 };
 
-LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& stream, const StepResult& result)
-{
-    result.pretty_print(stream, "");
-    return stream;
-}
+std::ostream& operator<<(std::ostream& stream, const StepResult& result);
+
 class Env : public renderer::Scene
 {
 protected:
-    utils::EnvSpec env_spec_;
-    utils::Rand rand_;
-    // utils::Clock clock_;
-    StepResult result_;
-    std::shared_ptr<spaces::AnySpace> observation_spaces_;
-    std::shared_ptr<spaces::AnySpace> action_spaces_;
+    LAB_ARG(utils::EnvSpec, env_spec);
+    LAB_ARG(std::shared_ptr<spaces::AnySpace>, observation_spaces);
+    LAB_ARG(std::shared_ptr<spaces::AnySpace>, action_spaces);
+    LAB_ARG(utils::Rand, rand);
+    LAB_ARG(StepResult, result);
+    LAB_ARG(std::shared_ptr<utils::Clock>, clock);
+    LAB_ARG(double, total_reward);
+    LAB_ARG(bool, is_open) = false;
 public:
     explicit Env(const utils::EnvSpec& env_spec);
     LAB_DEFAULT_CONSTRUCT(Env);
 
-    void reset(uint64_t seed = 0);
+    virtual void reset(uint64_t seed = 0) = 0;
 
-    void step(const torch::Tensor& act);
+    virtual void step(const torch::Tensor& act) = 0;
+
+    virtual torch::Tensor sample() = 0;
+
+    virtual void close() = 0;
+
+    virtual void render() = 0;
+
+    void enable_rendering();
 
     bool done() const;
 
-    torch::Tensor sample();
-
-    void close();
-
-    void render();
-
-    void enable_rendering();
+    bool is_venv() const;
 
     void save(torch::serialize::OutputArchive& archive) const;
 
@@ -85,11 +90,7 @@ public:
     void pretty_print(std::ostream& stream, const std::string& indentation) const;
 };
 
-LAB_FORCE_INLINE std::ostream& operator<<(std::ostream& stream, const Env& env)
-{
-    env.pretty_print(stream, "");
-    return stream;
-}
+std::ostream& operator<<(std::ostream& stream, const Env& env);
 
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Env>& env);
 

@@ -32,18 +32,18 @@ struct VarScheduler
 public:
     VarScheduler(const VarSchedulerSpec& spec);
     LAB_DEFAULT_CONSTRUCT(VarScheduler);
-    double update();
+    double update(int64_t step);
 };
 
 struct NoDecay
 {
     static constexpr const char* name = "no_decay";
-    static double update(const VarSchedulerSpec& exp_var, int64_t step);
+    static double update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate = 0, int64_t frequency = 0);
 };
 struct LinearDecay
 {
     static constexpr const char* name = "linear_decay";
-    static double update(const VarSchedulerSpec& exp_var, int64_t step);
+    static double update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate = 0, int64_t frequency = 0);
 };
 
 struct RateDecay
@@ -55,7 +55,7 @@ struct RateDecay
 struct PeriodicDecay
 {
     static constexpr const char* name = "periodic_decay";
-    static double update(const VarSchedulerSpec& exp_var, int64_t step, int64_t frequency = 60);
+    static double update(const VarSchedulerSpec& exp_var, int64_t step, double decay_rate = 0, int64_t frequency = 60);
 };
 
 struct ActionPolicy

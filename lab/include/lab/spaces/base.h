@@ -95,14 +95,17 @@ private:
 class Space
 {
 public:
-    using Iterator = torch::OrderedDict<std::string, std::shared_ptr<Space>>::Iterator;
-    using ConstIterator = torch::OrderedDict<std::string, std::shared_ptr<Space>>::ConstIterator;
+    using ParameterDict = torch::OrderedDict<std::string, torch::Tensor>;
+    using ChildrenDict = torch::OrderedDict<std::string, std::shared_ptr<Space>>;
+    using Iterator = ChildrenDict::Iterator;
+    using ConstIterator = ChildrenDict::ConstIterator;
 
-    torch::OrderedDict<std::string, torch::Tensor> parameters_;
-    torch::OrderedDict<std::string, std::shared_ptr<Space>> children_;
-    torch::Tensor shape_;
-    std::string name_ = "Space";
-    utils::Rand rand_;
+    LAB_ARG(ParameterDict, parameters);
+    LAB_ARG(ChildrenDict, children);
+    LAB_ARG(torch::Tensor, shape);
+    LAB_ARG(std::string, name) = "Space";
+    LAB_ARG(utils::Rand, rand);
+    LAB_ARG(int64_t, dim) = -1;
 public:
     explicit Space(std::string name);
     LAB_DEFAULT_CONSTRUCT(Space);

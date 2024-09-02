@@ -12,22 +12,22 @@ TEST(Spaces, Box1)
     lab::spaces::Box space1(low, high);
     lab::spaces::Box space2(low2, high2);
 
-    ASSERT_EQ( space1->name_, "Box" );
+    ASSERT_EQ( space1->name(), "Box" );
     ASSERT_TRUE( lab::utils::tensor_eq(space1->low, torch::full({1}, 0)) );
     ASSERT_TRUE( lab::utils::tensor_eq(space1->high, torch::full({1}, 10)) );
-    ASSERT_EQ( space1->shape_.size(0), low.dim() );
-    ASSERT_EQ( space1->shape_.size(0), high.dim() );
-    ASSERT_EQ( space1->shape_.numel(), 1 );
+    ASSERT_EQ( space1->shape().size(0), low.dim() );
+    ASSERT_EQ( space1->shape().size(0), high.dim() );
+    ASSERT_EQ( space1->shape().numel(), 1 );
     ASSERT_TRUE( space1->contains(valid) );
     ASSERT_TRUE( !space1->contains(not_valid_1) );
     ASSERT_TRUE( !space1->contains(not_valid_2) );
 
-    ASSERT_EQ( space2->name_, "Box" );
+    ASSERT_EQ( space2->name(), "Box" );
     ASSERT_TRUE( lab::utils::tensor_eq(space2->low, torch::full({1}, 5)) );
     ASSERT_TRUE( lab::utils::tensor_eq(space2->high, torch::full({1}, 15)) );
-    ASSERT_EQ( space2->shape_.size(0), low2.dim() );
-    ASSERT_EQ( space2->shape_.size(0), high2.dim() );
-    ASSERT_EQ( space2->shape_.numel(), 1 );
+    ASSERT_EQ( space2->shape().size(0), low2.dim() );
+    ASSERT_EQ( space2->shape().size(0), high2.dim() );
+    ASSERT_EQ( space2->shape().numel(), 1 );
     ASSERT_TRUE( space2->contains(valid) );
     ASSERT_TRUE( !space2->contains(not_valid_2) );
 
@@ -58,18 +58,18 @@ TEST(Spaces, Box2)
     lab::spaces::Box space1(low, high);
     lab::spaces::Box space2(low2, high2);
 
-    ASSERT_EQ( space1->name_, "Box" );
+    ASSERT_EQ( space1->name(), "Box" );
     ASSERT_TRUE( lab::utils::tensor_eq(space1->low, low) );
     ASSERT_TRUE( lab::utils::tensor_eq(space1->high, high) );
-    ASSERT_EQ( space1->shape_.size(0), low.dim() );
-    ASSERT_EQ( space1->shape_.size(0), high.dim() );
-    ASSERT_EQ( space1->shape_[0].item<double>(), 5 );
-    ASSERT_EQ( space2->name_, "Box" );
+    ASSERT_EQ( space1->shape().size(0), low.dim() );
+    ASSERT_EQ( space1->shape().size(0), high.dim() );
+    ASSERT_EQ( space1->shape()[0].item<double>(), 5 );
+    ASSERT_EQ( space2->name(), "Box" );
     ASSERT_TRUE( lab::utils::tensor_eq(space2->low, low2) );
     ASSERT_TRUE( lab::utils::tensor_eq(space2->high, high2) );
-    ASSERT_EQ( space2->shape_.size(0), low2.dim() );
-    ASSERT_EQ( space2->shape_.size(0), high2.dim() );
-    ASSERT_EQ( space2->shape_[0].item<double>(), 5 );
+    ASSERT_EQ( space2->shape().size(0), low2.dim() );
+    ASSERT_EQ( space2->shape().size(0), high2.dim() );
+    ASSERT_EQ( space2->shape()[0].item<double>(), 5 );
     ASSERT_TRUE( space1->contains(valid) );
     ASSERT_TRUE( !space1->contains(not_valid_1) );
     ASSERT_TRUE( !space1->contains(not_valid_2) );
@@ -95,14 +95,14 @@ TEST(Spaces, Box3)
     lab::spaces::Box space2(space1);
     lab::spaces::Box space3 = space2;
 
-    ASSERT_EQ( space3->name_, "Box" );
+    ASSERT_EQ( space3->name(), "Box" );
     ASSERT_TRUE( lab::utils::tensor_eq(space3->low, low) );
     ASSERT_TRUE( lab::utils::tensor_eq(space3->high, high) );
-    ASSERT_EQ( space3->shape_.size(0), low.dim() );
-    ASSERT_EQ( space3->shape_.size(0), high.dim() );
-    ASSERT_EQ( space3->shape_[0].item<double>(), 2 );
-    ASSERT_EQ( space3->shape_[1].item<double>(), 2 );
-    ASSERT_EQ( space3->shape_[2].item<double>(), 2 );
+    ASSERT_EQ( space3->shape().size(0), low.dim() );
+    ASSERT_EQ( space3->shape().size(0), high.dim() );
+    ASSERT_EQ( space3->shape()[0].item<double>(), 2 );
+    ASSERT_EQ( space3->shape()[1].item<double>(), 2 );
+    ASSERT_EQ( space3->shape()[2].item<double>(), 2 );
     ASSERT_TRUE( space3->contains(valid) );
     ASSERT_TRUE( !space3->contains(not_valid_1) );
     ASSERT_TRUE( !space3->contains(not_valid_2) );

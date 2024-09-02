@@ -63,13 +63,6 @@ Mat eigen_to_tensor(const torch::Tensor& in_tensor)
 }
 #endif
 
-std::vector<int64_t> get_arayref_data(torch::IntArrayRef arr)
-{
-    std::vector<int64_t> result(arr.size());
-    std::copy(arr.begin(), arr.end(), result.begin());
-    return result;
-}
-
 std::vector<double> get_data_from_tensor(const torch::Tensor& tensor)
 {
     torch::Tensor tensor_ = tensor.to(torch::kDouble).view(-1);
@@ -91,5 +84,34 @@ torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vec
     
     return tensor;
 }
+
+torch::Tensor get_tensor_from_ivalue_list(const torch::List<torch::IValue>& list)
+{
+    std::vector<torch::Tensor> tensor_vec;
+    tensor_vec.reserve(list.size());
+    for (const auto& ele : list.vec())
+        tensor_vec.push_back(ele.toTensor());
+    return torch::stack(tensor_vec).to(torch::kDouble);
+}
+
+std::vector<double> get_rewards_from_ivalue_list(const torch::List<torch::IValue>& list)
+{
+    std::vector<double> double_vec;
+    double_vec.reserve(list.size());
+    for (const auto& ele : list.vec())
+        double_vec.push_back(ele.toDouble());
+    return double_vec;
+}
+
+std::vector<bool> get_dones_from_ivalue_list(const torch::List<torch::IValue>& list)
+{
+    std::vector<bool> bool_vec;
+    bool_vec.reserve(list.size());
+    for (const auto& ele : list.vec())
+        bool_vec.push_back(ele.toBool());
+    return bool_vec;
+}
+
+
 }
 }

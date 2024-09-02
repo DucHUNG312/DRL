@@ -12,19 +12,20 @@ namespace agents
 class Reinforce : public Algorithm
 {
 public:
+    static constexpr const char* name = "Reinforce";
+public:
     using Algorithm::Algorithm;
+    using Algorithm::ExperienceDict;
 
-    torch::Tensor train();
+    torch::Tensor train(const ExperienceDict& experiences) override;
 
-    void update();
+    void update() override;
 
-    torch::IValue act(const torch::Tensor& state);
+    torch::Tensor act(const torch::Tensor& state) override;
 
-    torch::Tensor sample();
+    torch::Tensor calc_ret_advs(const ExperienceDict& experiences);
 
-    torch::Tensor calc_pdparam(torch::Tensor x);
-private:
-    bool to_train = false;
+    torch::Tensor calc_policy_loss(const ExperienceDict& experiences, const torch::Tensor& states, const torch::Tensor& advs);
 };
 
 }

@@ -9,14 +9,15 @@ namespace distributions
 Categorical::Categorical(const torch::Tensor& in, bool is_logits /*= false*/) 
     : Distribution(in.sizes()), is_logits_(is_logits)
 {
+    std::vector<int64_t> shape_vec = extended_shape();
     params_ = is_logits_ ? (in - in.logsumexp({-1}, true)) : (in / in.sum({-1}, true));
     num_events_ = params_.size(-1);
     mean_ =     torch::full(
-                extended_shape(),
+                torch::IntArrayRef(shape_vec),
                 std::numeric_limits<double>::quiet_NaN(),
                 torch::TensorOptions().dtype(torch::kDouble).device(params_.device()));
     variance_ = torch::full(
-                extended_shape(),
+                torch::IntArrayRef(shape_vec),
                 std::numeric_limits<double>::quiet_NaN(),
                 torch::TensorOptions().dtype(torch::kDouble).device(params_.device()));
 }
@@ -43,13 +44,15 @@ torch::Tensor Categorical::sample(torch::IntArrayRef sample_shape /*= {}*/)
         num_samples *= dim;
     torch::Tensor probs_2d = probs().view({-1, num_events_});
     torch::Tensor samples_2d = torch::multinomial(probs_2d, num_samples, true).transpose(0, 1);
-    return samples_2d.view(extended_shape(sample_shape));
+    return samples_2d;
+    // std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    // return samples_2d.view(torch::IntArrayRef(shape_vec));
 }
 
 torch::Tensor Categorical::log_prob(const torch::Tensor& value)
 {
-    auto broadcasted_tensors = torch::broadcast_tensors({value.to(torch::kDouble).unsqueeze(-1), logits()});
-    torch::Tensor val = broadcasted_tensors[0].index({torch::indexing::Ellipsis, 0});
+    auto broadcasted_tensors = torch::broadcast_tensors({value.to(torch::kInt64).unsqueeze(-1), logits()});
+    torch::Tensor val = broadcasted_tensors[0].index({torch::indexing::Ellipsis, torch::indexing::Slice(0, 1)});
     torch::Tensor log_pmf = broadcasted_tensors[1];
     return log_pmf.gather(-1, val).squeeze(-1);
 }

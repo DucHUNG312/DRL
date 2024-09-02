@@ -14,24 +14,25 @@ NetImpl::NetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef 
         device_ = torch::kCUDA;
 }
 
-torch::Tensor NetImpl::forward(torch::Tensor x)
+void NetImpl::train_step(
+    torch::Tensor& loss, 
+    const std::shared_ptr<torch::optim::Optimizer>& optimizer, 
+    const std::shared_ptr<torch::optim::LRScheduler>& lr_scheduler,
+    const std::shared_ptr<utils::Clock>& clock)
 {
-    LAB_UNIMPLEMENTED;
-    return torch::Tensor();
+    loss.to(device_);
+    lr_scheduler->step();
+    optimizer->zero_grad();
+    loss.backward();
+    optimizer->step();
+    clock->tick_opt_step();
 }
 
-torch::Tensor NetImpl::train_step(
-    torch::Tensor loss, 
-    torch::optim::Optimizer& optimizer, 
-    torch::optim::LRScheduler& lr_scheduler,
-    utils::Clock& clock)
+void NetImpl::print_weights() const
 {
-    lr_scheduler.step();
-    optimizer.zero_grad();
-    loss.backward();
-    optimizer.step();
-    clock.tick_opt_step();
-    return loss;
+    for (const auto& param : parameters()) 
+        if (param.grad().defined())
+            LAB_LOG_DEBUG("Gradient norm: {}", param.grad().norm().item<double>());
 }
 
 }

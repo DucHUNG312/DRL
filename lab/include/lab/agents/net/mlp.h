@@ -17,7 +17,7 @@ public:
 public:
     MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef out_dim);
 
-    torch::Tensor forward(torch::Tensor x);
+    torch::Tensor forward(torch::Tensor x) override;
 };
 
 TORCH_MODULE(MLPNet);

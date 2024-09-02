@@ -13,6 +13,7 @@ double Rand::rand()
 
 Rand::Rand(uint64_t seed /* = 0 */)
 {
+    generator_ = torch::make_generator<torch::CPUGeneratorImpl>(seed);
     reset(seed);
 }
 

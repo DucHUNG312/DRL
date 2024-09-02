@@ -9,21 +9,23 @@ Cauchy::Cauchy(const torch::Tensor& loc, const torch::Tensor& scale)
     : Distribution(loc.sizes())
 {
     auto loc_scale = torch::broadcast_tensors({loc, scale});
+    std::vector<int64_t> shape_vec = extended_shape();
     loc_ = loc_scale[0];
     scale_ = loc_scale[1];
     mean_ =     torch::full(
-                extended_shape(),
+                torch::IntArrayRef(shape_vec),
                 std::numeric_limits<double>::quiet_NaN(),
                 torch::TensorOptions().dtype(torch::kDouble).device(loc_.device()));
     variance_ = torch::full(
-                extended_shape(),
+                torch::IntArrayRef(shape_vec),
                 std::numeric_limits<double>::max(),
                 torch::TensorOptions().dtype(torch::kDouble).device(loc_.device()));
 }
 
 torch::Tensor Cauchy::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
-    torch::IntArrayRef shape = extended_shape(sample_shape);
+    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
     torch::Tensor eps = torch::empty(shape, loc_.options()).cauchy_();
     return loc_ + eps * scale_;
 }

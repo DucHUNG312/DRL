@@ -21,13 +21,15 @@ Normal::Normal(const torch::Tensor& loc, const torch::Tensor& scale)
 torch::Tensor Normal::sample(torch::IntArrayRef sample_shape /*= {}*/)
 {
     torch::NoGradGuard no_grad;
-    torch::IntArrayRef shape = extended_shape(sample_shape);
+    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
     return at::normal(loc_.expand(shape), scale_.expand(shape));
 }
 
 torch::Tensor Normal::rsample(torch::IntArrayRef sample_shape /*= {}*/)
 {
-    torch::IntArrayRef shape = extended_shape(sample_shape);
+    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
     torch::Tensor eps = standard_normal(shape, loc_.dtype().toScalarType(), loc_.device());
     return loc_ + eps * scale_;
 }

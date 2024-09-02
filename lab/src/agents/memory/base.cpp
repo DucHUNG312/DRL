@@ -6,26 +6,25 @@ namespace lab
 namespace agents
 {
 
-Memory::Memory(const std::shared_ptr<Body>& body, const utils::MemorySpec& spec)
-    : body_(body), spec_(std::move(spec))
+Memory::Memory(const utils::MemorySpec& spec)
+    : spec_(std::move(spec))
 {
     reset();
 }
 
 void Memory::reset()
 {
-    LAB_UNIMPLEMENTED;    
+    size_ = 0;
+    ready_ = 0;
+    most_recent_ = envs::StepResult();
+    experiences_.clear();
+    for (const auto& key : keys_)
+        experiences_.insert(key, c10::impl::GenericList(c10::AnyType::get()));     
 }
 
-void Memory::update(const envs::StepResult& result)
+torch::List<torch::IValue> Memory::get_experiences(const std::string& key) const
 {
-    LAB_UNIMPLEMENTED;
-}
-
-Memory::ExperienceDict Memory::sample()
-{
-    LAB_UNIMPLEMENTED;
-    return Memory::ExperienceDict();
+    return experiences_.at(key);
 }
 
 void Memory::save(torch::serialize::OutputArchive& archive) const
@@ -36,10 +35,6 @@ void Memory::save(torch::serialize::OutputArchive& archive) const
 void Memory::load(torch::serialize::InputArchive& archive)
 {
 
-}
-void Memory::add_experience(const envs::StepResult& result)
-{
-    LAB_UNIMPLEMENTED;
 }
 
 void Memory::pretty_print(std::ostream& stream, const std::string& indentation) const
@@ -63,11 +58,15 @@ std::ostream& Memory::operator<<(std::ostream& stream)
 
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Memory>& memory)
 {
+    LAB_CHECK(memory != nullptr);
+    memory->save(archive);
     return archive;
 }
 
 torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Memory>& memory)
 {
+    LAB_CHECK(memory != nullptr);
+    memory->load(archive);
     return archive;
 }
 

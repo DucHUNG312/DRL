@@ -11,16 +11,16 @@ namespace agents
 class OnPolicyReplay : public Memory
 {
 public:
+    static constexpr const char* name = "OnPolicyReplay";
+public:
     using Memory::Memory;
     using Memory::ExperienceDict;
 
-    void reset();
+    void update(const envs::StepResult& result) override;
 
-    void update(const envs::StepResult& result);
-
-    ExperienceDict sample();
+    ExperienceDict sample() override;
 private:
-    void add_experience(const envs::StepResult& result);
+    void add_experience(const envs::StepResult& result) override;
 };
 
 }

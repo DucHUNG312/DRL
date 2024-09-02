@@ -31,20 +31,28 @@ MLPNetImpl::MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArr
 
     loss_function_ = utils::create_loss(spec_.loss_spec.name);
 
-    this->to(device_);
-    this->train();
+    model_->to(device_);
+    model_->to(torch::kDouble);
+    model_ = register_module("model", model_);
+    
+    model_tail_->to(device_);
+    model_tail_->to(torch::kDouble);
+    model_tail_ = register_module("model_tail", model_tail_);
+
+    // enable training mode
+    train();
 }
 
 torch::Tensor MLPNetImpl::forward(torch::Tensor x)
 {
-    x = model_->forward(x);
+    x = model_->forward(x.to(device_));
     std::vector<torch::Tensor> outputs;
     for (const auto& module : *model_tail_)
     {
         auto seq_module = std::dynamic_pointer_cast<torch::nn::SequentialImpl>(module);
         outputs.push_back(seq_module->forward(x));
     }
-    return torch::cat(outputs, 1);
+    return torch::stack(outputs);
 }
 
 }

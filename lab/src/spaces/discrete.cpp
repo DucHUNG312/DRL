@@ -19,6 +19,7 @@ void DiscreteImpl::reset()
     n = register_parameter("n", torch::tensor({options.n()}, torch::kInt64));
     start = register_parameter("start", torch::tensor({options.start()}, torch::kInt64));
     shape_ = torch::tensor({1}, torch::kInt64);
+    dim_ = options.n();
     name_ = "Discrete";
 }
 
@@ -45,7 +46,7 @@ torch::Tensor DiscreteImpl::sample(/*const torch::Tensor& mask*/)
 
 bool DiscreteImpl::contains(const torch::Tensor& x) const
 {
-    LAB_CHECK(x.sizes() == torch::IntArrayRef({1}));
+    LAB_CHECK(x.numel() == 1);
     LAB_CHECK(x.dtype() == torch::kInt64);
     return (options.start() <= x.item<int64_t>()) && (x.item<int64_t>() < options.start() + options.n());
 }

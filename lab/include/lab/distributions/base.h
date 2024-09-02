@@ -18,7 +18,7 @@ public:
     Distribution(torch::IntArrayRef batch_shape);
     LAB_DEFAULT_CONSTRUCT(Distribution);
 
-    virtual torch::IntArrayRef extended_shape(torch::IntArrayRef sample_shape = {});
+    virtual std::vector<int64_t> extended_shape(torch::IntArrayRef sample_shape = {});
 
     virtual torch::Tensor sample(torch::IntArrayRef sample_shape = {}) = 0;
 

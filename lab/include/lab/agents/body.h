@@ -11,58 +11,38 @@ namespace lab
 namespace agents
 {
 
-class Algorithm;
-
-class Body : public std::enable_shared_from_this<Body>
+class Body
 {
     LAB_ARG(std::shared_ptr<envs::Env>, env);
     LAB_ARG(std::shared_ptr<Memory>, memory);
     LAB_ARG(std::shared_ptr<Algorithm>, algorithm);
-    LAB_ARG(torch::Tensor, loss);
     LAB_ARG(utils::BodySpec, spec);
 public:
+    using ExperienceDict = torch::Dict<std::string, torch::List<torch::IValue>>;
+
     Body(const std::shared_ptr<envs::Env>& env, const utils::BodySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Body);
 
-    void update(const envs::StepResult& result)
-    {
-        memory_->update(std::move(result));
-    }
+    void update(const envs::StepResult& result);
 
-    torch::IValue act(const torch::Tensor& state)
-    {
-        torch::IValue action = algorithm_->act(std::move(state));
-        return action;
-    }
+    torch::Tensor act(const torch::Tensor& state);
 
-    torch::Tensor train() 
-    {
-        return algorithm_->train();
-    }
+    torch::Tensor train();
 
-    void save(torch::serialize::OutputArchive& archive) const
-    {
+    ExperienceDict sample();
 
-    }
+    void save(torch::serialize::OutputArchive& archive) const;
 
-    void load(torch::serialize::InputArchive& archive)
-    {
+    void load(torch::serialize::InputArchive& archive);
+private:
+    void init_algorithm_specs(const utils::AlgorithmSpec& spec);
 
-    }
-
-    std::shared_ptr<spaces::AnySpace>& get_action_spaces();    
+    void init_memory_spec(const utils::MemorySpec& spec);
 };
 
-LAB_FORCE_INLINE torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Body>& body)
-{
-    return archive;
-}
+torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Body>& body);
 
-LAB_FORCE_INLINE torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Body>& body)
-{
-    return archive;
-}
-
+torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Body>& body);
 
 }
 

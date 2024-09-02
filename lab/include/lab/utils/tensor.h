@@ -27,6 +27,8 @@ std::string get_object_name(const c10::IValue& ivalue);
 
 torch::Tensor center_mean(const torch::Tensor& tensor);
 
+torch::Tensor center_mean(const std::vector<double>& vec);
+
 torch::Tensor normalize(const torch::Tensor& tensor);
 
 torch::Tensor standardize(const torch::Tensor& tensor);

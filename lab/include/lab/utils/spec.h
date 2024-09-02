@@ -29,6 +29,7 @@ struct AlgorithmSpec
     std::string name;
     std::string action_pdtype;
     std::string action_policy;
+    double policy_loss_coef;
     double gamma;
     uint64_t training_frequency;
     uint64_t training_batch_iter;
@@ -127,14 +128,15 @@ struct EnvSpec
     std::string frame_op;
     double reward_threshold;
     double reward_scale;
+    int64_t max_frame;
+    int64_t clock_speed;
     uint64_t frame_op_len;
     uint64_t max_time;
-    uint64_t max_frame;
+    uint64_t num_envs;
     uint64_t seed;
     bool nondeterministic;
     bool auto_reset;
     bool normalize_state;
-    bool is_open;
 
     LAB_DEFAULT_CONSTRUCT(EnvSpec);
 };
@@ -171,7 +173,7 @@ public:
     LAB_NONCOPYMOVEABLE(SpecLoader);
 
     static std::string get_default_experiment_name(const std::string& env_name);
-    static EnvSpec load_default_env_spec(const std::string& env_name); 
+    static EnvSpec load_default_env_spec(const std::string& env_name);
     static void load_specs_from_file(const std::string& file_path, const std::string& experiment_name);
 private:
     static void load_spec_json(const json& j);

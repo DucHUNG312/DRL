@@ -64,7 +64,6 @@ struct AnySpaceHolder : public AnySpacePlaceholder
 
     explicit AnySpaceHolder(std::shared_ptr<SpaceType>&& space_)
         : AnySpacePlaceholder(typeid(SpaceType)), space(std::move(space_)) {}
-
     
     torch::Tensor sample(/*torch::Tensor&& argument*/) override 
     {    

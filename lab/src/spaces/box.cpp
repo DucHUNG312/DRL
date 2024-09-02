@@ -24,6 +24,7 @@ void BoxImpl::reset()
     high = register_parameter("high", options.high());
     LAB_CHECK_EQ(low.sizes(), high.sizes());
     shape_ = torch::tensor(low.sizes().vec(), torch::kInt64);
+    dim_ = shape_[0].item<int64_t>();
     name_ = "Box";
 }
 
