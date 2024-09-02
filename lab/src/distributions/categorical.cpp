@@ -42,11 +42,10 @@ torch::Tensor Categorical::sample(torch::IntArrayRef sample_shape /*= {}*/)
     int64_t num_samples = 1;
     for (int64_t dim : sample_shape)
         num_samples *= dim;
+    
     torch::Tensor probs_2d = probs().view({-1, num_events_});
     torch::Tensor samples_2d = torch::multinomial(probs_2d, num_samples, true).transpose(0, 1);
     return samples_2d;
-    // std::vector<int64_t> shape_vec = extended_shape(sample_shape);
-    // return samples_2d.view(torch::IntArrayRef(shape_vec));
 }
 
 torch::Tensor Categorical::log_prob(const torch::Tensor& value)

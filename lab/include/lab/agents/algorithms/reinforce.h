@@ -19,7 +19,7 @@ public:
 
     torch::Tensor train(const ExperienceDict& experiences) override;
 
-    void update() override;
+    void update(const torch::Tensor& loss) override;
 
     torch::Tensor act(const torch::Tensor& state) override;
 

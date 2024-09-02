@@ -13,7 +13,7 @@
 #include "renderer/scene/scene.h"
 
 #ifdef LAB_GPU_BUILD
-#include "renderer/cuda/cuda.h"
+#include "renderer/cuda/core.h"
 #endif
 
 namespace lab

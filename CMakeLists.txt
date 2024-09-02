@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
 
+# Check CCACHE
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "Enabled CCache.")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
+# Check LTO
+include(CheckIPOSupported)
+check_ipo_supported(
+    RESULT LAB_IPO_SUPPORT 
+    OUTPUT LAB_IPO_ERROR
+)
+
 project(RL VERSION 1.0.0 LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -113,6 +127,11 @@ find_package(nlohmann_json REQUIRED)
 find_package(Libuuid REQUIRED)
 
 add_compile_definitions(EXPERIMENT_SPEC_DIR="${CMAKE_SOURCE_DIR}/spec/experiment/")
+
+if(LAB_IPO_SUPPORT)
+    message(STATUS "Enabled LTO.")
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 
 # common
 set(COMMON_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/common/include")

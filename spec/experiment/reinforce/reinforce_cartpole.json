@@ -10,7 +10,13 @@
           "name": "Reinforce",
           "action_pdtype": "Categorical",
           "action_policy": "default",
-          "explore_var_spec": null,
+          "explore_var_spec": {
+            "name": "linear_decay",
+            "start_val": 0.01,
+            "end_val": 0.001,
+            "start_step": 0,
+            "end_step": 20000
+          },
           "gamma": 0.99,
           "policy_loss_coef": 1.0,
           "entropy_coef_spec": {
@@ -27,8 +33,8 @@
         },
         "net": {
           "type": "MLPNet",
-          "hid_layers": [32, 64, 32],
-          "hid_layers_activation": "SELU",
+          "hid_layers": [64],
+          "hid_layers_activation": "RELU",
           "out_layers_activation": ["Sigmoid"],
           "init_fn": null,
           "clip_grad_val": null,
@@ -37,7 +43,7 @@
           },
           "optim_spec": {
             "name": "Adam",
-            "lr": 0.002
+            "lr": 0.02
           },
           "lr_scheduler_spec": {
             "name": "StepLR",
@@ -52,7 +58,7 @@
         "frame_op": null,
         "frame_op_len": 0,
         "max_time": null,
-        "max_frame": 100000,
+        "max_frame": 20000,
         "clock_speed": 1,
         "reward_threshold": 0,
         "reward_scale": 1,

@@ -23,7 +23,7 @@ public:
     Body(const std::shared_ptr<envs::Env>& env, const utils::BodySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Body);
 
-    void update(const envs::StepResult& result);
+    void update();
 
     torch::Tensor act(const torch::Tensor& state);
 
@@ -34,6 +34,22 @@ public:
     void save(torch::serialize::OutputArchive& archive) const;
 
     void load(torch::serialize::InputArchive& archive);
+
+    torch::Tensor get_loss() const;
+
+    void close_env();
+
+    void reset_env();
+
+    double get_total_reward() const;
+
+    bool is_env_terminated() const;
+
+    void step(const torch::Tensor& act);
+
+    torch::Tensor get_result_state() const;
+
+    std::shared_ptr<utils::Clock> get_env_clock() const;
 private:
     void init_algorithm_specs(const utils::AlgorithmSpec& spec);
 

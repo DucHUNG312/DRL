@@ -1,4 +1,4 @@
-#include "lab/agents/base.h"
+#include "lab/agents/agent.h"
 
 namespace lab
 {
@@ -17,18 +17,44 @@ torch::Tensor Agent::act(const torch::Tensor& state)
     return body_->act(state);
 }
 
-torch::Tensor Agent::update(const envs::StepResult& result)
+void Agent::update()
 {
-    body_->update(result);
-    torch::Tensor loss = body_->train();
-    if(loss.defined())
-        body_->algorithm()->loss(loss);
-    body_->algorithm()->update();
-    return loss;
+    body_->update();
+}
+
+void Agent::reset_env()
+{
+    body_->reset_env();
+}
+
+double Agent::get_total_reward() const
+{
+    return body_->get_total_reward();
+}
+
+bool Agent::is_env_terminated() const
+{
+    return body_->is_env_terminated();
+}
+
+void Agent::step(const torch::Tensor& act)
+{
+    body_->step(act);
+}
+
+torch::Tensor Agent::get_result_state() const
+{
+    return body_->get_result_state();
+}
+
+std::shared_ptr<utils::Clock> Agent::get_env_clock() const
+{
+    return body_->get_env_clock();
 }
 
 void Agent::close()
 {
+    body_->close_env();
     // TODO: save();
 }
 

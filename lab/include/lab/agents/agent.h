@@ -18,13 +18,25 @@ public:
 
     torch::Tensor act(const torch::Tensor& state);
 
-    torch::Tensor update(const envs::StepResult& result);
+    void update();
 
     void close();
 
     void save(torch::serialize::OutputArchive& archive) const;
 
     void load(torch::serialize::InputArchive& archive);
+
+    void reset_env();
+
+    double get_total_reward() const;
+
+    bool is_env_terminated() const;
+
+    void step(const torch::Tensor& act);
+
+    torch::Tensor get_result_state() const;
+
+    std::shared_ptr<utils::Clock> get_env_clock() const;
 };
 
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Agent>& agent);

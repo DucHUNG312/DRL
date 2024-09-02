@@ -1,4 +1,4 @@
-#include <lab/lab.h>
+#include "main.h"
 
 using namespace lab;
 

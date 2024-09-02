@@ -20,8 +20,11 @@ torch::Tensor Reinforce::train(const Algorithm::ExperienceDict& experiences)
     return loss;
 }
 
-void Reinforce::update()
+void Reinforce::update(const torch::Tensor& loss)
 {
+    if(loss.defined())
+        loss_ = loss;
+
     explore_var_ = explore_var_scheduler_.update(env_->clock()->frame);
     entropy_coef_ = entropy_coef_scheduler_.update(env_->clock()->frame);
 }

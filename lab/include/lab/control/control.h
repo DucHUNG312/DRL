@@ -1,10 +1,8 @@
 #pragma once
 
 #include "lab/core.h"
-#include "lab/agents/base.h"
-#include "lab/envs/base.h"
+#include "lab/agents/agent.h"
 #include "lab/utils/spec.h"
-
 
 namespace lab
 {
@@ -16,16 +14,15 @@ class Session
 {
     LAB_ARG(utils::LabSpec, spec);
     LAB_ARG(agents::Agent, agent);
-    LAB_ARG(std::shared_ptr<envs::Env>, eval_env);
+    LAB_ARG(double, max_total_reward) = 0;
 public:
     Session(const utils::LabSpec& lab_spec);
     void run();
 private:
     void run_rl();
     void close();
+    void update_total_reward();
 };
-
-agents::Agent make_agent(const utils::LabSpec& lab_spec);
 
 
 }

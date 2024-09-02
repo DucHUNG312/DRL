@@ -12,8 +12,8 @@ The project will build with GPU support by default. You can set `LAB_GPU` to `OF
 ```
 mkdir build
 cd build
-cmake .. -DLAB_GPU=OFF
-make -j 8
+cmake -G Ninja .. -DLAB_GPU=OFF
+ninja -j8
 ```
 
 ## GPU Support
@@ -21,7 +21,7 @@ make -j 8
 Check your GPU's compute capability version [here](https://developer.nvidia.com/cuda-gpus) and set it using `CMAKE_CUDA_ARCHITECTURE`. Otherwise, the default compute capability of 5.2 will be chosen.
 
 ```
-cmake .. -DCMAKE_CUDA_ARCHITECTURE=${GPU_COMPUTE_CAPABILITY}
+cmake -G Ninja .. -DCMAKE_CUDA_ARCHITECTURE=${GPU_COMPUTE_CAPABILITY}
 ```
 
 ## TODO

@@ -34,7 +34,7 @@
 #include "lab/wrappers/clip_action.h"
 #include "lab/wrappers/time_limit.h"
 
-#include "lab/agents/base.h"
+#include "lab/agents/agent.h"
 #include "lab/agents/body.h"
 #include "lab/agents/algorithms/base.h"
 #include "lab/agents/algorithms/reinforce.h"

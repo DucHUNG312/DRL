@@ -34,11 +34,14 @@ void Body::init_memory_spec(const utils::MemorySpec& spec)
     memory_ = utils::create_memory(std::move(spec));
 }
 
-void Body::update(const envs::StepResult& result)
+void Body::update()
 {
-    memory_->update(result.clone().to(torch::kCPU)); // store memory in CPU
+    memory_->update(env_->result().clone().to(torch::kCPU)); // store memory in CPU
     if(memory_->ready() /*&& memory_->size() == algorithm_->spec().training_frequency*/)
       algorithm_->to_train(true);
+    
+    torch::Tensor loss = train();
+    algorithm_->update(loss);
 }
 
 torch::Tensor Body::act(const torch::Tensor& state)
@@ -73,6 +76,46 @@ void Body::load(torch::serialize::InputArchive& archive)
 {
   memory_->load(archive);
   algorithm_->load(archive);
+}
+
+torch::Tensor Body::get_loss() const
+{
+  return algorithm_->loss();
+}
+
+void Body::close_env()
+{
+  env_->close();
+}
+
+void Body::reset_env()
+{
+  env_->reset();
+}
+
+double Body::get_total_reward() const
+{
+  return env_->total_reward();
+}
+
+bool Body::is_env_terminated() const
+{
+  return env_->result().terminated;
+}
+
+void Body::step(const torch::Tensor& act)
+{
+  env_->step(act);
+}
+
+torch::Tensor Body::get_result_state() const
+{
+  return env_->result().state.clone();
+}
+
+std::shared_ptr<utils::Clock> Body::get_env_clock() const
+{
+  return env_->clock();
 }
 
 torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Body>& body)

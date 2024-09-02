@@ -25,19 +25,18 @@ MLPNetImpl::MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArr
     for (int64_t i = 0; i < out_dim.size(); i++)
     { 
         std::vector<int64_t> out_dims = { spec_.hid_layers[spec_.hid_layers.size() - 1], out_dim[i] }; 
-        out_layers_activations_[i] = utils::create_act(spec_.out_layers_activation[i]);
+        out_layers_activations_.push_back(utils::create_act(spec_.out_layers_activation[i]));
         model_tail_->push_back(utils::create_fc_model(out_dims, out_layers_activations_[i]));
     }
 
     loss_function_ = utils::create_loss(spec_.loss_spec.name);
 
-    model_->to(device_);
-    model_->to(torch::kDouble);
     model_ = register_module("model", model_);
-    
-    model_tail_->to(device_);
-    model_tail_->to(torch::kDouble);
     model_tail_ = register_module("model_tail", model_tail_);
+
+    // transfer to device
+    to(device_);
+    to(torch::kDouble);
 
     // enable training mode
     train();
@@ -52,7 +51,7 @@ torch::Tensor MLPNetImpl::forward(torch::Tensor x)
         auto seq_module = std::dynamic_pointer_cast<torch::nn::SequentialImpl>(module);
         outputs.push_back(seq_module->forward(x));
     }
-    return torch::stack(outputs);
+    return torch::stack(outputs).squeeze(-1);
 }
 
 }

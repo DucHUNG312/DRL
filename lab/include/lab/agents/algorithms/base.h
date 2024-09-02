@@ -35,7 +35,7 @@ public:
 
     virtual torch::Tensor train(const ExperienceDict& experiences) = 0;
 
-    virtual void update() = 0;
+    virtual void update(const torch::Tensor& loss) = 0;
 
     virtual torch::Tensor act(const torch::Tensor& state) = 0;
 
