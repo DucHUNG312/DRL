@@ -16,9 +16,8 @@ torch::Tensor Reinforce::train(const Algorithm::ExperienceDict& experiences)
     torch::Tensor states = calc_pdparam_batch(experiences);
     torch::Tensor advs = calc_ret_advs(experiences);
     torch::Tensor loss = calc_policy_loss(experiences, states, advs);
-    net_->train_step(loss, optimizer_, lrscheduler_, env_->clock());
     to_train_ = false;
-    return loss;
+    return net_->train_step(loss, optimizer_, lrscheduler_, env_->clock()).clone();
 }
 
 void Reinforce::update(const torch::Tensor& loss)
@@ -32,7 +31,7 @@ void Reinforce::update(const torch::Tensor& loss)
 
 torch::Tensor Reinforce::act(const torch::Tensor& state)
 {
-    torch::Tensor action = utils::sample_action_with_policy(spec_. action_policy, shared_from_this(), state);
+    torch::Tensor action = utils::sample_action_with_policy(spec_.action_policy, shared_from_this(), state);
     return action.squeeze().to(torch::kCPU);
 }
 
@@ -48,7 +47,7 @@ torch::Tensor Reinforce::calc_ret_advs(const Algorithm::ExperienceDict& experien
         advs = utils::center_mean(advs.clone());
     if (env_->is_venv())
         advs = utils::venv_unpack(advs.clone());
-    return advs.to(torch::kDouble);
+    return advs;
 }
 
 torch::Tensor Reinforce::calc_policy_loss(const Algorithm::ExperienceDict& experiences, const torch::Tensor& states, const torch::Tensor& advs)
@@ -58,7 +57,7 @@ torch::Tensor Reinforce::calc_policy_loss(const Algorithm::ExperienceDict& exper
     torch::Tensor actions = utils::get_tensor_from_ivalue_list(batch);
     if(env_->is_venv())
         actions = utils::venv_unpack(actions.clone());
-    torch::Tensor log_probs = action_pd->log_prob(actions.clone());
+    torch::Tensor log_probs = action_pd->log_prob(actions);
     torch::Tensor policy_loss = - spec_.policy_loss_coef * (log_probs * advs).mean();
     torch::Tensor entropy = action_pd->entropy().mean();
     policy_loss = policy_loss + (-entropy_coef_ * entropy);

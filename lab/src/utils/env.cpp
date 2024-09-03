@@ -14,13 +14,14 @@ std::shared_ptr<envs::Env> create_env(const EnvSpec& spec)
 }
 
 StepResult::StepResult(
-    const torch::Tensor& state, 
+    const torch::Tensor& state,
+    const torch::Tensor& next_state,
     const torch::Tensor& action,
     double reward, 
     bool terminated, 
     bool truncated)
     : state(state.to(torch::kDouble)),
-    next_state(torch::empty_like(state, torch::TensorOptions().dtype(torch::kDouble))),
+    next_state(next_state.to(torch::kDouble)),
     action(action.to(torch::kDouble)),
     reward(reward), 
     terminated(terminated), 

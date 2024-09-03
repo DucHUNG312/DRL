@@ -58,7 +58,7 @@
         "frame_op": null,
         "frame_op_len": 0,
         "max_time": null,
-        "max_frame": 20000,
+        "max_frame": 100000,
         "clock_speed": 1,
         "reward_threshold": 0,
         "reward_scale": 1,

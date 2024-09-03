@@ -19,7 +19,7 @@ public:
     LAB_ARG(int64_t, size) = 0;
     LAB_ARG(int64_t, seen_size) = 0;
     LAB_ARG(bool, ready) = false;
-    LAB_ARG(std::vector<std::string>, keys) = {"state", "next_state", "action", "reward", "terminated", "truncated"};
+    LAB_ARG(std::vector<std::string>, keys) = {"state", /*"next_state",*/ "action", "reward", "terminated", "truncated"};
 public:
     Memory(const utils::MemorySpec& spec);
     LAB_DEFAULT_CONSTRUCT(Memory);

@@ -25,6 +25,7 @@ struct StepResult
 
     StepResult(
         const torch::Tensor& state, 
+        const torch::Tensor& next_state,
         const torch::Tensor& action,
         double reward, 
         bool terminated, 

@@ -44,7 +44,7 @@ MLPNetImpl::MLPNetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArr
 
 torch::Tensor MLPNetImpl::forward(torch::Tensor x)
 {
-    x = model_->forward(x.to(device_));
+    x = model_->forward(x);
     std::vector<torch::Tensor> outputs;
     for (const auto& module : *model_tail_)
     {

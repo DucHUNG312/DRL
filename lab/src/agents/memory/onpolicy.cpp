@@ -24,7 +24,7 @@ void OnPolicyReplay::add_experience(const utils::StepResult& result)
 
 #define ADD_EXPERIENCE(param) experiences_.at(#param).push_back(torch::IValue(result.param))
     ADD_EXPERIENCE(state);
-    ADD_EXPERIENCE(next_state);
+    //ADD_EXPERIENCE(next_state);
     ADD_EXPERIENCE(action);
     ADD_EXPERIENCE(reward);
     ADD_EXPERIENCE(terminated);

@@ -42,7 +42,7 @@ void Memory::pretty_print(std::ostream& stream, const std::string& indentation) 
     const std::string next_indentation = indentation + "  ";
     stream << "Memory(\n";
     pretty_print_list(stream, "state", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
-    pretty_print_list(stream, "next_state", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
+    //pretty_print_list(stream, "next_state", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
     pretty_print_list(stream, "action", next_indentation, [](const torch::IValue& value) { return value.toTensor(); });
     pretty_print_list(stream, "reward", next_indentation, [](const torch::IValue& value) { return value.toDouble(); });
     pretty_print_list(stream, "terminated", next_indentation, [](const torch::IValue& value) { return value.toBool(); });

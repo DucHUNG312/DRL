@@ -25,7 +25,7 @@ public:
 
     void update();
 
-    torch::Tensor act(const torch::Tensor& state);
+    torch::Tensor act();
 
     torch::Tensor train();
 

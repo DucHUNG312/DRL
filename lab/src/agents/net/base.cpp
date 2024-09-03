@@ -14,7 +14,7 @@ NetImpl::NetImpl(const utils::NetSpec& spec, int64_t in_dim, torch::IntArrayRef 
         device_ = torch::kCUDA;
 }
 
-void NetImpl::train_step(
+torch::Tensor& NetImpl::train_step(
     torch::Tensor& loss, 
     const std::shared_ptr<torch::optim::Optimizer>& optimizer, 
     const std::shared_ptr<torch::optim::LRScheduler>& lr_scheduler,
@@ -26,6 +26,7 @@ void NetImpl::train_step(
     loss.backward();
     optimizer->step();
     clock->tick_opt_step();
+    return loss;
 }
 
 void NetImpl::print_weights() const

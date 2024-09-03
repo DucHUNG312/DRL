@@ -10,11 +10,11 @@ Agent::Agent(const std::shared_ptr<Body>& body, const utils::AgentSpec& spec)
     : body_(body), spec_(std::move(spec))
 {}
 
-torch::Tensor Agent::act(const torch::Tensor& state)
+torch::Tensor Agent::act()
 {
     torch::NoGradGuard no_grad;
     LAB_CHECK(body_ != nullptr);
-    return body_->act(state);
+    return body_->act();
 }
 
 void Agent::update()

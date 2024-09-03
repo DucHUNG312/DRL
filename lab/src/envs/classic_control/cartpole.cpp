@@ -31,6 +31,7 @@ CartPole::CartPole(const utils::EnvSpec& env_spec)
     action_spaces_ = spaces::make_discrete_space_any(2);
     observation_spaces_ = spaces::make_box_space_any(-high, high);
     result_.state = torch::tensor({0, 0, 0, 0}, torch::kDouble);
+    result_.next_state = result_.state;
     is_open_ = true;
 
     // if (env_spec.renderer.enabled)
@@ -49,7 +50,7 @@ void CartPole::reset(uint64_t seed /*= 0*/)
     rand_.reset(seed);
     total_reward_ = 0;
     result_.state = rand_.sample_uniform(reset_low * result_.state, reset_high * result_.state).to(torch::kDouble);
-    result_.next_state = torch::empty_like(result_.state, torch::TensorOptions().dtype(torch::kDouble));
+    result_.next_state = result_.state;
     result_.reward = 0;
     result_.terminated = false;
     result_.truncated = false;
@@ -80,6 +81,8 @@ void CartPole::step(const torch::Tensor& action)
     LAB_CHECK(action_spaces_->template ptr<spaces::Discrete>()->contains(action));
 
     result_.action = action;
+    result_.state = result_.next_state;
+
 
     double x = result_.state[0].item<double>(); 
     double x_dot = result_.state[1].item<double>();
@@ -94,17 +97,17 @@ void CartPole::step(const torch::Tensor& action)
 
     if(kinematics_integrator == "euler")
     {
-        result_.state[0] = x = x + tau * x_dot;
-        result_.state[1] = x_dot = x_dot + tau * xacc;
-        result_.state[2] = theta = theta + tau * theta_dot;
-        result_.state[3] = theta_dot = theta_dot + tau * thetaacc;
+        result_.next_state[0] = x = x + tau * x_dot;
+        result_.next_state[1] = x_dot = x_dot + tau * xacc;
+        result_.next_state[2] = theta = theta + tau * theta_dot;
+        result_.next_state[3] = theta_dot = theta_dot + tau * thetaacc;
     }
     else
     {
-        result_.state[1] = x_dot = x_dot + tau * xacc;
-        result_.state[0] = x = x + tau * x_dot;
-        result_.state[3] = theta_dot = theta_dot + tau * thetaacc;
-        result_.state[2] = theta = theta + tau * theta_dot;
+        result_.next_state[1] = x_dot = x_dot + tau * xacc;
+        result_.next_state[0] = x = x + tau * x_dot;
+        result_.next_state[3] = theta_dot = theta_dot + tau * thetaacc;
+        result_.next_state[2] = theta = theta + tau * theta_dot;
     }
 
     bool terminated = (x < -x_threshold) || (x > x_threshold) || (theta < -theta_threshold_radians) || (theta > theta_threshold_radians);
@@ -122,15 +125,14 @@ void CartPole::step(const torch::Tensor& action)
     else
     {
         if (steps_beyond_terminated == 0)
-            LAB_LOG_WARN("You are calling 'step()' even though this environment has already returned done = true. You should always call 'reset()' once you receive 'done = true' -- any further steps are undefined behavior.");
-        steps_beyond_terminated = steps_beyond_terminated + 1;
+            LAB_LOG_WARN("You are calling 'step()' even though this environment has already returned terminated = true. You should always call 'reset()' once you receive 'terminated = true' -- any further steps are undefined behavior.");
+        steps_beyond_terminated += 1;
         reward = 0;
     }
 
     result_.reward = reward;
     result_.terminated = terminated;
     result_.truncated = false;
-    result_.next_state = result_.state;
 
     total_reward_ += reward;
 

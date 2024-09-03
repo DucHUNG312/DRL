@@ -17,7 +17,7 @@ public:
     Agent(const std::shared_ptr<Body>& body, const utils::AgentSpec& spec);
     LAB_DEFAULT_CONSTRUCT(Agent);
 
-    torch::Tensor act(const torch::Tensor& state);
+    torch::Tensor act();
 
     void update();
 

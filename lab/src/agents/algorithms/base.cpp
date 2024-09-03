@@ -23,7 +23,7 @@ torch::Tensor Algorithm::calc_pdparam_batch(const Algorithm::ExperienceDict& exp
     torch::Tensor states = utils::get_tensor_from_ivalue_list(batch);
     if (env_->is_venv())
         states = utils::venv_unpack(states);
-    return calc_pdparam(states);
+    return calc_pdparam(states.to(net_->device()));
 }
 
 void Algorithm::save(torch::serialize::OutputArchive& archive) const

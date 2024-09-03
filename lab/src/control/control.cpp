@@ -29,11 +29,16 @@ void Session::run_rl()
 {
     agent_.reset_env();
     auto clock = agent_.get_env_clock();
-    torch::Tensor state = agent_.get_result_state();
     while(true)
     {
         if(agent_.is_env_terminated())
-            agent_.reset_env();
+            if(clock->frame < clock->max_frame)
+            {
+                clock->tick_epi();
+                agent_.reset_env();
+                LAB_LOG_DEBUG("Loss: {}", agent_.body()->algorithm()->loss());
+                LAB_LOG_DEBUG("Max Total Reward: {}", max_total_reward_);
+            }
 
         if(clock->frame > clock->max_frame)
             break;
@@ -41,7 +46,11 @@ void Session::run_rl()
         clock->tick_time();
 
         // calc action
-        torch::Tensor action = agent_.act(state);
+        torch::Tensor action;
+        {
+            torch::NoGradGuard no_grad;
+            action = agent_.act();
+        }
 
         // do the work
         agent_.step(action);
@@ -49,18 +58,8 @@ void Session::run_rl()
         // update agent with current state
         agent_.update();
 
-        // update current state
-        state = agent_.get_result_state();
-
         // update maximum reward so far
         update_total_reward();
-
-        // debug only
-        if(clock->frame % 100 == 0)
-        {
-            agent_.body()->algorithm()->net()->print_weights();
-            LAB_LOG_DEBUG("Max Total Reward: {}", max_total_reward_);
-        }
     }
 }
 

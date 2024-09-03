@@ -45,8 +45,10 @@ void Body::update()
     algorithm_->update(loss);
 }
 
-torch::Tensor Body::act(const torch::Tensor& state)
+torch::Tensor Body::act()
 {
+    torch::NoGradGuard no_grad;
+    torch::Tensor state = get_result_state();
     torch::Tensor action = algorithm_->act(state);
     return action;
 }
@@ -55,8 +57,8 @@ torch::Tensor Body::train()
 {
     if(algorithm_->to_train())
     {
-        Body::ExperienceDict experiences = sample();
         env_->clock()->set_batch_size(memory_->size());
+        Body::ExperienceDict experiences = sample();
         return algorithm_->train(experiences);
     }
     return torch::Tensor();
@@ -111,7 +113,7 @@ void Body::step(const torch::Tensor& act)
 
 torch::Tensor Body::get_result_state() const
 {
-  return env_->result().state.clone();
+  return env_->result().next_state.clone();
 }
 
 std::shared_ptr<utils::Clock> Body::get_env_clock() const

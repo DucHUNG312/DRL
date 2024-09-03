@@ -24,7 +24,7 @@ public:
 
     virtual torch::Tensor forward(torch::Tensor x) = 0;
 
-    void train_step(
+    torch::Tensor& train_step(
         torch::Tensor& loss, 
         const std::shared_ptr<torch::optim::Optimizer>& optimizer, 
         const std::shared_ptr<torch::optim::LRScheduler>& lr_scheduler,

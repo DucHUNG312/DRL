@@ -10,7 +10,7 @@ file(GLOB_RECURSE HEADER_FILES${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_executable(example_gpu main.cu ${SRC_FILES} ${HEADER_FILES})
 target_include_directories(example_gpu PUBLIC ${LAB_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(example_gpu PRIVATE ${LAB_LINKED_LIBRARIES} lab)
-#target_precompile_headers(example_gpu PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/main.h")
+target_precompile_headers(example_gpu PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/main.h")
 set_target_properties(example_gpu PROPERTIES
     CUDA_STANDARD 17
     CUDA_STANDARD_REQUIRED YES
