@@ -1,4 +1,4 @@
-#include "renderer/cuda/core.h"
+#include "renderer/cuda/core.cuh"
 
 namespace lab
 {

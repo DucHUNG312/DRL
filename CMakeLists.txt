@@ -44,9 +44,9 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
     add_definitions(-DLAB_RELEASE)
 endif()
 
-find_package(CUDA)
+find_package(CUDAToolkit)
 if(LAB_DEVICE STREQUAL "GPU")
-    if (NOT CUDA_FOUND)
+    if (NOT CUDAToolkit_FOUND)
         message(WARNING "GPU build is set but CUDA toolkit not found. Use CPU instead.")
         set(LAB_DEVICE "CPU")
     else()
@@ -160,8 +160,8 @@ set(RENDERER_LINKED_LIBRARIES
     common 
 )
 if(LAB_DEVICE STREQUAL "GPU")
-    list(APPEND RENDERER_INCLUDE_DIRS ${CUDA_INCLUDE_DIRS})
-    list(APPEND RENDERER_LINKED_LIBRARIES ${CUDA_LIBRARIES})
+    list(APPEND RENDERER_INCLUDE_DIRS ${CUDAToolkit_INCLUDE_DIRS})
+    list(APPEND RENDERER_LINKED_LIBRARIES ${CUDAToolkit_LIBRARIES})
 endif()
 add_subdirectory("renderer")
 

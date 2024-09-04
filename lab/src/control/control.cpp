@@ -36,7 +36,6 @@ void Session::run_rl()
             {
                 clock->tick_epi();
                 agent_.reset_env();
-                LAB_LOG_DEBUG("Loss: {}", agent_.body()->algorithm()->loss());
                 LAB_LOG_DEBUG("Max Total Reward: {}", max_total_reward_);
             }
 

@@ -33,7 +33,7 @@ if(LAB_DEVICE STREQUAL "GPU")
     add_library(${PROJECT_NAME_GPU} SHARED ${CUDA_FILES} ${HEADER_FILES})
     target_include_directories(${PROJECT_NAME_GPU} PUBLIC ${RENDERER_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME_GPU} PRIVATE ${RENDERER_LINKED_LIBRARIES})
-    target_precompile_headers(${PROJECT_NAME_GPU} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/renderer/cuda/core.h")
+    target_precompile_headers(${PROJECT_NAME_GPU} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/renderer/cuda/core.cuh")
     set_target_properties(${PROJECT_NAME_GPU} PROPERTIES 
         CUDA_STANDARD 17
         CUDA_STANDARD_REQUIRED YES

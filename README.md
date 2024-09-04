@@ -13,26 +13,22 @@
 
 ## Build
 
-The project will build with GPU support by default. You can set `LAB_GPU` to `OFF` to run it on the CPU only.
+- Check your GPU's compute capability version [here](https://developer.nvidia.com/cuda-gpus) and set it using `CMAKE_CUDA_ARCHITECTURE`. Otherwise, the default compute capability of 5.2 will be chosen.
+
+- Note: The project will build with GPU support by default. You can set `LAB_GPU` to `OFF` to build it with only CPU support.
+
+- Note: CMake will automatically clone and download third-party libraries, which may take a few minutes to complete.
 
 ```
 mkdir build
 cd build
-cmake -G Ninja .. -DLAB_GPU=OFF
+cmake -G Ninja .. -DCMAKE_CUDA_ARCHITECTURE=YOUR_GPU_COMPUTE_CAPABILITY
 ninja -j8
-```
-
-## GPU Support
-
-Check your GPU's compute capability version [here](https://developer.nvidia.com/cuda-gpus) and set it using `CMAKE_CUDA_ARCHITECTURE`. Otherwise, the default compute capability of 5.2 will be chosen.
-
-```
-cmake -G Ninja .. -DCMAKE_CUDA_ARCHITECTURE=${GPU_COMPUTE_CAPABILITY}
 ```
 
 ## TODO
 
-- [ ] Create a trainning framework.
-- [ ] Add DRL algorithms.
+- [x] Create a trainning pipeline.
+- [ ] Add more algorithms.
 - [ ] Support more environments.
 - [ ] Support real time rendering.
