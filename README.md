@@ -5,6 +5,12 @@
 - GCC 12.3.0
 - PyTorch 2.4.0
 
+## Project structure
+
+- `lab/`: Contains the core code for the framework. This directory holds all the essential components, utilities, and main logic required for the framework's functionality.
+
+- `renderer/`: A separate project dedicated to rendering support for the framework. This folder includes modules and tools specifically for rendering tasks.
+
 ## Build
 
 The project will build with GPU support by default. You can set `LAB_GPU` to `OFF` to run it on the CPU only.
