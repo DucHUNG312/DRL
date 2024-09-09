@@ -1,28 +1,23 @@
-## This project has been tested on
+## Requirements
 
 - Ubuntu 22.04
-- CUDA 12.5
-- GCC 12.3.0
-- PyTorch 2.4.0
 
-## Project structure
+- CUDA Toolkit >= 12.5: [link](https://developer.nvidia.com/cuda-downloads).
 
-- `lab/`: Contains the core code for the framework. This directory holds all the essential components, utilities, and main logic required for the framework's functionality.
+- Libtorch 2.4.0: [GPU version](https://download.pytorch.org/libtorch/cu124/) or [CPU version](https://download.pytorch.org/libtorch/cpu/).
 
-- `renderer/`: A separate project dedicated to rendering support for the framework. This folder includes modules and tools specifically for rendering tasks.
+- CMake >= 3.25
+
+- Clang >= 17.0.6 or GCC >= 12.3.0
 
 ## Build
 
-- Check your GPU's compute capability version [here](https://developer.nvidia.com/cuda-gpus) and set it using `CMAKE_CUDA_ARCHITECTURE`. Otherwise, the default compute capability of 5.2 will be chosen.
-
-- Note: The project will build with GPU support by default. You can set `LAB_GPU` to `OFF` to build it with only CPU support.
-
-- Note: CMake will automatically clone and download third-party libraries, which may take a few minutes to complete.
+- Note: Ensure that the CUDA Toolkit is correctly installed and properly configured. Also export the location of LibTorch, so CMake can locate it during the build process. (```export Torch_DIR=PATH_TO_LIBTORCH```).
 
 ```
 mkdir build
 cd build
-cmake -G Ninja .. -DCMAKE_CUDA_ARCHITECTURE=YOUR_GPU_COMPUTE_CAPABILITY
+cmake -G Ninja ..
 ninja -j8
 ```
 

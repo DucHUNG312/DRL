@@ -23,11 +23,11 @@ CartPole::CartPole(const utils::EnvSpec& env_spec)
     LAB_CHECK_GE(polemass_length, 0);
     LAB_CHECK_GE(force_mag, 0);
     LAB_CHECK_GE(tau, 0);
-    LAB_CHECK_GE(theta_threshold_radians, -lab::math::Pi);
-    LAB_CHECK_LE(theta_threshold_radians, lab::math::Pi); 
+    LAB_CHECK_GE(theta_threshold_radians, -math::Pi);
+    LAB_CHECK_LE(theta_threshold_radians, math::Pi); 
     LAB_CHECK_LT(reset_low, reset_high);
 
-    torch::Tensor high = torch::tensor({x_threshold * 2, lab::math::Max, theta_threshold_radians * 2, lab::math::Max}, torch::kDouble);
+    torch::Tensor high = torch::tensor({x_threshold * 2, math::Max, theta_threshold_radians * 2, math::Max}, torch::kDouble);
     action_spaces_ = spaces::make_discrete_space_any(2);
     observation_spaces_ = spaces::make_box_space_any(-high, high);
     result_.state = torch::tensor({0, 0, 0, 0}, torch::kDouble);

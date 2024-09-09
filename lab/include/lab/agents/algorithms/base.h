@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lab/core.h"
+#include "lab/common/common.h"
 #include "lab/envs/base.h"
 #include "lab/agents/net/base.h"
 #include "lab/utils/policy.h"

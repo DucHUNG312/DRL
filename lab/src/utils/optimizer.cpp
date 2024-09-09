@@ -1,6 +1,5 @@
 #include "lab/utils/optimizer.h"
 #include "lab/utils/spec.h"
-#include <renderer/math/math.h>
 
 namespace torch
 {

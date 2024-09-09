@@ -1,25 +1,48 @@
-cmake_minimum_required(VERSION 3.25 FATAL_ERROR)
-
-project(lab CXX C CUDA)
-
-enable_language(CUDA)
+set(LIBRARY_NAME "lab")
 
 file(GLOB_RECURSE SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
 file(GLOB_RECURSE HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+    "${CMAKE_SOURCE_DIR}/lab/include/lab/*.h"
 )
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${LAB_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LAB_LINKED_LIBRARIES})
-target_precompile_headers(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/lab/core.h")
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    UNITY_BUILD ON UNITY_BUILD_MODE BATCH UNITY_BUILD_BATCH_SIZE 16
-    COMPILE_FLAGS ${CMAKE_CXX_FLAGS} ${CMAKE_VEC_FLAGS} ${CMAKE_OPENMP_FLAGS}
-    OUTPUT_NAME ${PROJECT_NAME}
+add_library(${LIBRARY_NAME} SHARED ${SRC_FILES} ${HEADER_FILES})
+
+target_include_directories(${LIBRARY_NAME} 
+    PUBLIC 
+        "${CMAKE_SOURCE_DIR}/lab/include/"
 )
+
+target_link_libraries(${LIBRARY_NAME} 
+    PUBLIC
+        ${TORCH_LIBRARIES}
+        spdlog::spdlog_header_only
+        nlohmann_json::nlohmann_json
+)
+
+if(LAB_DEVICE STREQUAL "GPU")
+    target_include_directories(${LIBRARY_NAME} 
+        PUBLIC 
+            ${CUDAToolkit_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(${LIBRARY_NAME}  
+        PUBLIC
+            ${CUDAToolkit_LIBRARIES}
+    )
+endif()
+
+target_precompile_headers(${LIBRARY_NAME} 
+    PUBLIC 
+        "${CMAKE_SOURCE_DIR}/lab/include/lab/common/common.h"
+)
+
+set_target_properties(${LIBRARY_NAME} 
+    PROPERTIES
+        UNITY_BUILD ON UNITY_BUILD_MODE BATCH UNITY_BUILD_BATCH_SIZE 16
+)
+
+# Install
+install(FILES ${HEADER_FILES} DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/lab")

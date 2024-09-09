@@ -39,9 +39,9 @@ build/
 bin/
 tmp/
 
-# Externs
-extern/*
-!extern/CMakeLists.txt
+# 3rdparty
+3rdparty/*
+!3rdparty/CMakeLists.txt
 
 data/*
 docs/
