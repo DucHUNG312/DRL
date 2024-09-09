@@ -1,6 +1,11 @@
 # Find CUDA.
 find_package(CUDAToolkit REQUIRED)
 
+# Enable CUDA language support
+set(CUDAToolkit_ROOT "${CUDA_TOOLKIT_ROOT_DIR}")
+# Pass clang as host compiler, which according to the docs
+# Must be done before CUDA language is enabled, see
+# https://cmake.org/cmake/help/v3.15/variable/CMAKE_CUDA_HOST_COMPILER.html
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_C_COMPILER}")
 endif()
@@ -15,9 +20,7 @@ cmake_policy(PUSH)
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.12.0)
   cmake_policy(SET CMP0074 NEW)
 endif()
-
 find_package(CUDAToolkit REQUIRED)
-
 cmake_policy(POP)
 
 if(NOT CMAKE_CUDA_COMPILER_VERSION VERSION_EQUAL CUDAToolkit_VERSION)
@@ -31,8 +34,6 @@ if(NOT TARGET CUDA::nvToolsExt)
 endif()
 
 message(STATUS "DRL: CUDA detected: " ${CUDA_VERSION})
-message(STATUS "DRL: CUDA nvcc is: " ${CUDA_NVCC_EXECUTABLE})
-message(STATUS "DRL: CUDA toolkit directory: " ${CUDA_TOOLKIT_ROOT_DIR})
 if(CUDA_VERSION VERSION_LESS 12.0)
   message(FATAL_ERROR "DRL requires CUDA 12.0 or above.")
 endif()
