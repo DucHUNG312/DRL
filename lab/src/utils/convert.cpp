@@ -1,15 +1,14 @@
 #include "lab/utils/convert.h"
 
-namespace lab
-{
-namespace utils
-{
-bool str_to_bool(const std::string& str)
-{
-    if(str == "0") return false;
-    else if(str == "1") return true;
-    LAB_UNREACHABLE;
+namespace lab {
+namespace utils {
+bool str_to_bool(const std::string& str) {
+  if (str == "0")
     return false;
+  else if (str == "1")
+    return true;
+  LAB_UNREACHABLE;
+  return false;
 }
 
 #if 0
@@ -63,55 +62,49 @@ Mat eigen_to_tensor(const torch::Tensor& in_tensor)
 }
 #endif
 
-std::vector<double> get_data_from_tensor(const torch::Tensor& tensor)
-{
-    torch::Tensor tensor_ = tensor.to(torch::kDouble).view(-1);
-    return std::vector<double>(tensor_.data_ptr<double>(), tensor_.data_ptr<double>() + tensor_.numel());
+std::vector<double> get_data_from_tensor(const torch::Tensor& tensor) {
+  torch::Tensor tensor_ = tensor.to(torch::kDouble).view(-1);
+  return std::vector<double>(tensor_.data_ptr<double>(), tensor_.data_ptr<double>() + tensor_.numel());
 }
 
-torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vector<int64_t>& shape) 
-{
-    int64_t total_size = 1;
-    for (int64_t dim : shape)
-        total_size *= dim;
+torch::Tensor get_tensor_from_vec(const std::vector<double>& vec, const std::vector<int64_t>& shape) {
+  int64_t total_size = 1;
+  for (int64_t dim : shape)
+    total_size *= dim;
 
-    if(vec.size() != total_size) 
-        throw std::invalid_argument("Size of vector does not match the specified shape.");
+  if (vec.size() != total_size)
+    throw std::invalid_argument("Size of vector does not match the specified shape.");
 
-    auto options = torch::TensorOptions().dtype(torch::kDouble).requires_grad(false);
-    torch::Tensor tensor = torch::empty(shape, options);
-    std::memcpy(tensor.data_ptr(), vec.data(), vec.size() * sizeof(double));
-    
-    return tensor;
+  auto options = torch::TensorOptions().dtype(torch::kDouble).requires_grad(false);
+  torch::Tensor tensor = torch::empty(shape, options);
+  std::memcpy(tensor.data_ptr(), vec.data(), vec.size() * sizeof(double));
+
+  return tensor;
 }
 
-torch::Tensor get_tensor_from_ivalue_list(const torch::List<torch::IValue>& list)
-{
-    std::vector<torch::Tensor> tensor_vec;
-    tensor_vec.reserve(list.size());
-    for (const auto& ele : list.vec())
-        tensor_vec.push_back(ele.toTensor());
-    return torch::stack(tensor_vec).to(torch::kDouble);
+torch::Tensor get_tensor_from_ivalue_list(const torch::List<torch::IValue>& list) {
+  std::vector<torch::Tensor> tensor_vec;
+  tensor_vec.reserve(list.size());
+  for (const auto& ele : list.vec())
+    tensor_vec.push_back(ele.toTensor());
+  return torch::stack(tensor_vec).to(torch::kDouble);
 }
 
-std::vector<double> get_rewards_from_ivalue_list(const torch::List<torch::IValue>& list)
-{
-    std::vector<double> double_vec;
-    double_vec.reserve(list.size());
-    for (const auto& ele : list.vec())
-        double_vec.push_back(ele.toDouble());
-    return double_vec;
+std::vector<double> get_rewards_from_ivalue_list(const torch::List<torch::IValue>& list) {
+  std::vector<double> double_vec;
+  double_vec.reserve(list.size());
+  for (const auto& ele : list.vec())
+    double_vec.push_back(ele.toDouble());
+  return double_vec;
 }
 
-std::vector<bool> get_dones_from_ivalue_list(const torch::List<torch::IValue>& list)
-{
-    std::vector<bool> bool_vec;
-    bool_vec.reserve(list.size());
-    for (const auto& ele : list.vec())
-        bool_vec.push_back(ele.toBool());
-    return bool_vec;
+std::vector<bool> get_dones_from_ivalue_list(const torch::List<torch::IValue>& list) {
+  std::vector<bool> bool_vec;
+  bool_vec.reserve(list.size());
+  for (const auto& ele : list.vec())
+    bool_vec.push_back(ele.toBool());
+  return bool_vec;
 }
 
-
-}
-}
+} // namespace utils
+} // namespace lab

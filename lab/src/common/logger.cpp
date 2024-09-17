@@ -1,45 +1,94 @@
 #include "lab/common/logger.h"
 
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include <iostream>
+#include <string>
 
-namespace lab
-{
-namespace common
-{
-std::shared_ptr<spdlog::logger> Logger::core_logger;
-std::vector<spdlog::sink_ptr> sinks;
+#define TERM_NORMAL "\033[0m";
+#define TERM_RED "\033[0;31m";
+#define TERM_YELLOW "\033[0;33m";
+#define TERM_GREEN "\033[0;32m";
+#define TERM_MAGENTA "\033[1;35m";
 
-void Logger::init()
-{
-	sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>()); // debug
-	// sinks.emplace_back(std::make_shared<ImGuiConsoleSink_mt>()); // ImGuiConsole
+namespace lab {
 
-	auto logFileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>("lab.log", 1048576 * 5, 3);
-	sinks.emplace_back(logFileSink); // Log file
-	// create the loggers
-	core_logger = std::make_shared<spdlog::logger>("lab", begin(sinks), end(sinks));
-	spdlog::register_logger(core_logger);
+Logger::Logger(Severity severity /*= Severity::DEBUG*/, bool color /*= true*/) : severity_(severity), color_(color) {}
 
-	// configure the loggers
-#ifdef LOG_TIMESTAMP
-	spdlog::set_pattern("%^[%T] %v%$");
-#else
-	spdlog::set_pattern("%v%$");
-#endif // LOG_TIMESTAMP
-	core_logger->set_level(spdlog::level::trace);
+void Logger::log(Severity severity, const std::string& msg) noexcept {
+  if (severity > severity_) {
+    return;
+  }
+
+  if (color_) {
+    switch (severity_) {
+      case Severity::FATAL:
+        std::cerr << TERM_RED;
+        break;
+      case Severity::ERROR:
+        std::cerr << TERM_RED;
+        break;
+      case Severity::WARNING:
+        std::cerr << TERM_YELLOW;
+        break;
+      case Severity::INFO:
+        std::cerr << TERM_GREEN;
+        break;
+      case Severity::DEBUG:
+        std::cerr << TERM_MAGENTA;
+        break;
+      case Severity::VERBOSE:
+        std::cerr << TERM_NORMAL;
+        break;
+      default:
+        break;
+    }
+  }
+
+  switch (severity_) {
+    case Severity::FATAL:
+      std::cerr << "FATAL: ";
+      break;
+    case Severity::ERROR:
+      std::cerr << "ERROR: ";
+      break;
+    case Severity::WARNING:
+      std::cerr << "WARNING: ";
+      break;
+    case Severity::INFO:
+      std::cerr << "INFO: ";
+      break;
+    case Severity::DEBUG:
+      std::cerr << "DEBUG: ";
+      break;
+    case Severity::VERBOSE:
+      std::cerr << "VERBOSE: ";
+      break;
+    default:
+      std::cerr << "UNKNOWN: ";
+      break;
+  }
+
+  if (color_) {
+    std::cerr << TERM_NORMAL;
+  }
+
+  std::cerr << msg << '\n';
 }
 
-void Logger::shutdown()
-{
-	core_logger.reset();
-	spdlog::shutdown();
+Logger::Severity Logger::get_reportable_severity() const noexcept {
+  return severity_;
 }
 
-void Logger::add_sink(spdlog::sink_ptr& sink)
-{
-	core_logger->sinks().push_back(sink);
-	core_logger->set_pattern("%v%$");
+void Logger::set_reportable_log_severity(Severity severity) noexcept {
+  severity_ = severity;
 }
+
+void Logger::set_log_color(bool color) noexcept {
+  color_ = color;
 }
+
+Logger& get_logger() noexcept {
+  static Logger logger{Logger::Severity::DEBUG, true};
+  return logger;
 }
+
+} // namespace lab

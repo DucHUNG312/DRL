@@ -33,6 +33,7 @@
 
 #VSCode
 *.vscode/
+*.cache/
 
 # Build
 build/

@@ -2,40 +2,38 @@
 
 #include "lab/distributions/base.h"
 
-namespace lab
-{
-namespace distributions
-{
+namespace lab {
+namespace distributions {
 
-class Categorical : public Distribution 
-{
-    LAB_ARG(bool , is_logits) = false;
-    LAB_ARG(torch::Tensor, params);
-    LAB_ARG(int64_t, num_events);
-public:
-    Categorical(const torch::Tensor& in, bool is_logits = false);
+class Categorical : public Distribution {
+  LAB_ARG(bool, is_logits) = false;
+  LAB_ARG(torch::Tensor, params);
+  LAB_ARG(int64_t, num_events);
 
-    torch::Tensor logits();
+ public:
+  Categorical(const torch::Tensor& in, bool is_logits = false);
 
-    torch::Tensor probs();
-    
-    torch::IntArrayRef params_shape();
+  torch::Tensor logits();
 
-    torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
-    
-    torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
-    
-    torch::Tensor sample_n(int64_t n) override;
-    
-    torch::Tensor log_prob(const torch::Tensor& value) override;
-    
-    torch::Tensor cdf(const torch::Tensor& value) override;
-    
-    torch::Tensor icdf(const torch::Tensor& value) override;  
-    
-    torch::Tensor entropy() override;
+  torch::Tensor probs();
+
+  torch::IntArrayRef params_shape();
+
+  torch::Tensor sample(torch::IntArrayRef sample_shape = {}) override;
+
+  torch::Tensor rsample(torch::IntArrayRef sample_shape = {}) override;
+
+  torch::Tensor sample_n(int64_t n) override;
+
+  torch::Tensor log_prob(const torch::Tensor& value) override;
+
+  torch::Tensor cdf(const torch::Tensor& value) override;
+
+  torch::Tensor icdf(const torch::Tensor& value) override;
+
+  torch::Tensor entropy() override;
 };
 
-}
+} // namespace distributions
 
-}
+} // namespace lab

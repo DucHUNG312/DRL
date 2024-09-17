@@ -2,14 +2,12 @@
 
 #include "lab/common/common.h"
 
-namespace lab
-{
+namespace lab {
 
-namespace utils
-{
-    
+namespace utils {
+
 agents::Agent make_agent(const utils::LabSpec& lab_spec);
 
 }
 
-}
+} // namespace lab

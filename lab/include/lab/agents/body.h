@@ -1,65 +1,66 @@
 #pragma once
 
+#include "lab/agents/algorithms/base.h"
+#include "lab/agents/memory/base.h"
 #include "lab/common/common.h"
 #include "lab/envs/base.h"
 #include "lab/utils/spec.h"
-#include "lab/agents/memory/base.h"
-#include "lab/agents/algorithms/base.h"
 
-namespace lab
-{
-namespace agents
-{
+namespace lab {
+namespace agents {
 
-class Body
-{
-    LAB_ARG(std::shared_ptr<envs::Env>, env);
-    LAB_ARG(std::shared_ptr<Memory>, memory);
-    LAB_ARG(std::shared_ptr<Algorithm>, algorithm);
-    LAB_ARG(utils::BodySpec, spec);
-public:
-    using ExperienceDict = torch::Dict<std::string, torch::List<torch::IValue>>;
+class Body {
+  LAB_ARG(std::shared_ptr<envs::Env>, env);
+  LAB_ARG(std::shared_ptr<Memory>, memory);
+  LAB_ARG(std::shared_ptr<Algorithm>, algorithm);
+  LAB_ARG(utils::BodySpec, spec);
 
-    Body(const std::shared_ptr<envs::Env>& env, const utils::BodySpec& spec);
-    LAB_DEFAULT_CONSTRUCT(Body);
+ public:
+  using ExperienceDict = torch::Dict<std::string, torch::List<torch::IValue>>;
 
-    void update();
+  Body(const std::shared_ptr<envs::Env>& env, const utils::BodySpec& spec);
+  LAB_DEFAULT_CONSTRUCT(Body);
 
-    torch::Tensor act();
+  void update();
 
-    torch::Tensor train();
+  torch::Tensor act();
 
-    ExperienceDict sample();
+  torch::Tensor train();
 
-    void save(torch::serialize::OutputArchive& archive) const;
+  ExperienceDict sample();
 
-    void load(torch::serialize::InputArchive& archive);
+  void save(torch::serialize::OutputArchive& archive) const;
 
-    torch::Tensor get_loss() const;
+  void load(torch::serialize::InputArchive& archive);
 
-    void close_env();
+  torch::Tensor get_loss() const;
 
-    void reset_env();
+  void close_env();
 
-    double get_total_reward() const;
+  void reset_env();
 
-    bool is_env_terminated() const;
+  double get_total_reward() const;
 
-    void step(const torch::Tensor& act);
+  bool is_env_terminated() const;
 
-    torch::Tensor get_result_state() const;
+  void step(const torch::Tensor& act);
 
-    std::shared_ptr<utils::Clock> get_env_clock() const;
-private:
-    void init_algorithm_specs(const utils::AlgorithmSpec& spec);
+  torch::Tensor get_result_state() const;
 
-    void init_memory_spec(const utils::MemorySpec& spec);
+  std::shared_ptr<utils::Clock> get_env_clock() const;
+
+ private:
+  void init_algorithm_specs(const utils::AlgorithmSpec& spec);
+
+  void init_memory_spec(const utils::MemorySpec& spec);
 };
 
-torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Body>& body);
+torch::serialize::OutputArchive& operator<<(
+    torch::serialize::OutputArchive& archive,
+    const std::shared_ptr<Body>& body);
 
 torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Body>& body);
 
-}
+} // namespace agents
 
-}
+} // namespace lab

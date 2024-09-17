@@ -1,22 +1,24 @@
 #pragma once
 
-#define SPDLOG_EOL ""
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
+#include <cstdint>
+#include <string>
 
-namespace lab
-{
-namespace common
-{
-class Logger
-{
-public:
-	static void init();
-	static void shutdown();
-	static std::shared_ptr<spdlog::logger>& get_core_logger() { return core_logger; }
-	static void add_sink(std::shared_ptr<spdlog::sinks::sink>& sink);
-private:
-	static std::shared_ptr<spdlog::logger> core_logger;
+namespace lab {
+class Logger {
+ public:
+  enum class Severity : int8_t { FATAL = 0, ERROR, WARNING, INFO, DEBUG, VERBOSE };
+
+ private:
+  Severity severity_;
+  bool color_;
+
+ public:
+  Logger(Severity severity = Severity::DEBUG, bool color = true);
+  void log(Severity severity, const std::string& msg) noexcept;
+  Severity get_reportable_severity() const noexcept;
+  void set_reportable_log_severity(Severity severity) noexcept;
+  void set_log_color(bool color) noexcept;
 };
-}
-}
+
+Logger& get_logger() noexcept;
+} // namespace lab

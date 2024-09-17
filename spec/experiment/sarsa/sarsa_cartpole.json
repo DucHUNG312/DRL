@@ -1,6 +1,7 @@
 {
-    "sarsa_epsilon_greedy_cartpole": {
-      "agent": [{
+  "sarsa_epsilon_greedy_cartpole": {
+    "agent": [
+      {
         "name": "SARSA",
         "algorithm": {
           "name": "SARSA",
@@ -21,7 +22,9 @@
         },
         "net": {
           "type": "MLPNet",
-          "hid_layers": [64],
+          "hid_layers": [
+            64
+          ],
           "hid_layers_activation": "SeLU",
           "clip_grad_val": 0.5,
           "loss_spec": {
@@ -37,25 +40,29 @@
             "gamma": 0.9
           }
         }
-      }],
-      "env": [{
+      }
+    ],
+    "env": [
+      {
         "name": "CartPole-v0",
         "max_t": null,
         "max_frame": 80000
-      }],
-      "body": {
-        "product": "outer",
-        "num": 1
-      },
-      "meta": {
-        "distributed": false,
-        "eval_frequency": 2000,
-        "max_trial": 1,
-        "max_session": 1
       }
+    ],
+    "body": {
+      "product": "outer",
+      "num": 1
     },
-    "sarsa_boltzmann_cartpole": {
-      "agent": [{
+    "meta": {
+      "distributed": false,
+      "eval_frequency": 2000,
+      "max_trial": 1,
+      "max_session": 1
+    }
+  },
+  "sarsa_boltzmann_cartpole": {
+    "agent": [
+      {
         "name": "SARSA",
         "algorithm": {
           "name": "SARSA",
@@ -76,7 +83,9 @@
         },
         "net": {
           "type": "MLPNet",
-          "hid_layers": [64],
+          "hid_layers": [
+            64
+          ],
           "hid_layers_activation": "SeLU",
           "clip_grad_val": 0.5,
           "loss_spec": {
@@ -92,21 +101,24 @@
             "gamma": 0.9
           }
         }
-      }],
-      "env": [{
+      }
+    ],
+    "env": [
+      {
         "name": "CartPole-v0",
         "max_t": null,
         "max_frame": 80000
-      }],
-      "body": {
-        "product": "outer",
-        "num": 1
-      },
-      "meta": {
-        "distributed": false,
-        "eval_frequency": 2000,
-        "max_trial": 1,
-        "max_session": 1
       }
+    ],
+    "body": {
+      "product": "outer",
+      "num": 1
+    },
+    "meta": {
+      "distributed": false,
+      "eval_frequency": 2000,
+      "max_trial": 1,
+      "max_session": 1
     }
   }
+}

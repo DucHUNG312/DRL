@@ -1,9 +1,7 @@
 #include "lab/distributions/dirichlet.h"
 
-namespace lab
-{
-namespace distributions
-{
+namespace lab {
+namespace distributions {
 
 /// class MyFunction : public Function<MyFunction> {
 ///   public:
@@ -34,77 +32,68 @@ namespace distributions
 /// // Example backward call
 /// y[0].sum().backward();
 
-torch::Tensor dirichlet_backward_(const torch::Tensor& x, const torch::Tensor& concentration, const torch::Tensor& grad_output) 
-{
-    torch::Tensor total = concentration.sum(-1, true).expand_as(concentration);
-    torch::Tensor grad = at::_dirichlet_grad(x, concentration, total);
-    return grad * (grad_output - (x * grad_output).sum(-1, true));
+torch::Tensor dirichlet_backward_(
+    const torch::Tensor& x,
+    const torch::Tensor& concentration,
+    const torch::Tensor& grad_output) {
+  torch::Tensor total = concentration.sum(-1, true).expand_as(concentration);
+  torch::Tensor grad = at::_dirichlet_grad(x, concentration, total);
+  return grad * (grad_output - (x * grad_output).sum(-1, true));
 }
 
-torch::Tensor Dirichlet_::forward(torch::autograd::AutogradContext* ctx, const torch::Tensor& concentration) 
-{
-    torch::Tensor x = torch::_sample_dirichlet(concentration);
-    ctx->save_for_backward({x, concentration});
-    return x;
+torch::Tensor Dirichlet_::forward(torch::autograd::AutogradContext* ctx, const torch::Tensor& concentration) {
+  torch::Tensor x = torch::_sample_dirichlet(concentration);
+  ctx->save_for_backward({x, concentration});
+  return x;
 }
 
-torch::autograd::variable_list Dirichlet_::backward(torch::autograd::AutogradContext* ctx, torch::autograd::variable_list grad_output) 
-{
-    std::vector<torch::Tensor> saved = ctx->get_saved_variables();
-    torch::Tensor x = saved[0];
-    torch::Tensor concentration = saved[1];
-    auto grad_output_tensor = grad_output[0];
-    torch::Tensor grad_input = dirichlet_backward_(x, concentration, grad_output_tensor);
-    return { grad_input };
+torch::autograd::variable_list Dirichlet_::backward(
+    torch::autograd::AutogradContext* ctx,
+    torch::autograd::variable_list grad_output) {
+  std::vector<torch::Tensor> saved = ctx->get_saved_variables();
+  torch::Tensor x = saved[0];
+  torch::Tensor concentration = saved[1];
+  auto grad_output_tensor = grad_output[0];
+  torch::Tensor grad_input = dirichlet_backward_(x, concentration, grad_output_tensor);
+  return {grad_input};
 }
 
 Dirichlet::Dirichlet(const torch::Tensor& concentration)
-    : ExponentialFamily(concentration.sizes().slice(0, concentration.dim() - 1)), 
-        concentration_(concentration)
-{
-    LAB_CHECK(concentration.dim() >= 1);
-    mean_ = concentration / (concentration.sum(-1, true));
-    torch::Tensor con0 = concentration.sum(-1, true);
-    variance_ = concentration * (con0 - concentration) / (con0.pow(2) * (con0 + 1));
-    natural_params_ = torch::TensorList(concentration);
+    : ExponentialFamily(concentration.sizes().slice(0, concentration.dim() - 1)), concentration_(concentration) {
+  LAB_CHECK(concentration.dim() >= 1, "Expect concentration dim greater or equal 1, got " << concentration.dim());
+  mean_ = concentration / (concentration.sum(-1, true));
+  torch::Tensor con0 = concentration.sum(-1, true);
+  variance_ = concentration * (con0 - concentration) / (con0.pow(2) * (con0 + 1));
+  natural_params_ = torch::TensorList(concentration);
 }
 
-Dirichlet::Dirichlet(const torch::Tensor& concentration, const torch::Tensor&)
-    : Dirichlet(concentration) {};
+Dirichlet::Dirichlet(const torch::Tensor& concentration, const torch::Tensor&) : Dirichlet(concentration){};
 
-torch::Tensor Dirichlet::rsample(torch::IntArrayRef sample_shape /*= {}*/)
-{
-    std::vector<int64_t> shape_vec = extended_shape(sample_shape);
-    torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
-    torch::Tensor concentration = concentration_.expand(shape);
-    return Dirichlet_::apply(concentration_);
+torch::Tensor Dirichlet::rsample(torch::IntArrayRef sample_shape /*= {}*/) {
+  std::vector<int64_t> shape_vec = extended_shape(sample_shape);
+  torch::IntArrayRef shape = torch::IntArrayRef(shape_vec);
+  torch::Tensor concentration = concentration_.expand(shape);
+  return Dirichlet_::apply(concentration_);
 }
 
-torch::Tensor Dirichlet::log_prob(const torch::Tensor& value)
-{
-    return torch::xlogy(concentration_ - 1.0, value).sum(-1)
-        +  torch::lgamma(concentration_.sum(-1))
-        -  torch::lgamma(concentration_).sum(-1);
+torch::Tensor Dirichlet::log_prob(const torch::Tensor& value) {
+  return torch::xlogy(concentration_ - 1.0, value).sum(-1) + torch::lgamma(concentration_.sum(-1)) -
+      torch::lgamma(concentration_).sum(-1);
 }
 
-torch::Tensor Dirichlet::entropy()
-{
-    int64_t k = concentration_.size(-1);
-    torch::Tensor a0 = concentration_.sum(-1);
-    return (
-        torch::lgamma(concentration_).sum(-1)
-        - torch::lgamma(a0)
-        - (k - a0) * torch::digamma(a0)
-        - ((concentration_ - 1.0) * torch::digamma(concentration_)).sum(-1)
-    );
+torch::Tensor Dirichlet::entropy() {
+  int64_t k = concentration_.size(-1);
+  torch::Tensor a0 = concentration_.sum(-1);
+  return (
+      torch::lgamma(concentration_).sum(-1) - torch::lgamma(a0) - (k - a0) * torch::digamma(a0) -
+      ((concentration_ - 1.0) * torch::digamma(concentration_)).sum(-1));
 }
 
-torch::Tensor Dirichlet::log_normalizer(torch::TensorList params)
-{
-    LAB_CHECK_EQ(params.size(), 1);
-    return params[0].lgamma().sum(-1) - torch::lgamma(params[0].sum(-1));
+torch::Tensor Dirichlet::log_normalizer(torch::TensorList params) {
+  LAB_CHECK(params.size() == 1, "Expect params size is 1, got " << params.size());
+  return params[0].lgamma().sum(-1) - torch::lgamma(params[0].sum(-1));
 }
 
-}
+} // namespace distributions
 
-}
+} // namespace lab

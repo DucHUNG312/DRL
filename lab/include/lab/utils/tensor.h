@@ -2,10 +2,8 @@
 
 #include "lab/common/common.h"
 
-namespace lab
-{
-namespace utils
-{
+namespace lab {
+namespace utils {
 
 bool has_no_zeros(const torch::Tensor& tensor);
 
@@ -40,5 +38,5 @@ torch::Tensor venv_pack(const torch::Tensor& batch_tensor, int64_t num_envs);
 torch::Tensor venv_unpack(const torch::Tensor& batch_tensor);
 
 torch::Tensor calc_q_value_logits(const torch::Tensor& state_value, const torch::Tensor& raw_advantages);
-}
-}
+} // namespace utils
+} // namespace lab

@@ -1,5 +1,3 @@
 #include "main.h"
 
-TEST(Spaces, Sequential1)
-{
-}
+TEST(Spaces, Sequential1) {}

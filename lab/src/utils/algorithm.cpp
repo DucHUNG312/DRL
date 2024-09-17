@@ -3,17 +3,14 @@
 #include "lab/agents/algorithms/reinforce.h"
 #include "lab/utils/spec.h"
 
-namespace lab
-{
+namespace lab {
 
-namespace utils
-{
+namespace utils {
 
-std::shared_ptr<agents::Algorithm> create_algorithm(const AlgorithmSpec& spec)
-{
-    return AlgorithmFactory(spec.name, spec);
+std::shared_ptr<agents::Algorithm> create_algorithm(const AlgorithmSpec& spec) {
+  return AlgorithmFactory(spec.name, spec);
 }
 
-}
+} // namespace utils
 
-}
+} // namespace lab

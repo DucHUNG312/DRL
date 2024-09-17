@@ -1,19 +1,12 @@
 #include "lab/utils/memory.h"
-#include "lab/utils/spec.h"
 #include "lab/agents/memory/base.h"
 #include "lab/agents/memory/onpolicy.h"
+#include "lab/utils/spec.h"
 
-namespace lab
-{
+namespace lab::utils {
 
-namespace utils
-{
-
-std::shared_ptr<agents::Memory> create_memory(const MemorySpec& spec)
-{
-    return MemoryFactory(spec.name, spec);
+std::shared_ptr<agents::Memory> create_memory(const MemorySpec& spec) {
+  return MemoryFactory(spec.name, spec);
 }
 
-}
-
-}
+} // namespace lab::utils

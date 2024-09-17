@@ -1,16 +1,12 @@
 #pragma once
 
-
-namespace lab
-{
-namespace envs
-{
+namespace lab {
+namespace envs {
 class Env;
 class CartPole;
-}
+} // namespace envs
 
-namespace agents
-{
+namespace agents {
 class Algorithm;
 class Reinforce;
 
@@ -21,15 +17,13 @@ class NetImpl;
 class MLPNetImpl;
 
 class Agent;
-}
+} // namespace agents
 
-namespace distributions
-{
+namespace distributions {
 class Distribution;
 }
 
-namespace utils
-{
+namespace utils {
 struct LabSpec;
 struct AlgorithmSpec;
 struct EnvSpec;
@@ -41,5 +35,5 @@ struct ActionPolicy;
 
 struct StepResult;
 class Clock;
-}
-}
+} // namespace utils
+} // namespace lab

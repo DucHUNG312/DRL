@@ -1,9 +1,10 @@
 {
-    "reinforce_cartpole": {
-      "agent": {
-        "name": "Reinforce"
-      },
-      "body": [{
+  "reinforce_cartpole": {
+    "agent": {
+      "name": "Reinforce"
+    },
+    "body": [
+      {
         "product": "outer",
         "num": 1,
         "algorithm": {
@@ -33,9 +34,13 @@
         },
         "net": {
           "type": "MLPNet",
-          "hid_layers": [64],
+          "hid_layers": [
+            64
+          ],
           "hid_layers_activation": "RELU",
-          "out_layers_activation": ["Sigmoid"],
+          "out_layers_activation": [
+            "Sigmoid"
+          ],
           "init_fn": null,
           "clip_grad_val": null,
           "loss_spec": {
@@ -52,8 +57,10 @@
           },
           "gpu": true
         }
-      }],
-      "env": [{
+      }
+    ],
+    "env": [
+      {
         "name": "CartPole",
         "frame_op": null,
         "frame_op_len": 0,
@@ -62,25 +69,29 @@
         "clock_speed": 1,
         "reward_threshold": 0,
         "reward_scale": 1,
-        "reward_range": [0, 0],
+        "reward_range": [
+          0,
+          0
+        ],
         "num_envs": 1,
         "nondeterministic": true,
         "seed": 0,
         "auto_reset": false,
         "normalize_state": false,
         "renderer": {
-            "enabled": false,
-            "graphics": "OpenGL",
-            "screen_width": 1280,
-            "screen_height": 720
+          "enabled": false,
+          "graphics": "OpenGL",
+          "screen_width": 1280,
+          "screen_height": 720
         }
-      }],
-      "meta": {
-        "distributed": false,
-        "eval_frequency": 2000,
-        "log_frequenc": 2000,
-        "max_session": 1,
-        "max_trial": 1
       }
+    ],
+    "meta": {
+      "distributed": false,
+      "eval_frequency": 2000,
+      "log_frequenc": 2000,
+      "max_session": 1,
+      "max_trial": 1
     }
   }
+}

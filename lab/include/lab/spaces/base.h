@@ -4,256 +4,239 @@
 #include "lab/utils/rand.h"
 #include "lab/utils/typetraits.h"
 
-namespace lab
-{
-namespace spaces
-{
-    
+namespace lab {
+namespace spaces {
+
 template <typename Contained>
-class SpaceHolder : public utils::SpaceHolderIndicator
-{
-protected:
-    /// The pointer this class wraps around
-    std::shared_ptr<Contained> impl_;
-public:
-    using ContainedType = Contained;
+class SpaceHolder : public utils::SpaceHolderIndicator {
+ protected:
+  /// The pointer this class wraps around
+  std::shared_ptr<Contained> impl_;
 
-    SpaceHolder() : impl_(default_construct()) 
-    {
-        static_assert(std::is_default_constructible<Contained>::value);
-    }
+ public:
+  using ContainedType = Contained;
 
-    template <typename Head, typename... Tail, typename = typename std::enable_if<
-          !(utils::is_space_holder_of<Head, ContainedType>::value &&
-            (sizeof...(Tail) == 0))>::type>
-    explicit SpaceHolder(Head&& head, Tail&&... tail)
-        : impl_(new Contained(std::forward<Head>(head), std::forward<Tail>(tail)...)) {}
+  SpaceHolder() : impl_(default_construct()) {
+    static_assert(std::is_default_constructible<Contained>::value);
+  }
 
-    /* implicit */ SpaceHolder(std::nullptr_t) : impl_(nullptr) {}
+  template <
+      typename Head,
+      typename... Tail,
+      typename = typename std::enable_if<
+          !(utils::is_space_holder_of<Head, ContainedType>::value && (sizeof...(Tail) == 0))>::type>
+  explicit SpaceHolder(Head&& head, Tail&&... tail)
+      : impl_(new Contained(std::forward<Head>(head), std::forward<Tail>(tail)...)) {}
 
-    /* implicit */ SpaceHolder(std::shared_ptr<Contained> space)
-        : impl_(std::move(space)) {}
+  /* implicit */ SpaceHolder(std::nullptr_t) : impl_(nullptr) {}
 
-    explicit operator bool() const noexcept 
-    {
-        return !is_empty();
-    }
+  /* implicit */ SpaceHolder(std::shared_ptr<Contained> space) : impl_(std::move(space)) {}
 
-    Contained* operator->() 
-    {
-        return get();
-    }
+  explicit operator bool() const noexcept {
+    return !is_empty();
+  }
 
-    const Contained* operator->() const 
-    {
-        return get();
-    }
+  Contained* operator->() {
+    return get();
+  }
 
-    Contained& operator*() 
-    {
-        return *get();
-    }
+  const Contained* operator->() const {
+    return get();
+  }
 
-    const Contained& operator*() const 
-    {
-        return *get();
-    }
+  Contained& operator*() {
+    return *get();
+  }
 
-    const std::shared_ptr<Contained>& ptr() const 
-    {
-        LAB_CHECK(!is_empty());
-        return impl_;
-    }
+  const Contained& operator*() const {
+    return *get();
+  }
 
-    Contained* get() 
-    {
-        LAB_CHECK(!is_empty());
-        return impl_.get();
-    }
+  const std::shared_ptr<Contained>& ptr() const {
+    LAB_CHECK(!is_empty(), "Space container is empty");
+    return impl_;
+  }
 
-    const Contained* get() const 
-    {
-        LAB_CHECK(!is_empty());
-        return impl_.get();
-    }
+  Contained* get() {
+    LAB_CHECK(!is_empty(), "Space container is empty");
+    return impl_.get();
+  }
 
-    bool is_empty() const noexcept 
-    {
-        return impl_ == nullptr;
-    }
-private:
-    template <typename T = Contained>
-    std::shared_ptr<Contained> default_construct() 
-    {
-        if constexpr (std::is_default_constructible_v<T>) 
-            return std::make_shared<Contained>();
-        else
-            return nullptr;
-    }
+  const Contained* get() const {
+    LAB_CHECK(!is_empty(), "Space container is empty");
+    return impl_.get();
+  }
+
+  bool is_empty() const noexcept {
+    return impl_ == nullptr;
+  }
+
+ private:
+  template <typename T = Contained>
+  std::shared_ptr<Contained> default_construct() {
+    if constexpr (std::is_default_constructible_v<T>)
+      return std::make_shared<Contained>();
+    else
+      return nullptr;
+  }
 };
 
-class Space
-{
-public:
-    using ParameterDict = torch::OrderedDict<std::string, torch::Tensor>;
-    using ChildrenDict = torch::OrderedDict<std::string, std::shared_ptr<Space>>;
-    using Iterator = ChildrenDict::Iterator;
-    using ConstIterator = ChildrenDict::ConstIterator;
+class Space {
+ public:
+  using ParameterDict = torch::OrderedDict<std::string, torch::Tensor>;
+  using ChildrenDict = torch::OrderedDict<std::string, std::shared_ptr<Space>>;
+  using Iterator = ChildrenDict::Iterator;
+  using ConstIterator = ChildrenDict::ConstIterator;
 
-    LAB_ARG(ParameterDict, parameters);
-    LAB_ARG(ChildrenDict, children);
-    LAB_ARG(torch::Tensor, shape);
-    LAB_ARG(std::string, name) = "Space";
-    LAB_ARG(utils::Rand, rand);
-    LAB_ARG(int64_t, dim) = -1;
-public:
-    explicit Space(std::string name);
-    LAB_DEFAULT_CONSTRUCT(Space);
+  LAB_ARG(ParameterDict, parameters);
+  LAB_ARG(ChildrenDict, children);
+  LAB_ARG(torch::Tensor, shape);
+  LAB_ARG(std::string, name) = "Space";
+  LAB_ARG(utils::Rand, rand);
+  LAB_ARG(int64_t, dim) = -1;
 
-    virtual std::shared_ptr<Space> clone(const std::optional<torch::Device>& device = std::nullopt) const;
-    
-    void save(torch::serialize::OutputArchive& archive) const;
+ public:
+  explicit Space(std::string name);
+  LAB_DEFAULT_CONSTRUCT(Space);
 
-    void load(torch::serialize::InputArchive& archive);
+  virtual std::shared_ptr<Space> clone(const std::optional<torch::Device>& device = std::nullopt) const;
 
-    template <typename SpaceType>
-    std::shared_ptr<SpaceType> register_subspace(std::string name, std::shared_ptr<SpaceType> space);
+  void save(torch::serialize::OutputArchive& archive) const;
 
-    template <typename SpaceType>
-    std::shared_ptr<SpaceType> register_subspace(std::string name, SpaceHolder<SpaceType> space_holder);
+  void load(torch::serialize::InputArchive& archive);
 
-    torch::Tensor& register_parameter(std::string name, torch::Tensor tensor, bool requires_grad = false);
-    
-    torch::Tensor& get_parameter(std::string name);
+  template <typename SpaceType>
+  std::shared_ptr<SpaceType> register_subspace(std::string name, std::shared_ptr<SpaceType> space);
 
-    bool is_serializable() const;
+  template <typename SpaceType>
+  std::shared_ptr<SpaceType> register_subspace(std::string name, SpaceHolder<SpaceType> space_holder);
 
-    virtual void pretty_print(std::ostream& stream) const;
+  torch::Tensor& register_parameter(std::string name, torch::Tensor tensor, bool requires_grad = false);
 
-    void pretty_print_recursive(std::ostream& stream, const std::string& indentation) const;
+  torch::Tensor& get_parameter(std::string name);
 
-    std::ostream& operator<<(std::ostream& stream);
+  bool is_serializable() const;
 
-    Iterator begin();
+  virtual void pretty_print(std::ostream& stream) const;
 
-    ConstIterator begin() const;
+  void pretty_print_recursive(std::ostream& stream, const std::string& indentation) const;
 
-    Iterator end();
+  std::ostream& operator<<(std::ostream& stream);
 
-    ConstIterator end() const;
+  Iterator begin();
 
-    template <typename SpaceType>
-    typename SpaceType::ContainedType* as() noexcept;
+  ConstIterator begin() const;
 
-    template <typename SpaceType>
-    const typename SpaceType::ContainedType* as() const noexcept;
+  Iterator end();
 
-    template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
-    SpaceType* as() noexcept;
+  ConstIterator end() const;
 
-    template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
-    const SpaceType* as() const noexcept;
-private:
-    template <typename Derived>
-    friend class ClonableSpace;
+  template <typename SpaceType>
+  typename SpaceType::ContainedType* as() noexcept;
 
-    virtual void clone_(Space& other, const std::optional<torch::Device>& device);
+  template <typename SpaceType>
+  const typename SpaceType::ContainedType* as() const noexcept;
+
+  template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
+  SpaceType* as() noexcept;
+
+  template <typename SpaceType, typename = utils::disable_if_space_holder_t<SpaceType>>
+  const SpaceType* as() const noexcept;
+
+ private:
+  template <typename Derived>
+  friend class ClonableSpace;
+
+  virtual void clone_(Space& other, const std::optional<torch::Device>& device);
 };
 
-torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Space>& space);
+torch::serialize::OutputArchive& operator<<(
+    torch::serialize::OutputArchive& archive,
+    const std::shared_ptr<Space>& space);
 
-torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Space>& space);
+torch::serialize::InputArchive& operator>>(
+    torch::serialize::InputArchive& archive,
+    const std::shared_ptr<Space>& space);
 
 template <typename SpaceType>
-typename SpaceType::ContainedType* Space::as() noexcept 
-{
-    return as<typename SpaceType::ContainedType>();
+typename SpaceType::ContainedType* Space::as() noexcept {
+  return as<typename SpaceType::ContainedType>();
 }
 
 template <typename SpaceType>
-const typename SpaceType::ContainedType* Space::as() const noexcept 
-{
-    return as<typename SpaceType::ContainedType>();
+const typename SpaceType::ContainedType* Space::as() const noexcept {
+  return as<typename SpaceType::ContainedType>();
 }
 
 template <typename SpaceType, typename>
-SpaceType* Space::as() noexcept 
-{
-    return dynamic_cast<SpaceType*>(this);
+SpaceType* Space::as() noexcept {
+  return dynamic_cast<SpaceType*>(this);
 }
 
 template <typename SpaceType, typename>
-const SpaceType* Space::as() const noexcept 
-{
-    return dynamic_cast<const SpaceType*>(this);
+const SpaceType* Space::as() const noexcept {
+  return dynamic_cast<const SpaceType*>(this);
 }
 
 template <typename SpaceType>
-std::shared_ptr<SpaceType> Space::register_subspace(std::string name, std::shared_ptr<SpaceType> space)
-{
-    LAB_CHECK(!name.empty());
-    LAB_CHECK(name.find('.') == std::string::npos);
-    auto& base_space = children_.insert(std::move(name), std::move(space));
-    return std::dynamic_pointer_cast<SpaceType>(base_space);
+std::shared_ptr<SpaceType> Space::register_subspace(std::string name, std::shared_ptr<SpaceType> space) {
+  LAB_CHECK(!name.empty(), "Couldn't register subspace with empty name");
+  LAB_CHECK(name.find('.') == std::string::npos, "Couldn't register subspace with character '.' in name");
+  auto& base_space = children_.insert(std::move(name), std::move(space));
+  return std::dynamic_pointer_cast<SpaceType>(base_space);
 }
 
 template <typename SpaceType>
-std::shared_ptr<SpaceType> Space::register_subspace(std::string name, SpaceHolder<SpaceType> space_holder)
-{
-    return register_subspace(std::move(name), space_holder.ptr());
+std::shared_ptr<SpaceType> Space::register_subspace(std::string name, SpaceHolder<SpaceType> space_holder) {
+  return register_subspace(std::move(name), space_holder.ptr());
 }
 
-template<typename Derived>
-class ClonableSpace : public Space
-{
-public:
-    using Space::Space;
+template <typename Derived>
+class ClonableSpace : public Space {
+ public:
+  using Space::Space;
 
-    // reset shape and rand inside Derived class
-    virtual void reset() = 0;
+  // reset shape and rand inside Derived class
+  virtual void reset() = 0;
 
-    std::shared_ptr<Space> clone(const std::optional<torch::Device>& device = std::nullopt) const override 
-    {
-        torch::NoGradGuard no_grad;
+  std::shared_ptr<Space> clone(const std::optional<torch::Device>& device = std::nullopt) const override {
+    torch::NoGradGuard no_grad;
 
-        const auto& self = static_cast<const Derived&>(*this);
-        auto copy = std::make_shared<Derived>(self);
-        copy->parameters_.clear();
-        copy->children_.clear();
-        copy->reset();
+    const auto& self = static_cast<const Derived&>(*this);
+    auto copy = std::make_shared<Derived>(self);
+    copy->parameters_.clear();
+    copy->children_.clear();
+    copy->reset();
 
-        LAB_CHECK(copy->parameters_.size() == parameters_.size());
-        for (const auto& parameter : parameters_) 
-        {
-            auto& tensor = *parameter;
-            auto data = device && tensor.device() != *device ? tensor.to(*device) : torch::autograd::Variable(tensor).clone();
-            copy->parameters_[parameter.key()].set_data(data);
-        }
-        
-        LAB_CHECK(copy->children_.size() == children_.size());
-        for (const auto& child : children_) 
-        {
-            copy->children_[child.key()]->clone_(*child.value(), device);
-        }
-        return copy;
+    LAB_CHECK(copy->parameters_.size() == parameters_.size(), "Expected parameter size to be equal");
+    for (const auto& parameter : parameters_) {
+      auto& tensor = *parameter;
+      auto data = device && tensor.device() != *device ? tensor.to(*device) : torch::autograd::Variable(tensor).clone();
+      copy->parameters_[parameter.key()].set_data(data);
     }
-private:
-    void clone_(Space& other, const std::optional<torch::Device>& device) final 
-    {
-        auto clone = std::dynamic_pointer_cast<Derived>(other.clone(device));
-        LAB_CHECK(clone != nullptr);
-        static_cast<Derived&>(*this) = *clone;
+
+    LAB_CHECK(copy->children_.size() == children_.size(), "Expected number children space to be equal");
+    for (const auto& child : children_) {
+      copy->children_[child.key()]->clone_(*child.value(), device);
     }
+    return copy;
+  }
+
+ private:
+  void clone_(Space& other, const std::optional<torch::Device>& device) final {
+    auto clone = std::dynamic_pointer_cast<Derived>(other.clone(device));
+    LAB_CHECK(clone != nullptr, "Couldn't cast space type, are you sure they are inherited ?");
+    static_cast<Derived&>(*this) = *clone;
+  }
 };
 
-#define LAB_SPACE_IMPL(Name, ImplType)                                          \
-  class Name : public lab::spaces::SpaceHolder<ImplType> { /* NOLINT */          \
-   public:                                                                      \
-    using lab::spaces::SpaceHolder<ImplType>::SpaceHolder;                       \
+#define LAB_SPACE_IMPL(Name, ImplType)                                  \
+  class Name : public lab::spaces::SpaceHolder<ImplType> { /* NOLINT */ \
+   public:                                                              \
+    using lab::spaces::SpaceHolder<ImplType>::SpaceHolder;              \
   }
 
 #define LAB_SPACE(Name) LAB_SPACE_IMPL(Name, Name##Impl)
 
-
-}
-}
+} // namespace spaces
+} // namespace lab

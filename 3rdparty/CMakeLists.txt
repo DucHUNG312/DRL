@@ -1,20 +1,5 @@
 include(FetchContent)
 
-# spdlog
-FetchContent_Declare(
-    3rdparty_spdlog
-    GIT_REPOSITORY https://github.com/gabime/spdlog.git
-    GIT_TAG v1.13.0
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/spdlog
-)
-
-set(SPDLOG_BUILD_EXAMPLE OFF CACHE BOOL "Set to ON to build examples" FORCE)
-set(SPDLOG_BUILD_TESTS OFF CACHE BOOL "Set to ON to build tests" FORCE)
-set(SPDLOG_BUILD_BENCH OFF CACHE BOOL "Set to ON to the build bench" FORCE)
-set(SPDLOG_INSTALL OFF CACHE BOOL "Set to ON to generate the install target" FORCE)
-
-FetchContent_MakeAvailable(3rdparty_spdlog)
-
 #json
 FetchContent_Declare(
     3rdparty_json

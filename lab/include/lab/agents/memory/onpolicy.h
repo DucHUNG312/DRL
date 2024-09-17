@@ -2,27 +2,26 @@
 
 #include "lab/agents/memory/base.h"
 
-namespace lab
-{
+namespace lab {
 
-namespace agents
-{
+namespace agents {
 
-class OnPolicyReplay : public Memory
-{
-public:
-    static constexpr const char* name = "OnPolicyReplay";
-public:
-    using Memory::Memory;
-    using Memory::ExperienceDict;
+class OnPolicyReplay : public Memory {
+ public:
+  static constexpr const char* name = "OnPolicyReplay";
 
-    void update(const utils::StepResult& result) override;
+ public:
+  using Memory::ExperienceDict;
+  using Memory::Memory;
 
-    ExperienceDict sample() override;
-private:
-    void add_experience(const utils::StepResult& result) override;
+  void update(const utils::StepResult& result) override;
+
+  ExperienceDict sample() override;
+
+ private:
+  void add_experience(const utils::StepResult& result) override;
 };
 
-}
+} // namespace agents
 
-}
+} // namespace lab

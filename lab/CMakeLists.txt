@@ -18,7 +18,6 @@ target_include_directories(${LIBRARY_NAME}
 target_link_libraries(${LIBRARY_NAME} 
     PUBLIC
         ${TORCH_LIBRARIES}
-        spdlog::spdlog_header_only
         nlohmann_json::nlohmann_json
 )
 
@@ -37,11 +36,6 @@ endif()
 target_precompile_headers(${LIBRARY_NAME} 
     PUBLIC 
         "${CMAKE_SOURCE_DIR}/lab/include/lab/common/common.h"
-)
-
-set_target_properties(${LIBRARY_NAME} 
-    PROPERTIES
-        UNITY_BUILD ON UNITY_BUILD_MODE BATCH UNITY_BUILD_BATCH_SIZE 16
 )
 
 # Install

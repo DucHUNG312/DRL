@@ -2,54 +2,44 @@
 #include "lab/utils/convert.h"
 #include "lab/utils/tensor.h"
 
-namespace lab
-{
+namespace lab {
 
-namespace agents
-{
+namespace agents {
 
-Algorithm::Algorithm(const utils::AlgorithmSpec& spec)
-    : spec_(std::move(spec))
-{}
+Algorithm::Algorithm(const utils::AlgorithmSpec& spec) : spec_(std::move(spec)) {}
 
-torch::Tensor Algorithm::calc_pdparam(const torch::Tensor& x)
-{
-    return net_->forward(x);
+torch::Tensor Algorithm::calc_pdparam(const torch::Tensor& x) {
+  return net_->forward(x);
 }
 
-torch::Tensor Algorithm::calc_pdparam_batch(const Algorithm::ExperienceDict& experiences)
-{
-    auto batch = experiences.at("state");
-    torch::Tensor states = utils::get_tensor_from_ivalue_list(batch);
-    if (env_->is_venv())
-        states = utils::venv_unpack(states);
-    return calc_pdparam(states.to(net_->device()));
+torch::Tensor Algorithm::calc_pdparam_batch(const Algorithm::ExperienceDict& experiences) {
+  auto batch = experiences.at("state");
+  torch::Tensor states = utils::get_tensor_from_ivalue_list(batch);
+  if (env_->is_venv())
+    states = utils::venv_unpack(states);
+  return calc_pdparam(states.to(net_->device()));
 }
 
-void Algorithm::save(torch::serialize::OutputArchive& archive) const
-{
+void Algorithm::save(torch::serialize::OutputArchive& archive) const {}
 
+void Algorithm::load(torch::serialize::InputArchive& archive) {}
+
+torch::serialize::OutputArchive& operator<<(
+    torch::serialize::OutputArchive& archive,
+    const std::shared_ptr<Algorithm>& algo) {
+  LAB_CHECK(algo != nullptr, "Algorithm pointer is nullptr");
+  algo->save(archive);
+  return archive;
 }
 
-void Algorithm::load(torch::serialize::InputArchive& archive)
-{
-
+torch::serialize::InputArchive& operator>>(
+    torch::serialize::InputArchive& archive,
+    const std::shared_ptr<Algorithm>& algo) {
+  LAB_CHECK(algo != nullptr, "Algorithm pointer is nullptr");
+  algo->load(archive);
+  return archive;
 }
 
-torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Algorithm>& algo)
-{
-    LAB_CHECK(algo != nullptr);
-    algo->save(archive);
-    return archive;
-}
+} // namespace agents
 
-torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Algorithm>& algo)
-{
-    LAB_CHECK(algo != nullptr);
-    algo->load(archive);
-    return archive;
-}
-
-}
-
-}
+} // namespace lab

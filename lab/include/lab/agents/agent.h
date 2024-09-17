@@ -1,49 +1,50 @@
 #pragma once
 
-#include "lab/common/common.h"
 #include "lab/agents/body.h"
+#include "lab/common/common.h"
 #include "lab/utils/spec.h"
 
-namespace lab
-{
-namespace agents
-{
+namespace lab {
+namespace agents {
 
-class Agent 
-{
-    LAB_ARG(utils::AgentSpec, spec);
-    LAB_ARG(std::shared_ptr<Body>, body);
-public:
-    Agent(const std::shared_ptr<Body>& body, const utils::AgentSpec& spec);
-    LAB_DEFAULT_CONSTRUCT(Agent);
+class Agent {
+  LAB_ARG(utils::AgentSpec, spec);
+  LAB_ARG(std::shared_ptr<Body>, body);
 
-    torch::Tensor act();
+ public:
+  Agent(const std::shared_ptr<Body>& body, const utils::AgentSpec& spec);
+  LAB_DEFAULT_CONSTRUCT(Agent);
 
-    void update();
+  torch::Tensor act();
 
-    void close();
+  void update();
 
-    void save(torch::serialize::OutputArchive& archive) const;
+  void close();
 
-    void load(torch::serialize::InputArchive& archive);
+  void save(torch::serialize::OutputArchive& archive) const;
 
-    void reset_env();
+  void load(torch::serialize::InputArchive& archive);
 
-    double get_total_reward() const;
+  void reset_env();
 
-    bool is_env_terminated() const;
+  double get_total_reward() const;
 
-    void step(const torch::Tensor& act);
+  bool is_env_terminated() const;
 
-    torch::Tensor get_result_state() const;
+  void step(const torch::Tensor& act);
 
-    std::shared_ptr<utils::Clock> get_env_clock() const;
+  torch::Tensor get_result_state() const;
+
+  std::shared_ptr<utils::Clock> get_env_clock() const;
 };
 
-torch::serialize::OutputArchive& operator<<(torch::serialize::OutputArchive& archive, const std::shared_ptr<Agent>& agent);
+torch::serialize::OutputArchive& operator<<(
+    torch::serialize::OutputArchive& archive,
+    const std::shared_ptr<Agent>& agent);
 
-torch::serialize::InputArchive& operator>>(torch::serialize::InputArchive& archive, const std::shared_ptr<Agent>& agent);
+torch::serialize::InputArchive& operator>>(
+    torch::serialize::InputArchive& archive,
+    const std::shared_ptr<Agent>& agent);
 
-
-}
-}
+} // namespace agents
+} // namespace lab

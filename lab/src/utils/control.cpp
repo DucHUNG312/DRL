@@ -4,20 +4,16 @@
 #include "lab/envs/base.h"
 #include "lab/utils/spec.h"
 
-namespace lab
-{
+namespace lab {
 
-namespace utils
-{
+namespace utils {
 
-agents::Agent make_agent(const utils::LabSpec& lab_spec)
-{
-    std::shared_ptr<envs::Env> env = utils::create_env(lab_spec.env);
-    std::shared_ptr<agents::Body> body = std::make_shared<agents::Body>(env, lab_spec.body);
-    return agents::Agent(body, lab_spec.agent);
+agents::Agent make_agent(const utils::LabSpec& lab_spec) {
+  std::shared_ptr<envs::Env> env = utils::create_env(lab_spec.env);
+  std::shared_ptr<agents::Body> body = std::make_shared<agents::Body>(env, lab_spec.body);
+  return agents::Agent(body, lab_spec.agent);
 }
 
+} // namespace utils
 
-}
-
-}
+} // namespace lab

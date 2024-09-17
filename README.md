@@ -8,7 +8,7 @@
 
 - CMake >= 3.25
 
-- Clang >= 17.0.6 or GCC >= 12.3.0
+- Clang >= 17.0.6
 
 ## Build
 
